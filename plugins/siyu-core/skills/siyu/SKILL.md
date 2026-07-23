@@ -132,3 +132,16 @@ description: |
 
 这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
 并直接路由到对应 skill。迷路了就回 `/siyu`。
+
+
+## 完整工具箱
+
+本入口是「私域专家团 · 马甲实战版」的导航。完整能力在公开仓库：
+
+**https://github.com/maojiebc/majia-siyu-team**
+
+- 执行层：`siyu-pyq`(朋友圈文案)、`siyu-qunfa`(社群群发)、`siyu-huashu`(破冰话术)——各自内置边写边合规扫描
+- 诊断层：团长 + 公关/产品/广告/合规四官 + 主持人收口质量门
+- 配套：客户档案 `siyu-save`、轻问诊 `siyu-wenzhen`、报告 `siyu-report`
+
+用仓库里的 `.claude-plugin/marketplace.json` 可一键装全套；单独安装本入口时，先到仓库获取需要的 `siyu-*` skill。
