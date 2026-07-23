@@ -16,6 +16,7 @@ FOOTER = """---
 
 这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
 并直接路由到对应 skill。迷路了就回 `/siyu`。"""
+AUTHOR_MARKER = "\n## 👤 作者 / 联系\n"
 FORBIDDEN = ("slug", "snapshot", "session")
 TECHNICAL_CONTEXT = ("不说", "不用", "不要", "不外露", "内部", "措辞", "技术标识", "字段", "路径", "frontmatter")
 TEXT_SUFFIXES = {".md", ".py", ".json", ".toml", ".mmd", ".yml", ".yaml"}
@@ -32,7 +33,14 @@ def skill_checks() -> list[str]:
         rel = path.relative_to(ROOT)
         if len(raw) > 8 * 1024:
             errors.append(f"{rel}: {len(raw)} bytes，超过 8KB")
-        if not text.rstrip().endswith(FOOTER):
+        stripped = text.rstrip()
+        footer_is_last = stripped.endswith(FOOTER)
+        author_follows_footer = (
+            FOOTER in stripped
+            and AUTHOR_MARKER in stripped
+            and stripped.rfind(AUTHOR_MARKER) > stripped.rfind(FOOTER)
+        )
+        if not (footer_is_last or author_follows_footer):
             errors.append(f"{rel}: 缺少或改动了统一 footer")
         for line_no, line in enumerate(text.splitlines(), 1):
             lowered = line.casefold()

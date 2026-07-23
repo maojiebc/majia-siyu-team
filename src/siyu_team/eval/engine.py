@@ -15,11 +15,13 @@ def badge(score: float) -> str:
 
 def composite(dim_scores: dict, static_penalty: float = 1.0) -> dict:
     """dim_scores: {维度: 0.0–1.0}。缺的维度按 0 计并提示。"""
-    total = 0.0; missing = []
+    total = 0.0
+    missing = []
     for dim, (w, _) in DIMENSION_WEIGHTS.items():
         s = dim_scores.get(dim)
         if s is None:
-            missing.append(dim); s = 0.0
+            missing.append(dim)
+            s = 0.0
         total += w * s
     score = round(total * 100 * static_penalty, 1)
     return {"score": score, "badge": badge(score), "missing_dims": missing, "static_penalty": static_penalty}

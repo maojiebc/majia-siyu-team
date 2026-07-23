@@ -1,12 +1,20 @@
 [project]
 name = "siyu-team"
-version = "0.1.0"
-description = "私域专家团 — orchestrator + host(主持人收口) + eval质量门 for WorkBuddy"
+version = "0.4.0"
+description = "私域专家团 — structured task runtime + host(主持人收口) + eval质量门"
 requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
 siyu-eval = "siyu_team.eval.cli:main"
+siyu-plan = "siyu_team.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.10,<2",
+  "pytest>=8,<9",
+  "ruff>=0.5,<1",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -14,3 +22,15 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/siyu_team"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true

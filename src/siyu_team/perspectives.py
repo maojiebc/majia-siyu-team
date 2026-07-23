@@ -3,6 +3,10 @@
 """
 from __future__ import annotations
 
+import json
+
+from .context import AgentContext
+
 _TEMPLATE = """你是私域专家团的{name}，你的方法论引擎是『{engine}』。
 只用『{engine}』这一个视角独立分析本案，不要提及、不要假设其他官会说什么。
 
@@ -31,3 +35,23 @@ def build_officer_prompt(officer: dict, intake: str, routing: str) -> str:
         description=officer.get("description", ""),
         intake=intake, routing=routing,
     )
+
+
+def build_isolated_officer_prompt(
+    officer: dict,
+    context: AgentContext,
+    routing: str,
+) -> str:
+    """使用 Runtime 白名单上下文构造 prompt，不接受未过滤的 intake。"""
+    expected_name = officer.get("name", "专家")
+    if expected_name != context.officer:
+        raise ValueError(
+            f"角色与上下文不一致：{expected_name!r} != {context.officer!r}"
+        )
+    intake = json.dumps(
+        dict(context.fields),
+        ensure_ascii=False,
+        indent=2,
+        sort_keys=True,
+    )
+    return build_officer_prompt(officer, intake, routing)

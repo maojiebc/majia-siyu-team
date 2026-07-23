@@ -1,18 +1,24 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.3.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.4.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
+> **Siyu Expert Team · 马甲实战版**
+>
 > A Chinese private-domain (WeCom / 私域) operations toolbox. Get daily copywriting done directly; escalate structural questions to a four-officer diagnostic panel. One entry point: `/siyu`.
 
-![私域专家团 v0.3.1 框架全局：客户私域诉求→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口(不投票只评推理质量)→质量门 eval→可落地 playbook；全程知识库三层 RAG + 工具链底座支撑](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![Siyu Expert Team v0.4.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## What it does
 
 `/siyu` picks the single most useful capability for your current situation, runs it, then re-routes based on the real outcome — no fixed long chain.
 
+- **Planning layer**: natural language becomes a validated `Task`, then a deterministic `RouteDecision`.
 - **Execution layer**: `siyu-pyq` (Moments copy), `siyu-qunfa` (group broadcast), `siyu-huashu` (welcome & FAQ scripts) — each with **write-time compliance scanning** (blocks WeCom-ban triggers / absolute-claim ad-law words / share-bait).
-- **Diagnostic layer**: a lead + four officers (PR / product / ads / compliance) with a host-style synthesis and a quality gate.
+- **Diagnostic layer**: structural issues escalate to four isolated officer contexts (PR / product / ads / compliance), host synthesis, and a quality gate.
+- **Runtime foundation**: atomic state storage, redacted JSONL traces, layered knowledge, and connector boundaries.
+
+Technical architecture: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md).
 
 ## Install
 
@@ -21,8 +27,31 @@ clawhub install majia-siyu-team
 npx -y skills add maojiebc/majia-siyu-team -g --all
 ```
 
-Full docs & source: https://github.com/maojiebc/majia-siyu-team
+## Version History
 
-Methodology: private-domain = PR · content = product · operations = advertising.
+- **v0.4.0** — Structured Task Runtime, deterministic routing, isolated officer contexts, redacted tracing, and atomic state.
+- **v0.3.1** — Public architecture image, capability overview, and install surfaces.
+- **v0.3.0** — Unified entry point, execution skills, four-officer diagnostics, and client records.
 
-— Majia (@maojiebc)
+Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
+
+## 👤 Author / Contact
+
+**Majia (@maojiebc)** · 超级马甲 (Super Majia)
+
+If this skill helps you, find me on any of these channels — happy to chat about field experience, take feature requests, hear bug reports, or trade notes on user operations / data platforms / BI engineering work:
+
+| Channel | Link |
+|---|---|
+| 📧 Email | [m9224@163.com](mailto:m9224@163.com) |
+| 🐙 GitHub | [github.com/maojiebc](https://github.com/maojiebc) |
+| 🪝 ClawHub | [clawhub.ai/p/maojiebc](https://clawhub.ai/p/maojiebc) |
+| 🐦 X | [@maojiebc](https://x.com/maojiebc) |
+| 📕 Xiaohongshu | [Super Majia](https://xhslink.com/m/4fQMJeHHWKC) |
+| 📰 WeChat Official Account | [超级马甲](https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzY5NzIzODk2NA==#wechat_redirect) |
+
+> Built from 14 years of user-operations work and hands-on data platform &amp; BI engineering in production.
+
+## License
+
+MIT © 2026 Majia (maojiebc). The public repository contains the framework and methodology; private operating SOPs are excluded.

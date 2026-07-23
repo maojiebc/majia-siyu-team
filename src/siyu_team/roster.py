@@ -2,7 +2,10 @@
 字段仿 qiaomu HeavyPerspectiveInput(schemas.py:144-152)。
 """
 from __future__ import annotations
-import json, os
+
+import json
+import os
+
 from typing import Optional
 
 DEFAULT_ROSTER_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "examples", "roster.example.json")

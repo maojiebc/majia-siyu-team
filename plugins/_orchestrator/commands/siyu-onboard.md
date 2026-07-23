@@ -18,15 +18,19 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 4. **失败即停**。任何步骤失败（尤其合规官命中 `COMPLIANCE_RED`）立即 STOP。
 5. **只用本地 agent**。所有 `subagent_type` 指向本 repo plugins 里的 agent 或 `general-purpose`。
 6. **不自行进 plan mode**。这个 command 就是计划——执行它。
+7. **先结构化再派发**。没有通过 `SiyuRuntime.plan()` 生成有效 Task 和 RouteDecision，不得把原始文本直接交给 Skill 或四官。
 
-（1–6 照搬 full-stack-feature.md:8-18，仅第 4 条补了合规红线。）
+（1–6 照搬 full-stack-feature.md:8-18，仅第 4 条补了合规红线；第 7 条是 Runtime 边界。）
 
 ## Pre-flight Checks
 1. **查会话**：`.siyu-team/state.json` 是否存在？
    - 存在且 `status=="in_progress"`：读出，显示 `current_step`，问用户 **1. 续跑 / 2. 重开（归档旧档）/ 3. 退出**。
    - 存在且 `status=="complete"`：问是否归档后重开。
-2. **初始化 state.json**（字段见 `src/siyu_team/state.py` / docs/blueprint.md §3c），调 `state.init_state(client, industry, stage)`。
-3. **解析 `$ARGUMENTS`**：抽出 `$CLIENT`、`--industry`、`--stage`（缺则在 Step 0 调研补问）。
+2. **解析 `$ARGUMENTS`**：抽出 `$CLIENT`、`--industry`、`--stage`。
+3. **建立结构化计划**：调 `SiyuRuntime.plan($ARGUMENTS, hints)`，把 `plan.to_dict()` 写入 `.siyu-team/task.json`。
+   - `decision.skill != "siyu-onboard"`：停止本命令，按 RouteDecision 转给对应单步能力。
+   - `needs_clarification=true`：只在 Step 0 补 `required_fields`，不得提前创建或派发四官上下文。
+4. **初始化 state.json**（字段见 `src/siyu_team/state.py` / docs/blueprint.md §3c），调 `state.init_state(client, industry, stage)`。
 
 ---
 
@@ -43,7 +47,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 → 写 `.siyu-team/00-intake.md` → `state.update(step=1, add_file="00-intake.md", add_completed=0)`
 
 ## Step 1 · 按行业×阶段路由（规则路由，不花 token）
-读 `00-intake.md`，调 `src/siyu_team/routing.py` 的 `route(industry, stage)` 推断 task 类目与阶段重点，加载 `knowledge/02-industry/<industry>/` 行业册。
+读 `00-intake.md`，把调研字段映射进 `Task.context`，重新调 `SiyuRuntime.plan()`。只有 RouteDecision 不再缺字段时才更新 `.siyu-team/task.json`，并加载 `knowledge/02-industry/<industry>/` 行业册。
 产出：选定行业册 + 阶段重点 + **四官各自要重点回答的子问题**。
 → 写 `.siyu-team/01-routing.md` → `state.update(step="checkpoint-1")`
 
@@ -57,14 +61,14 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ## Step 2 · 并行派四官（多 Task 单 response）
 **Launch four agents in parallel using multiple Task tool calls in a single response.**
-每个 Task 的 prompt 由 `src/siyu_team/perspectives.py` 的 `build_officer_prompt()` 生成（内联 `00-intake` + `01-routing` 全文）：
+每个 Task 必须先用 `context.build_agent_context()` 做字段白名单投影，再由 `perspectives.build_isolated_officer_prompt()` 生成；禁止调用接受未过滤 intake 的旧接口：
 
 - **Task 2a 公关官** `subagent_type: "private-pr-officer-private-pr-officer"` → `.siyu-team/02a-pr.md`
 - **Task 2b 产品官** `subagent_type: "content-product-officer-content-product-officer"` → `.siyu-team/02b-product.md`
 - **Task 2c 广告官** `subagent_type: "ops-ad-officer-ops-ad-officer"` → `.siyu-team/02c-ad.md`
 - **Task 2d 合规官** `subagent_type: "compliance-critic-compliance-critic"` → `.siyu-team/02d-critic.md`
 
-四官互不读对方输出（都只读已落盘的 `00+01`），故可真并行。
+四官互不读对方输出，也不直接读取 `00-intake.md`；公关/产品/广告官看不到原始请求，只有合规官可读取已脱敏的 `source_text` 与风险字段，故可真并行。
 → `state.update(add_completed="2a/2b/2c/2d")`
 
 ## Step 3 · 主持收口（团长综合）

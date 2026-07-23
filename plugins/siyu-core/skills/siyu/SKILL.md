@@ -4,9 +4,13 @@ description: |
   私域专家团主入口。三种模式：新手教程、任务前路由、任务后导航。
   触发方式：/siyu、/私域、「帮我看看私域」、「下一步怎么走」
   Main entry point for siyu expert team. Trigger: /siyu, "help with my private domain"
+license: MIT
+metadata:
+  version: "0.4.0"
+  author: "超级马甲 / maojiebc"
 ---
 
-# siyu：私域工具箱入口
+# siyu：私域工具箱入口 · 马甲实战版
 
 你负责识别模式、选择 skill、组织衔接；具体工作由被路由到的 skill 完成。
 
@@ -23,39 +27,11 @@ description: |
 
 ## 模式 C：新手教程
 
-### 工作流程
-
-1. 读取上下文，保留用户已经说过的处境。
-2. 完整输出教程，不用提问或外链代替。
-3. 让用户直接描述问题。
-4. 按模式 A 选一个 skill 并立即执行，不让用户另开对话或重输命令。
-5. 实际任务完成后说明刚才用了哪个 skill；想继续时可输入 `/siyu`。
-
-### 教程正文
-
-> 欢迎使用私域工具箱。你可以把正在做的事、卡住的问题或现有材料直接交给我，不用先判断该找谁。
->
-> 比如：朋友圈写到枯竭、群发没人打开、新客进群不知道说什么，或整盘私域不知道怎么搭。说得不完整也可以。
->
-> 我会先判断当前最需要解决的一步，交给合适的私域能力直接产出文案、话术、方案或诊断结论。你反馈实际结果后，我再重新判断下一步。
->
-> 整个过程每次只决定当前一步。现在直接说说，你最近想处理哪件私域运营的事？
-
-### 硬性规则
-
-- 首次回复讲清可交付什么、怎样处理、会得到什么、如何开始。
-- 使用运营者能理解的任务语言，不展示完整工具目录。
-- 不要求用户记命令、离开当前对话或重复信息。
-- 教程后继续带用户完成一次实际任务。
-
-### 单步路由原则
-
-- 每次只调用一个 skill，下一步由当前产出和用户反馈决定。
-- 不预设「先 A 再 B 再 C」的长链。
-- 展示能力关系时只说明什么结果下可能考虑哪个 skill，仍由 `/siyu` 重新判断。
-- 用户已明确下一步时尊重其选择。
+完整读取 [`references/新手教程.md`](references/新手教程.md)，按其中正文和规则执行。用户已明确下一步时尊重其选择。
 
 ## 模式 A：任务前路由
+
+源码可用时必须先调用 `SiyuRuntime.plan()`，只按 `decision.skill` 路由；需要补信息时只问 `required_fields` 第一项。下表是降级规则。
 
 ### 路由表
 
@@ -124,16 +100,6 @@ description: |
 
 面向用户一律中文，遵循《中文文案排版指北》；不用 slug、snapshot、session 等内部术语。
 
----
-
-## 不知道下一步用哪个 skill？
-
-输入 `/siyu`。
-
-这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
-并直接路由到对应 skill。迷路了就回 `/siyu`。
-
-
 ## 完整工具箱
 
 本入口是「私域专家团 · 马甲实战版」的导航。完整能力在公开仓库：
@@ -145,3 +111,37 @@ description: |
 - 配套：客户档案 `siyu-save`、轻问诊 `siyu-wenzhen`、报告 `siyu-report`
 
 用仓库里的 `.claude-plugin/marketplace.json` 可一键装全套；单独安装本入口时，先到仓库获取需要的 `siyu-*` skill。
+
+---
+
+## 不知道下一步用哪个 skill？
+
+输入 `/siyu`。
+
+这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
+并直接路由到对应 skill。迷路了就回 `/siyu`。
+
+## 📋 版本记录
+
+- **v0.4.0** — 结构化 Task Runtime、确定性路由、四官上下文白名单、脱敏追踪与原子状态。
+- **v0.3.1** — 首页框架图、能力一览与安装通道。
+- **v0.3.0** — 统一入口、执行三件套、四官诊断与客户档案。
+
+完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
+
+## 👤 作者 / 联系
+
+**马甲（@maojiebc）** · 超级马甲
+
+如果这份 skill 帮到你，欢迎在以下任意渠道找我交流踩坑实录、提需求、报 bug，也欢迎勾兑用户运营 / 数据中台 / BI 工程的实战经验：
+
+| 渠道 | 链接 |
+|---|---|
+| 📧 Email | [m9224@163.com](mailto:m9224@163.com) |
+| 🐙 GitHub | [github.com/maojiebc](https://github.com/maojiebc) |
+| 🪝 ClawHub | [clawhub.ai/p/maojiebc](https://clawhub.ai/p/maojiebc) |
+| 🐦 X | [@maojiebc](https://x.com/maojiebc) |
+| 📕 小红书 | [超级马甲](https://xhslink.com/m/4fQMJeHHWKC) |
+| 📰 微信公众号 | [超级马甲](https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzY5NzIzODk2NA==#wechat_redirect) |
+
+> 这份 skill 是 14 年用户运营 + 数据中台 + BI 工程实战沉淀出来的，问题/合作随时聊。

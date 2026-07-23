@@ -4,7 +4,7 @@
 要它只对这一个维度给 0.0–1.0 分并附理由。这里给出 prompt 工厂 + 占位评分。
 """
 from __future__ import annotations
-from .rubrics import ANCHORS, DIMENSION_WEIGHTS
+from .rubrics import ANCHORS
 
 JUDGE_PROMPT = """你是私域方案的严格评审。只评一个维度：{dim}。
 锚定标准（0.0–1.0）：

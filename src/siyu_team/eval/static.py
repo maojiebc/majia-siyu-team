@@ -11,11 +11,14 @@ def scan(text: str) -> Dict:
         if flag in ("NO_RESPONSIBLE_PARTY",):
             continue
         if flag == "NO_METRIC":
-            hit = not rx.search(text)
+            hit = not (rx and rx.search(text))
         else:
             hit = bool(rx and rx.search(text))
         if hit:
-            flags.append(flag); details.append({"flag": flag, "desc": desc, "severity": sev, "hard": hard})
+            flags.append(flag)
+            details.append(
+                {"flag": flag, "desc": desc, "severity": sev, "hard": hard}
+            )
     penalty = max(0.5, 1.0 - 0.05 * len(flags))  # 照搬 plugin-eval static.py:30-32
     hard_fail = any(d["hard"] for d in details)
     return {"flags": flags, "details": details, "penalty": penalty, "hard_fail": hard_fail}

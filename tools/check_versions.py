@@ -23,7 +23,10 @@ for plugin in marketplace.get("plugins", []):
     if plugin.get("version") != version:
         errors.append(f"marketplace 插件 {plugin.get('name', '<未命名>')} 版本不一致")
 
-badge = re.search(r"img\.shields\.io/badge/version-([0-9.]+)-[A-Fa-f0-9]+\.svg", readme)
+badge = re.search(
+    r"img\.shields\.io/badge/(?:skill-)?v?([0-9.]+)-[A-Fa-f0-9]+\.svg",
+    readme,
+)
 if not badge:
     errors.append("README 未找到版本徽章")
 elif badge.group(1) != version:

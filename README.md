@@ -1,13 +1,15 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.3.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.4.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu--team-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu-team)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
 
+> **私域专家团 · 马甲实战版**
+>
 > **从日常文案直接干活、遇到结构问题再升舱诊断的中文私域工具箱。** 你只需记住 `/siyu`：它按当前处境选一个能力，干完再按真实结论导航下一步——不预设固定长链。
 
-![私域专家团 v0.3.1 框架全局：客户私域诉求→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口(不投票只评推理质量)→质量门 eval→可落地 playbook；全程知识库三层 RAG + 工具链底座支撑](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![私域专家团 v0.4.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -73,19 +75,21 @@ claude plugin marketplace add maojiebc/majia-siyu-team
 
 ```mermaid
 flowchart LR
-    A["说出真实处境"] --> B["/siyu 只选当前一步"]
-    B --> C["执行 skill 直接出活"]
-    B --> D["轻问诊先消解问题"]
-    D --> E["结构问题升舱四官评审"]
-    C --> F["保存结论或重新导航"]
-    E --> F
+    A["说出真实处境"] --> B["Task Schema"]
+    B --> C["RouteDecision 只选当前一步"]
+    C --> D["执行 Skill 直接出活"]
+    C --> E["轻问诊先消解问题"]
+    E --> F["真结构问题才升舱四官"]
+    D --> G["保存结论或重新导航"]
+    F --> G
 ```
 
+- **计划层（代码边界）**：`Task → RouteDecision` 固定任务类型、渠道、目标、风险与缺失字段；信息不足时先补问。
 - **执行层（入口·高频）**：`siyu-pyq` / `siyu-qunfa` / `siyu-huashu`，各自内置边写边合规。
-- **诊断层（升舱·低频）**：团长 + 公关/产品/广告/合规四官 + 主持人收口 + 质量门。
-- **共用底座**：三层知识库（企微合规 + 行业册 + 真实 SOP）、合规词库单一真源、三句话方法论质检。
+- **诊断层（升舱·低频）**：四官先经过 `AgentContext` 白名单隔离，再由团长主持收口并过质量门。
+- **共用底座**：原子状态、脱敏追踪、三层知识库、合规词库单一真源与连接器薄包装。
 
-完整能力图见 [`docs/framework.svg`](docs/framework.svg)；工程范式与标杆移植来源见 [`docs/标杆移植说明.md`](docs/标杆移植说明.md)，详细拆解在 [`docs/teardowns/`](docs/teardowns/)。
+当前 Runtime 说明见 [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md)，完整能力图见 [`docs/framework.svg`](docs/framework.svg)；工程范式来源见 [`docs/标杆移植说明.md`](docs/标杆移植说明.md)。
 
 ## 方法论引擎：三句话
 
@@ -97,13 +101,16 @@ flowchart LR
 
 ```bash
 make validate
+make test
 PYTHONPATH=src python3 -m siyu_team.eval.cli score <方案.md> --threshold 80
+PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在哪？" --industry catering
 ```
 
-能力定义的唯一真源是 `plugins/` 与 `src/siyu_team/`。质量门命中 `COMPLIANCE_RED` 直接失败，不交付。
+自然语言请求先进入结构化 Runtime，生成 `Task → RouteDecision → AgentContext`，再交给现有 Skill。运行追踪默认写入本地 `.siyu-team/traces/`，敏感字段、手机号、身份证号和 Bearer 凭据会在落盘前脱敏。能力定义的唯一真源是 `plugins/` 与 `src/siyu_team/`。质量门命中 `COMPLIANCE_RED` 直接失败，不交付。
 
 ## 📋 版本记录
 
+- **v0.4.0** — Runtime 基础：结构化 Task Schema、确定性路由、四官上下文白名单、本地脱敏追踪、原子状态存储与回归测试。
 - **v0.3.1** — 公开首页装修：框架全局图、能力一览与安装通道整理，README 图走绝对 URL + PNG。
 - **v0.3.0** — 首个公开版本：统一入口 `/siyu` + 执行三件套 + 四官诊断层 + 跨对话客户档案。
 
@@ -111,16 +118,20 @@ PYTHONPATH=src python3 -m siyu_team.eval.cli score <方案.md> --threshold 80
 
 ## 👤 作者 / 联系
 
-**马甲（@maojiebc）· 超级马甲**
+**马甲（@maojiebc）** · 超级马甲
 
-14 年用户运营 + 数据中台 + BI 工程实战。私域踩坑、合作、报 bug 随时聊。
+如果这份 skill 帮到你，欢迎在以下任意渠道找我交流踩坑实录、提需求、报 bug，也欢迎勾兑用户运营 / 数据中台 / BI 工程的实战经验：
 
 | 渠道 | 链接 |
 |---|---|
+| 📧 Email | [m9224@163.com](mailto:m9224@163.com) |
 | 🐙 GitHub | [github.com/maojiebc](https://github.com/maojiebc) |
 | 🪝 ClawHub | [clawhub.ai/p/maojiebc](https://clawhub.ai/p/maojiebc) |
 | 🐦 X | [@maojiebc](https://x.com/maojiebc) |
+| 📕 小红书 | [超级马甲](https://xhslink.com/m/4fQMJeHHWKC) |
 | 📰 微信公众号 | [超级马甲](https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzY5NzIzODk2NA==#wechat_redirect) |
+
+> 这份 skill 是 14 年用户运营 + 数据中台 + BI 工程实战沉淀出来的，问题/合作随时聊。
 
 ## License
 
