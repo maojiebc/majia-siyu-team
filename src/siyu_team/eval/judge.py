@@ -57,9 +57,11 @@ def parse_judge_scores(raw: Any) -> dict[str, float]:
         if dim not in DIMENSION_WEIGHTS:
             raise ValueError(f"未知评分维度：{dim}")
         raw_score = value.get("score") if isinstance(value, Mapping) else value
+        if not isinstance(raw_score, (int, float, str)):
+            raise ValueError(f"{dim} 分数不是数字：{raw_score!r}")
         try:
             score = float(raw_score)
-        except (TypeError, ValueError) as exc:
+        except ValueError as exc:
             raise ValueError(f"{dim} 分数不是数字：{raw_score!r}") from exc
         if not 0.0 <= score <= 1.0:
             raise ValueError(f"{dim} 分数越界（需 0.0–1.0）：{score}")
