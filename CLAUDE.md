@@ -6,7 +6,7 @@
 
 **收口范式**：走 qiaomu HeavySkill 主持人模式——四官各自独立采样、互不可见，团长（host）不投票不平均，只评推理质量、保留少数意见。合规官红线一票否决。
 
-**质量门**：照 plugin-eval 设计四层——静态层（正则反模式，免费）→ 判官层（LLM 锚定 rubric）→ 蒙卡层（一致性）→ 反模式乘法惩罚 → 阈值 `exit 1` 硬门。**当前实装的只有静态层**：命中 `COMPLIANCE_RED`（含裂变诱导 / 绝对化用词）或软性反模式过多即 `exit 1`，不产出质量分；判官 / 蒙卡为 4 档规划、尚未实装（见 `docs/runtime-v0.4.md`）。
+**质量门**：照 plugin-eval 四层——静态层（正则反模式，免费）→ 判官层（锚定 rubric，**B 路径：宿主 Agent 评分，不调外部 API**）→ 蒙卡层（同一诉求 N 份测一致性 + Wilson 置信区间）→ 加权合成 → 阈值 `exit 1` 硬门。`siyu-eval score` 走静态层（命中 `COMPLIANCE_RED`（含裂变诱导 / 绝对化）即 `exit 1`）；`siyu-eval judge` 走判官 + 蒙卡出加权总分（宿主逐维打分回填，见 `docs/runtime-v0.4.md`）。
 
 **护城河边界**：`knowledge/03-majia-sop/` 是马甲真实 SOP，私有，git-ignore，**绝不进公开库**。所有 `【待马甲填真实SOP】` 标记处由马甲本人注入。
 

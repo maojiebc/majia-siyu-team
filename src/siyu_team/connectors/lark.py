@@ -6,5 +6,12 @@
 """
 
 
+from .base import ConnectorNotImplemented, require_secret
+
+POINTER = "keychain:siyu-team/lark"
+
+
 def call(*args, **kwargs):
-    raise NotImplementedError("接入 飞书 时实现：lark-cli")
+    # keychain 骨架已就绪：先解析密钥（环境变量 / macOS keychain），再接具体 API。
+    require_secret(POINTER, "飞书", "SIYU_LARK_TOKEN")
+    raise ConnectorNotImplemented("飞书密钥已解析；lark-cli 调用接入时实现。")

@@ -1,13 +1,13 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.4.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.5.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 > **Siyu Expert Team · 马甲实战版**
 >
 > A Chinese private-domain (WeCom / 私域) operations toolbox. Get daily copywriting done directly; escalate structural questions to a four-officer diagnostic panel. One entry point: `/siyu`.
 
-![Siyu Expert Team v0.4.1 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![Siyu Expert Team v0.5.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## What it does
 
@@ -29,9 +29,9 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 
 ## Version History
 
+- **v0.5.0** — Quality gate goes four-layer: judge + Monte Carlo via B-path (host-Agent scoring, zero external API), connector keychain skeleton, officer method frameworks filled in, and self-contained compliance-lint fallback outside the repo.
 - **v0.4.1** — Security & compliance hardening: redaction now covers country-code phones, credential field names, bare tokens, emails and legacy IDs; the quality gate blocks fission-inducement and privacy solicitation; component versions aligned; honest eval/connector implementation status.
 - **v0.4.0** — Structured Task Runtime, deterministic routing, isolated officer contexts, redacted tracing, and atomic state.
-- **v0.3.1** — Public architecture image, capability overview, and install surfaces.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 

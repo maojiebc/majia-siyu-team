@@ -6,5 +6,12 @@
 """
 
 
+from .base import ConnectorNotImplemented, require_secret
+
+POINTER = "keychain:siyu-team/getnote"
+
+
 def call(*args, **kwargs):
-    raise NotImplementedError("接入 Get笔记 时实现：majia-getnote")
+    # keychain 骨架已就绪：先解析密钥（环境变量 / macOS keychain），再接具体 API。
+    require_secret(POINTER, "Get笔记", "SIYU_GETNOTE_TOKEN")
+    raise ConnectorNotImplemented("Get笔记密钥已解析；majia-getnote 调用接入时实现。")

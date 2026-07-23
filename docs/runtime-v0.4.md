@@ -99,7 +99,7 @@ GitHub Actions 额外执行 Ruff 与 mypy。
 以下能力尚未在 v0.4.0 完成：
 
 - Runtime 尚不直接执行模型或管理模型重试；
-- LLM Judge 与 Monte Carlo Eval 仍是接口占位；
+- 判官层与蒙卡层走 B 路径已实装（宿主 Agent 按 rubric 逐维评分 + 脚本加权 / Wilson 统计，`siyu-eval judge`），但需宿主参与、非全自动；
 - BI、飞书、Get 笔记和 Nowledge Mem 连接器仍是薄包装；
 - 长期客户档案还没有 tenant/workspace 级隔离。
 

@@ -6,7 +6,7 @@ description: |
   Main entry point for siyu expert team. Trigger: /siyu, "help with my private domain"
 license: MIT
 metadata:
-  version: "0.4.1"
+  version: "0.5.0"
   author: "超级马甲 / maojiebc"
 ---
 

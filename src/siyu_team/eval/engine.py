@@ -1,7 +1,7 @@
 """加权合成 + 反模式乘法惩罚 + 徽章。照 plugin-eval engine。
 
-注意：composite()/badge() 依赖 judge/蒙卡产出的维度分；那两层当前未实装，
-本模块也不被 score CLI 调用。score 只做静态合规检查，不据此产出质量分。
+composite() 吃宿主判官评的维度分 + 静态惩罚系数，出加权总分；由 `siyu-eval judge`
+调用（B 路径，宿主评分逻辑见 judge.py）。`score` 子命令仍是纯静态、不产出质量分。
 """
 from __future__ import annotations
 from .rubrics import DIMENSION_WEIGHTS

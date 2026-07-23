@@ -6,5 +6,12 @@
 """
 
 
+from .base import ConnectorNotImplemented, require_secret
+
+POINTER = "keychain:siyu-team/nowledge_mem"
+
+
 def call(*args, **kwargs):
-    raise NotImplementedError("接入 Nowledge Mem 时实现：memory_search")
+    # keychain 骨架已就绪：先解析密钥（环境变量 / macOS keychain），再接具体 API。
+    require_secret(POINTER, "Nowledge Mem", "SIYU_NOWLEDGE_MEM_TOKEN")
+    raise ConnectorNotImplemented("Nowledge Mem 密钥已解析；memory_search 调用接入时实现。")

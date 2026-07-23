@@ -20,9 +20,38 @@ sys.path.insert(0, str(ROOT / "src"))
 try:
     from siyu_team.eval.static import scan
     from siyu_team.eval.compliance_lexicon import INDUCE_PATTERN, PRIVACY_PATTERN
-except Exception as exc:  # noqa: BLE001
-    print("无法加载合规词库（需在 repo 内运行）:", exc)
-    sys.exit(2)
+except Exception:  # 脱离 repo（如装成独立插件）时降级兜底
+    import re as _re
+
+    print(
+        "⚠️ 脱离 repo，启用降级合规词表（只拦最关键封号红线；完整词库单一真源见 "
+        "src/siyu_team/eval/compliance_lexicon.py）",
+        file=sys.stderr,
+    )
+    _RED = _re.compile(
+        r"(诱导分享|外挂|群发软件|虚拟定位|改定位|第一|最便宜|最好|最佳|最优|最强"
+        r"|最高级|国家级|世界级|100%|稳赚|包赚)"
+    )
+    INDUCE_PATTERN = _re.compile(
+        r"(转发.{0,8}(领|送|得|抽|享|免)|集(?:满|齐|够)?\s*\d*\s*个?赞|拉\s*\d+\s*人)"
+    )
+    PRIVACY_PATTERN = _re.compile(
+        r"(留.{0,3}(手机号|电话|身份证)|发.{0,3}(身份证|定位)|身份证号|银行卡)"
+    )
+
+    def scan(text):
+        hit = _RED.search(text)
+        details = (
+            [{"flag": "COMPLIANCE_RED", "desc": "封号/绝对化（降级词表）",
+              "severity": 0.2, "hard": True}]
+            if hit else []
+        )
+        return {
+            "flags": [d["flag"] for d in details],
+            "details": details,
+            "penalty": 1.0,
+            "hard_fail": bool(hit),
+        }
 
 RELEVANT = {"COMPLIANCE_RED", "ABSOLUTE_CLAIM"}
 def main() -> None:

@@ -6,5 +6,12 @@
 """
 
 
+from .base import ConnectorNotImplemented, require_secret
+
+POINTER = "keychain:siyu-team/bi_platform"
+
+
 def call(*args, **kwargs):
-    raise NotImplementedError("接入 某 BI 平台 时实现：bi-cli/bi-ds/bi-vis")
+    # keychain 骨架已就绪：先解析密钥（环境变量 / macOS keychain），再接具体 API。
+    require_secret(POINTER, "某 BI 平台", "SIYU_BI_PLATFORM_TOKEN")
+    raise ConnectorNotImplemented("某 BI 平台密钥已解析；bi-cli/bi-ds/bi-vis 调用接入时实现。")
