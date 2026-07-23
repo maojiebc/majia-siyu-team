@@ -1,0 +1,12 @@
+# 运行时状态（每个客户诊断的中间产物，不入库）
+.siyu-team/
+# 护城河：马甲真实 SOP，私有，绝不进库（仅保留 README 占位）
+knowledge/03-majia-sop/*
+!knowledge/03-majia-sop/README.md
+# 标杆源码（只读参考，不随本仓走）
+_benchmark-src/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+dist/

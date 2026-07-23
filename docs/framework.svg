@@ -1,0 +1,92 @@
+<svg width="100%" viewBox="0 0 680 744" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>私域专家团框架全局图</title>
+<desc>从上到下的流程：客户私域诉求输入，团长调研路由，并行派公关官、产品官、广告官、合规官四官独立评审，团长主持收口，过质量门后产出可落地 playbook；底部是知识库三层与工具链两层底座，贯穿全程。</desc>
+<defs>
+<marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#888780"/></marker>
+<style>
+text{font-family:'PingFang SC','Microsoft YaHei',-apple-system,Helvetica,Arial,sans-serif}
+.c-teal rect{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1.5}
+.c-teal text{fill:#085041}
+.c-coral rect{fill:#FAECE7;stroke:#993C1D;stroke-width:1.5}
+.c-coral text{fill:#712B13}
+.c-gray rect{fill:#F1EFE8;stroke:#9A988F;stroke-width:1.5}
+.c-gray text{fill:#44433E}
+</style>
+</defs>
+
+<text x="40" y="33" font-size="18" font-weight="500" fill="#1A1A18">私域专家团 · 框架全局</text>
+<rect x="420" y="23" width="11" height="11" rx="2" fill="#1D9E75"/><text x="436" y="32" font-size="12" fill="#6B6A62">主流程</text>
+<rect x="492" y="23" width="11" height="11" rx="2" fill="#D85A30"/><text x="508" y="32" font-size="12" fill="#6B6A62">合规把关</text>
+<rect x="578" y="23" width="11" height="11" rx="2" fill="#888780"/><text x="594" y="32" font-size="12" fill="#6B6A62">底座</text>
+
+<g class="c-gray"><rect x="210" y="64" width="260" height="44" rx="10"/>
+<text x="340" y="84" text-anchor="middle" font-size="14" font-weight="500">① 客户私域诉求</text>
+<text x="340" y="100" text-anchor="middle" font-size="12">行业 × 阶段 × 痛点</text></g>
+<line x1="340" y1="108" x2="340" y2="124" stroke="#888780" stroke-width="1.6" marker-end="url(#ah)"/>
+
+<g class="c-teal"><rect x="190" y="126" width="300" height="58" rx="10"/>
+<text x="340" y="150" text-anchor="middle" font-size="15" font-weight="500">② 团长 · 私域操盘手</text>
+<text x="340" y="170" text-anchor="middle" font-size="12">调研 → 按行业/阶段路由 → 收口</text></g>
+<g class="c-gray"><rect x="506" y="135" width="132" height="40" rx="8"/>
+<text x="572" y="151" text-anchor="middle" font-size="11">state.json</text>
+<text x="572" y="166" text-anchor="middle" font-size="11">续跑 · 卡点</text></g>
+<line x1="340" y1="184" x2="340" y2="210" stroke="#888780" stroke-width="1.6" marker-end="url(#ah)"/>
+<text x="352" y="202" font-size="11" fill="#6B6A62">并行派四官 · 各自独立</text>
+
+<g class="c-teal"><rect x="40" y="214" width="135" height="80" rx="10"/>
+<text x="107" y="242" text-anchor="middle" font-size="14" font-weight="500">公关官</text>
+<text x="107" y="262" text-anchor="middle" font-size="12">私域即公关</text>
+<text x="107" y="281" text-anchor="middle" font-size="11">信任 · 口碑 · 转介绍</text></g>
+<g class="c-teal"><rect x="195" y="214" width="135" height="80" rx="10"/>
+<text x="262" y="242" text-anchor="middle" font-size="14" font-weight="500">产品官</text>
+<text x="262" y="262" text-anchor="middle" font-size="12">内容即产品</text>
+<text x="262" y="281" text-anchor="middle" font-size="11">选题 · 钩子 · 促活</text></g>
+<g class="c-teal"><rect x="350" y="214" width="135" height="80" rx="10"/>
+<text x="417" y="242" text-anchor="middle" font-size="14" font-weight="500">广告官</text>
+<text x="417" y="262" text-anchor="middle" font-size="12">运营即广告</text>
+<text x="417" y="281" text-anchor="middle" font-size="11">漏斗 · 埋点 · 转化</text></g>
+<g class="c-coral"><rect x="505" y="214" width="135" height="80" rx="10"/>
+<text x="572" y="242" text-anchor="middle" font-size="14" font-weight="500">合规官</text>
+<text x="572" y="262" text-anchor="middle" font-size="12">红线一票否决</text>
+<text x="572" y="281" text-anchor="middle" font-size="11">企微合规 · 把关</text></g>
+
+<line x1="107" y1="294" x2="107" y2="308" stroke="#888780" stroke-width="1.4"/>
+<line x1="262" y1="294" x2="262" y2="308" stroke="#888780" stroke-width="1.4"/>
+<line x1="417" y1="294" x2="417" y2="308" stroke="#888780" stroke-width="1.4"/>
+<line x1="572" y1="294" x2="572" y2="308" stroke="#888780" stroke-width="1.4"/>
+<line x1="107" y1="308" x2="572" y2="308" stroke="#888780" stroke-width="1.4"/>
+<line x1="340" y1="308" x2="340" y2="324" stroke="#888780" stroke-width="1.6" marker-end="url(#ah)"/>
+
+<g class="c-teal"><rect x="170" y="324" width="340" height="56" rx="10"/>
+<text x="340" y="348" text-anchor="middle" font-size="15" font-weight="500">④ 团长主持收口</text>
+<text x="340" y="368" text-anchor="middle" font-size="12">不投票 · 只评推理质量 · 保留少数意见</text></g>
+<line x1="340" y1="380" x2="340" y2="394" stroke="#888780" stroke-width="1.6" marker-end="url(#ah)"/>
+
+<g class="c-coral"><rect x="200" y="396" width="280" height="50" rx="10"/>
+<text x="340" y="418" text-anchor="middle" font-size="14" font-weight="500">质量门 eval</text>
+<text x="340" y="436" text-anchor="middle" font-size="11">合规红线→打回 · 评分徽章 · 低分 exit 1</text></g>
+<line x1="340" y1="446" x2="340" y2="460" stroke="#888780" stroke-width="1.6" marker-end="url(#ah)"/>
+
+<g class="c-teal"><rect x="200" y="462" width="280" height="52" rx="10"/>
+<text x="340" y="486" text-anchor="middle" font-size="15" font-weight="500">⑤ 可落地 playbook</text>
+<text x="340" y="504" text-anchor="middle" font-size="12">可埋点 · 可交付客户</text></g>
+
+<text x="340" y="542" text-anchor="middle" font-size="12" fill="#6B6A62">↑ 全程由下方底座支撑：四官检索知识、团长取数验证口径</text>
+
+<text x="40" y="570" font-size="13" font-weight="500" fill="#1A1A18">知识库三层（RAG）</text>
+<g class="c-gray"><rect x="40" y="578" width="186" height="56" rx="10"/>
+<text x="133" y="603" text-anchor="middle" font-size="13" font-weight="500">① 企微官方文档</text>
+<text x="133" y="621" text-anchor="middle" font-size="11">合规底座</text></g>
+<g class="c-gray"><rect x="247" y="578" width="186" height="56" rx="10"/>
+<text x="340" y="603" text-anchor="middle" font-size="13" font-weight="500">② 行业册</text>
+<text x="340" y="621" text-anchor="middle" font-size="11">餐饮先做 · 零售 · 教培</text></g>
+<g class="c-gray"><rect x="454" y="578" width="186" height="56" rx="10"/>
+<text x="547" y="603" text-anchor="middle" font-size="13" font-weight="500">③ 真实 SOP</text>
+<text x="547" y="621" text-anchor="middle" font-size="11">护城河 · 私有</text></g>
+
+<text x="40" y="662" font-size="13" font-weight="500" fill="#1A1A18">工具链接入</text>
+<g class="c-gray"><rect x="40" y="670" width="135" height="38" rx="8"/><text x="107" y="694" text-anchor="middle" font-size="12">某 BI 平台</text></g>
+<g class="c-gray"><rect x="195" y="670" width="135" height="38" rx="8"/><text x="262" y="694" text-anchor="middle" font-size="12">飞书</text></g>
+<g class="c-gray"><rect x="350" y="670" width="135" height="38" rx="8"/><text x="417" y="694" text-anchor="middle" font-size="12">Get笔记</text></g>
+<g class="c-gray"><rect x="505" y="670" width="135" height="38" rx="8"/><text x="572" y="694" text-anchor="middle" font-size="12">Nowledge Mem</text></g>
+</svg>

@@ -1,0 +1,127 @@
+{
+  "name": "siyu-expert-team",
+  "owner": {
+    "name": "maojiebc"
+  },
+  "metadata": {
+    "description": "私域工具箱：统一入口、执行能力、轻问诊、客户档案与四官专家团",
+    "version": "0.3.0"
+  },
+  "plugins": [
+    {
+      "name": "siyu",
+      "description": "私域工具箱统一入口：新手教程、任务前路由与任务后导航。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "workflow-infrastructure",
+      "keywords": ["private-domain", "router", "workflow", "chinese"],
+      "skills": ["./plugins/siyu-core/skills/siyu"]
+    },
+    {
+      "name": "siyu-pyq",
+      "description": "朋友圈内容池与单条文案生成，内置配比、结构和合规前置扫描。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "content-creation",
+      "keywords": ["wechat", "moments", "copywriting", "compliance", "chinese"],
+      "skills": ["./plugins/siyu-execution/skills/siyu-pyq"]
+    },
+    {
+      "name": "siyu-qunfa",
+      "description": "社群栏目与群发脚本生成，绑定真实优惠并做合规前置扫描。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "content-creation",
+      "keywords": ["wechat-groups", "broadcast", "community", "compliance", "chinese"],
+      "skills": ["./plugins/siyu-execution/skills/siyu-qunfa"]
+    },
+    {
+      "name": "siyu-huashu",
+      "description": "新客破冰、欢迎语与高频答疑话术，兼顾账号人设和授权合规。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "content-creation",
+      "keywords": ["welcome", "customer-service", "scripts", "retention", "chinese"],
+      "skills": ["./plugins/siyu-execution/skills/siyu-huashu"]
+    },
+    {
+      "name": "siyu-save",
+      "description": "把本次私域咨询的结论、否决方向与待验证假设保存为本地客户档案。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "workflow-infrastructure",
+      "keywords": ["save", "client-record", "memory", "local", "chinese"],
+      "skills": ["./plugins/siyu-core/skills/siyu-save"]
+    },
+    {
+      "name": "siyu-restore",
+      "description": "恢复最近一份本地客户档案，接续上次私域咨询。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "workflow-infrastructure",
+      "keywords": ["restore", "client-record", "continuity", "local", "chinese"],
+      "skills": ["./plugins/siyu-core/skills/siyu-restore"]
+    },
+    {
+      "name": "siyu-report",
+      "description": "合并客户存档，生成经过合规扫描的 markdown 私域咨询报告。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "business-diagnostics",
+      "keywords": ["report", "consulting", "compliance", "markdown", "chinese"],
+      "skills": ["./plugins/siyu-core/skills/siyu-report"]
+    },
+    {
+      "name": "siyu-wenzhen",
+      "description": "私域轻问诊：用五层消解漏斗先判断问题是否成立，再回答或升舱。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "business-diagnostics",
+      "keywords": ["diagnosis", "problem-dissolution", "private-domain", "consulting", "chinese"],
+      "skills": ["./plugins/siyu-core/skills/siyu-wenzhen"]
+    },
+    {
+      "name": "siyu-update",
+      "description": "更新私域专家团；只同步官方项目，不碰本地客户档案。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "workflow-infrastructure",
+      "keywords": ["update", "upgrade", "maintenance", "private-domain", "chinese"],
+      "skills": ["./plugins/siyu-core/skills/siyu-update"]
+    },
+    {
+      "name": "siyu-expert-panel",
+      "description": "团长调研并编排公关、内容产品、运营广告与合规四官，主持收口出 playbook。",
+      "source": "./",
+      "strict": false,
+      "version": "0.3.0",
+      "category": "business-diagnostics",
+      "keywords": ["multi-agent", "orchestrator", "private-domain", "playbook", "chinese"],
+      "commands": ["./plugins/_orchestrator/commands/siyu-onboard.md"],
+      "agents": [
+        "./plugins/private-pr-officer/agents/private-pr-officer.md",
+        "./plugins/content-product-officer/agents/content-product-officer.md",
+        "./plugins/ops-ad-officer/agents/ops-ad-officer.md",
+        "./plugins/compliance-critic/agents/compliance-critic.md"
+      ],
+      "skills": [
+        "./plugins/private-pr-officer/skills/trust-asset-playbook",
+        "./plugins/private-pr-officer/skills/crisis-response-sop",
+        "./plugins/content-product-officer/skills/content-as-product",
+        "./plugins/content-product-officer/skills/reactivation-playbook",
+        "./plugins/ops-ad-officer/skills/ops-as-ad-funnel",
+        "./plugins/ops-ad-officer/skills/conversion-caliber",
+        "./plugins/compliance-critic/skills/wechat-compliance-redlines"
+      ]
+    }
+  ]
+}

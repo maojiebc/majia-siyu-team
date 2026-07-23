@@ -1,0 +1,32 @@
+flowchart TD
+    U["用户"] --> S["/siyu 主入口"]
+    S --> P["/siyu-pyq 朋友圈"]
+    S --> Q["/siyu-qunfa 群发"]
+    S --> H["/siyu-huashu 话术"]
+    S --> W["siyu-wenzhen 轻问诊"]
+    S --> O["siyu-onboard 全盘诊断"]
+    S --> SV["/siyu-save 存档"]
+    S --> RS["/siyu-restore 接续"]
+    S --> RP["/siyu-report 报告"]
+    S --> UP["/siyu-update 更新"]
+    P --> Q
+    P --> W
+    Q --> H
+    Q --> W
+    H --> P
+    H --> Q
+    H --> O
+    W --> P
+    W --> Q
+    W --> H
+    W --> O
+    O --> P
+    O --> Q
+    O --> H
+    O --> SV
+    SV --> RP
+    RS --> P
+    RS --> Q
+    RS --> H
+    RS --> W
+    RS --> O
