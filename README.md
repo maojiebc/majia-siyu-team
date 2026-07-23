@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.5.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.6.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu--team-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu-team)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -9,7 +9,7 @@
 >
 > **从日常文案直接干活、遇到结构问题再升舱诊断的中文私域工具箱。** 你只需记住 `/siyu`：它按当前处境选一个能力，干完再按真实结论导航下一步——不预设固定长链。
 
-![私域专家团 v0.5.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![私域专家团 v0.6.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -110,9 +110,9 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v0.6.0** — 新增餐饮企业微信冷启动基建知识包：企微四件套（好友码/资料页/欢迎语/群活码）脱敏方法论、SCRM 选型阶梯与产品成本口径、老客迁移玩法卡；私有护城河层首建 23 条真实 SOP 原子。
 - **v0.5.0** — 质量门四层落地（判官 + 蒙卡走 B 路径，宿主评分零 API）、连接器 keychain 骨架、四官方法框架补全、合规 lint 脱离 repo 降级兜底。
 - **v0.4.1** — 安全与合规加固：脱敏补国家码/凭据字段名/裸 token/邮箱/老身份证；质量门纳入裂变诱导与隐私索取拦截；组件版本对齐；eval judge/蒙卡与连接器实装状态诚实化。
-- **v0.4.0** — Runtime 基础：结构化 Task Schema、确定性路由、四官上下文白名单、本地脱敏追踪、原子状态存储与回归测试。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

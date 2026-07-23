@@ -2,6 +2,15 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [0.6.0] - 2026-07-23
+### 新增
+- 餐饮册企业微信冷启动基建知识包：新增 `knowledge/01-wechat-official/features/企业微信基建四件套.md`（好友码 / 对外资料页 / 好友欢迎语 / 群活码四模块脱敏 SOP + 认证要点 + SCRM 选型阶梯 + 成本口径 + 老客迁移方法论）。
+- `catering/stages.md` 冷启动加微钩子库与「第一周基建 SOP」从占位升级为可执行指针；`餐饮私域方法论.md` 增补「企微地基与搭台唱戏」「老客迁移玩法卡」两节；`benchmarks.md` 补企业微信产品口径（单群 200 上限 / 2000 免费线 / 超额每客约一毛 / 认证时效）。
+- 私有护城河层首建知识原子库（`knowledge/03-majia-sop/atoms.jsonl`，23 条）与实操 playbook，从一次真实付费咨询拆解沉淀，git-ignore 不入公开库。
+
+### 说明
+- 本次为知识内容增补，四官 skill 与 Runtime 代码不变；语料来源已脱敏，公开层无真实品牌 / 人名 / 报价。
+
 ## [0.5.0] - 2026-07-23
 ### 新增
 - 质量门判官层与蒙卡层落地（B 路径）：宿主 Agent 按 8 维 rubric 逐维打分，脚本加权合成出总分 + 徽章，蒙卡层统计 N 份一致性与 Wilson 置信区间——不调外部 API，复用宿主额度。新增 `siyu-eval judge` 子命令（`--emit-prompts` / `--scores` / `--samples`）。

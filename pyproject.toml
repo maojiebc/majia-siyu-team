@@ -1,6 +1,6 @@
 [project]
 name = "siyu-team"
-version = "0.5.0"
+version = "0.6.0"
 description = "私域专家团 — structured task runtime + host(主持人收口) + eval质量门"
 requires-python = ">=3.10"
 dependencies = []

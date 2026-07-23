@@ -1,5 +1,5 @@
 {
   "name": "compliance-critic",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "质检合规官：企微封号红线/违禁词/落地性，红线一票否决"
 }
