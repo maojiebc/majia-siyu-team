@@ -4,7 +4,7 @@
 
 > 中文私域运营工具箱。日常文案直接干活，结构问题升舱四官诊断。入口只有一个：`/siyu`。
 
-![私域专家团 v0.4.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→四官独立评审→团长收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![私域专家团 v0.4.1 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→四官独立评审→团长收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## 这个入口做什么
 
