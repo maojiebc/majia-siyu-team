@@ -1,13 +1,13 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.6.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.7.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 > **Siyu Expert Team · 马甲实战版**
 >
 > A Chinese private-domain (WeCom / 私域) operations toolbox. Get daily copywriting done directly; escalate structural questions to a four-officer diagnostic panel. One entry point: `/siyu`.
 
-![Siyu Expert Team v0.6.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![Siyu Expert Team v0.7.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## What it does
 
@@ -29,9 +29,9 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 
 ## Version History
 
+- **v0.7.0** — Universal-compatibility layer: a zero-dependency "how to build private-domain · restaurant-owner edition" guide (plain language + a shareable map + an interactive page, works even where only the entry skill is installed); entry point fully de-jargoned with a plain-language rule established.
 - **v0.6.0** — Catering WeCom cold-start infrastructure knowledge pack: the four-piece setup (contact QR / profile page / welcome message / group live-code) as redacted methodology, an SCRM selection ladder with cost benchmarks, and an old-customer migration play; first private-moat atom library (23 real-SOP atoms).
 - **v0.5.0** — Quality gate goes four-layer: judge + Monte Carlo via B-path (host-Agent scoring, zero external API), connector keychain skeleton, officer method frameworks filled in, and self-contained compliance-lint fallback outside the repo.
-- **v0.4.1** — Security & compliance hardening: redaction now covers country-code phones, credential field names, bare tokens, emails and legacy IDs; the quality gate blocks fission-inducement and privacy solicitation; component versions aligned; honest eval/connector implementation status.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 

@@ -7,6 +7,8 @@ argument-hint: "<客户名/品类> [--industry catering|retail|edu] [--stage col
 
 > 如只需单个动作（写朋友圈 / 出群发 / 给话术），直接调用 siyu-execution 对应 skill，无需全盘诊断。
 
+> **讲人话**：这是后台编排文档，但**最终交付给用户的话**遵循讲人话铁律——别对店老板暴露"团长/四官/升舱/playbook"这些词，产物就叫「搭建清单 / 怎么做」。面对普通店老板（问得泛、没运营黑话），优先走零依赖的 [`../../siyu-core/skills/siyu/references/整盘怎么搭-老板版.md`](../../siyu-core/skills/siyu/references/整盘怎么搭-老板版.md)，讲人话 + 出图 / 网页，别硬上这套复杂编排。
+
 > 母版 = wshobson `full-stack-feature.md` 七段式 + qiaomu HeavySkill 主持收口。
 > 编排走范式 A（单 orchestrator + 文件状态机），收口走主持人模式（四官独立采样、团长不投票只评质量）。
 
