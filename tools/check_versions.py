@@ -23,6 +23,15 @@ for plugin in marketplace.get("plugins", []):
     if plugin.get("version") != version:
         errors.append(f"marketplace 插件 {plugin.get('name', '<未命名>')} 版本不一致")
 
+# 组件 plugin.json 的 version 也要与发布版一致（此前是 CI 盲区，会静默漂移）。
+for plugin_json in sorted(ROOT.glob("plugins/*/.claude-plugin/plugin.json")):
+    data = json.loads(plugin_json.read_text(encoding="utf-8"))
+    if data.get("version") != version:
+        errors.append(
+            f"组件 {plugin_json.parent.parent.name}/plugin.json 版本 "
+            f"{data.get('version')!r} 与 VERSION 不一致"
+        )
+
 badge = re.search(
     r"img\.shields\.io/badge/(?:skill-)?v?([0-9.]+)-[A-Fa-f0-9]+\.svg",
     readme,

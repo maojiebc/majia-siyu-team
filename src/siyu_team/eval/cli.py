@@ -1,5 +1,5 @@
-"""siyu-eval：质量门 CLI。方案分 <阈值 或 命中 COMPLIANCE_RED → exit 1。
-3档：static-only 可跑（合规红线 + 反模式惩罚）。4档：接 judge/monte_carlo 出完整分。
+"""siyu-eval：质量门 CLI。当前 static-only：命中 COMPLIANCE_RED 或软性反模式过多 → exit 1。
+judge/monte_carlo 为 4 档规划，未实装，故本命令不产出质量分。
 """
 from __future__ import annotations
 
@@ -9,7 +9,6 @@ import re
 import sys
 
 from . import static as static_mod
-from .engine import badge
 
 
 def cmd_score(args) -> int:
@@ -24,14 +23,15 @@ def cmd_score(args) -> int:
     if st["hard_fail"]:
         print("❌ COMPLIANCE_RED：命中合规红线，方案不得交付。")
         return 1
-    # 3档：判官/蒙卡未接，给出 static-only 提示分（仅惩罚维度可见）
-    print("（judge/蒙卡层为 4 档功能，当前 static-only。完整打分见 docs/blueprint.md §3d）")
-    # 用惩罚系数粗估一个下限分，纯提示
-    approx = round(st["penalty"] * 100, 1)
-    print("static-only 上限提示分:", approx, "|", badge(approx))
-    if approx < args.threshold:
-        print("低于阈值 %d，打回。" % args.threshold)
+    # judge/蒙卡未实装，静态层不产出质量分，只做合规红线 + 反模式惩罚。
+    print("（judge/蒙卡层未实装；当前仅静态合规检查，不产出质量分。设计见 docs/blueprint.md §3d）")
+    # penalty 越低表示软性反模式越多；这不是质量分，仅用来把明显粗糙的稿子挡在阈值外。
+    penalty_pct = round(st["penalty"] * 100, 1)
+    print("反模式惩罚系数（非质量分，越低越粗糙）:", penalty_pct)
+    if penalty_pct < args.threshold:
+        print("软性反模式过多（%s < %d），建议打回精修。" % (penalty_pct, args.threshold))
         return 1
+    print("✅ 未命中合规红线；方案质量高低需人工或 4 档 judge 评定，本命令不代表已过质量门。")
     return 0
 
 

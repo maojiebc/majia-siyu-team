@@ -15,7 +15,7 @@ from siyu_team.task import (
     TaskValidationError,
     parse_task,
 )
-from siyu_team.tracing import TraceRecorder
+from siyu_team.tracing import TraceRecorder, redact
 
 
 class TaskParsingTests(unittest.TestCase):
@@ -154,6 +154,62 @@ class RuntimeTests(unittest.TestCase):
             self.assertNotIn("13800138000", content)
             self.assertNotIn("abc.def", content)
             self.assertIn("[REDACTED]", content)
+
+
+class RedactionHardeningTests(unittest.TestCase):
+    """回归覆盖历史泄漏向量，并确保不误伤正常内容。"""
+
+    def test_phone_with_country_code_is_masked(self) -> None:
+        for raw in (
+            "+8613812345678",
+            "8613812345678",
+            "008613812345678",
+            "13812345678",
+        ):
+            self.assertNotIn("13812345678", str(redact({"note": raw})), raw)
+
+    def test_credential_key_names_are_masked(self) -> None:
+        for key in (
+            "api_key",
+            "apiKey",
+            "access_key",
+            "credential",
+            "session",
+            "密码",
+            "密钥",
+        ):
+            out = redact({key: "sk-live-DEADBEEF-value"})
+            self.assertEqual(out[key], "[REDACTED]", key)
+
+    def test_bare_tokens_in_value_are_masked(self) -> None:
+        for raw in ("ghp_abcd1234efgh", "sk-live-DEADBEEF", "AKIAIOSFODNN7EXAMPLE"):
+            out = str(redact({"note": f"凭据是 {raw} 请勿外传"}))
+            self.assertNotIn(raw, out, raw)
+            self.assertIn("[TOKEN]", out, raw)
+
+    def test_email_is_masked(self) -> None:
+        out = str(redact({"note": "联系 zhangsan@company.com"}))
+        self.assertNotIn("zhangsan@company.com", out)
+        self.assertIn("[EMAIL]", out)
+
+    def test_15_digit_id_card_is_masked(self) -> None:
+        out = str(redact({"note": "老证号 110101900307817"}))
+        self.assertNotIn("110101900307817", out)
+
+    def test_integer_phone_is_masked(self) -> None:
+        out = redact({"contact": 13812345678})
+        self.assertEqual(out["contact"], "[PHONE]")
+
+    def test_set_values_are_masked(self) -> None:
+        out = redact({"s": {"13812345678"}})
+        self.assertNotIn("13812345678", str(out))
+
+    def test_does_not_over_redact_normal_content(self) -> None:
+        # 含 sk 的普通词、短数字、正常整数、布尔都不应被改。
+        self.assertEqual(redact({"job": "task-force123"})["job"], "task-force123")
+        self.assertEqual(redact({"order": "12345678"})["order"], "12345678")
+        self.assertEqual(redact({"budget": 5000})["budget"], 5000)
+        self.assertIs(redact({"flag": True})["flag"], True)
 
 
 if __name__ == "__main__":

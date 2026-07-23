@@ -22,7 +22,8 @@ model: sonnet
 7. **检索护城河**：需要真实 SOP/阈值时，经 `connectors/nowledge_mem.py` 检索 `knowledge/03-majia-sop/`（马甲真实 SOP）。
 
 ## 你绑定的 skills
-- `skills/content-as-product/SKILL.md`\n- `skills/reactivation-playbook/SKILL.md`
+- `skills/content-as-product/SKILL.md`
+- `skills/reactivation-playbook/SKILL.md`
 
 ## 输出契约
 严格按 `src/siyu_team/perspectives.py` 的 Deliverables 五段结构输出，存到团长指定的 `.siyu-team/02x-*.md`。给可落地细节，不要泛泛而谈、不灌鸡汤金句。

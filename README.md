@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.4.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.4.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu--team-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu-team)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -9,7 +9,7 @@
 >
 > **从日常文案直接干活、遇到结构问题再升舱诊断的中文私域工具箱。** 你只需记住 `/siyu`：它按当前处境选一个能力，干完再按真实结论导航下一步——不预设固定长链。
 
-![私域专家团 v0.4.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![私域专家团 v0.4.1 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -87,7 +87,7 @@ flowchart LR
 - **计划层（代码边界）**：`Task → RouteDecision` 固定任务类型、渠道、目标、风险与缺失字段；信息不足时先补问。
 - **执行层（入口·高频）**：`siyu-pyq` / `siyu-qunfa` / `siyu-huashu`，各自内置边写边合规。
 - **诊断层（升舱·低频）**：四官先经过 `AgentContext` 白名单隔离，再由团长主持收口并过质量门。
-- **共用底座**：原子状态、脱敏追踪、三层知识库、合规词库单一真源与连接器薄包装。
+- **共用底座**：原子状态、脱敏追踪、三层知识库、合规词库单一真源与连接器预留接口（未接入）。
 
 当前 Runtime 说明见 [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md)，完整能力图见 [`docs/framework.svg`](docs/framework.svg)；工程范式来源见 [`docs/标杆移植说明.md`](docs/标杆移植说明.md)。
 
@@ -110,9 +110,9 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v0.4.1** — 安全与合规加固：脱敏补国家码/凭据字段名/裸 token/邮箱/老身份证；质量门纳入裂变诱导与隐私索取拦截；组件版本对齐；eval judge/蒙卡与连接器实装状态诚实化。
 - **v0.4.0** — Runtime 基础：结构化 Task Schema、确定性路由、四官上下文白名单、本地脱敏追踪、原子状态存储与回归测试。
 - **v0.3.1** — 公开首页装修：框架全局图、能力一览与安装通道整理，README 图走绝对 URL + PNG。
-- **v0.3.0** — 首个公开版本：统一入口 `/siyu` + 执行三件套 + 四官诊断层 + 跨对话客户档案。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

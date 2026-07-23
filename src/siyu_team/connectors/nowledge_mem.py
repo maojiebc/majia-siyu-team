@@ -1,4 +1,4 @@
-"""Nowledge Mem 连接器（薄包装）。接在：四官 skill 检索。
+"""Nowledge Mem 连接器（预留接口，未接入）。接在：四官 skill 检索。
 马甲真实 SOP 语义检索（护城河 RAG 取数）
 
 密钥走 keychain 指针 keychain:siyu-team/<tool>，真 token 不入库。

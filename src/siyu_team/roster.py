@@ -30,7 +30,11 @@ MAX_OFFICERS = 6
 def load_roster(path: Optional[str] = None) -> dict:
     path = path or DEFAULT_ROSTER_PATH
     if os.path.exists(path):
-        return json.load(open(path))
+        try:
+            with open(path, encoding="utf-8") as handle:
+                return json.load(handle)
+        except (OSError, json.JSONDecodeError):
+            pass  # 损坏或不可读时回落到内置默认，不让整条团长链崩。
     return {"version": "1.0.0", "officers": DEFAULT_OFFICERS, "host": {"mode": "codex", "rounds_max": 2}}
 
 

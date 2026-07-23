@@ -187,7 +187,7 @@ plugins/community-activation/
   "name": "community-activation",
   "description": "私域社群促活：沉默用户唤醒、活动节奏设计、群话术与裂变 SOP",
   "version": "1.0.0",
-  "author": { "name": "WorkBuddy", "email": "expert@workbuddy.example" },
+  "author": { "name": "your-org", "email": "maintainer@example.com" },
   "license": "MIT"
 }
 ```

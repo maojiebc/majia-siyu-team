@@ -1,4 +1,4 @@
-"""运行状态的原子化读写、续跑与防重入。"""
+"""运行状态的原子化读写与续跑（单进程假设，无跨进程文件锁）。"""
 from __future__ import annotations
 
 from datetime import datetime, timezone

@@ -1,4 +1,8 @@
-"""加权合成 + 反模式乘法惩罚 + 徽章。照 plugin-eval engine。"""
+"""加权合成 + 反模式乘法惩罚 + 徽章。照 plugin-eval engine。
+
+注意：composite()/badge() 依赖 judge/蒙卡产出的维度分；那两层当前未实装，
+本模块也不被 score CLI 调用。score 只做静态合规检查，不据此产出质量分。
+"""
 from __future__ import annotations
 from .rubrics import DIMENSION_WEIGHTS
 
