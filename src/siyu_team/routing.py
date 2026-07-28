@@ -37,6 +37,10 @@ TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
         "/siyu-huashu",
         "请求的是欢迎、破冰或答疑话术，走一对一承接执行层。",
     ),
+    TaskKind.MARKET_RESEARCH: (
+        "siyu-market-research",
+        "请求涉及厂商、产品、价格或市场动态，先实时检索并生成证据快照。",
+    ),
     TaskKind.DIAGNOSIS: (
         "siyu-wenzhen",
         "请求包含结果异常或因果疑问，先验证问题是否成立。",
@@ -121,13 +125,25 @@ def route_task(task: Task) -> RouteDecision:
         if not industry_route["stage"]:
             required.append("stage")
 
-    knowledge_refs = [
-        "knowledge/01-wechat-official/compliance/redlines.md",
-        "knowledge/00-methodology/私域公理与消解案例库.md",
-    ]
-    industry_book = industry_route["industry_book"]
-    if industry_book:
+    knowledge_refs = []
+    if task.kind is not TaskKind.MARKET_RESEARCH:
+        knowledge_refs.extend(
+            [
+                "knowledge/01-wechat-official/compliance/redlines.md",
+                "knowledge/00-methodology/私域公理与消解案例库.md",
+            ]
+        )
+    industry_book = (
+        None
+        if task.kind is TaskKind.MARKET_RESEARCH
+        else industry_route["industry_book"]
+    )
+    if industry_book and task.kind is not TaskKind.MARKET_RESEARCH:
         knowledge_refs.append(industry_book)
+
+    focus = industry_route["focus"]
+    if task.kind is TaskKind.MARKET_RESEARCH:
+        focus = "先完成实时检索与证据快照；证据不足的对象不得进入正式推荐。"
 
     return RouteDecision(
         skill=skill,
@@ -135,6 +151,6 @@ def route_task(task: Task) -> RouteDecision:
         needs_clarification=bool(required),
         required_fields=tuple(required),
         industry_book=industry_book,
-        focus=industry_route["focus"],
+        focus=focus,
         knowledge_refs=tuple(knowledge_refs),
     )

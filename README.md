@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.0.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.1.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -11,7 +11,7 @@
 
 <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
 
-![majia-siyu v1.0.1 框架全局：客户私域诉求→结构化任务→经营动作路由或四官评审→主持收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.1.0 框架全局：动态事实先检索留证，再进入经营动作或专家分析](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -23,6 +23,7 @@
 | 群发没人打开，活动通知越发越沉 | 栏目化群发脚本、首句 A/B、承接动作与「该救文案还是救机制」判断 |
 | 新客加进来不知道第一句说什么 | 分场景欢迎语、破冰流程与高频答疑话术 |
 | 有个具体私域问题，但不知道问题出在哪 | 五层问诊：先判断问题是否成立，再回答或升舱 |
+| 要选厂商、比竞品或核对当前报价 | 实时检索、存续与产品状态分开核验、带链接和日期的证据快照 |
 | 整盘私域不知道怎么搭 | 团长调研 → 四官独立评审 → 主持收口成可执行 playbook |
 | 上次结论散在聊天里，下次又要重讲 | 本地客户档案、跨对话接续与合规报告 |
 
@@ -43,6 +44,7 @@
 | `/siyu-qunfa` | 群发、社群栏目、秒杀通知 | 群发脚本、承接动作、机制提醒 |
 | `/siyu-huashu` | 欢迎语、破冰、答疑 | 分场景话术库 + 账号 IP 模板 |
 | `siyu-wenzhen` | 转化/留存/加微等具体问题 | 五层问诊：消解问题或给明确处方 |
+| `siyu-market-research` | 厂商选型、竞品、报价、市场地图 | 带核验状态、日期与来源链接的证据快照 |
 | `siyu-onboard` | 全盘诊断与战略评审 | 四官评审后的私域 playbook |
 | `/siyu-save` · `/siyu-restore` · `/siyu-report` | 存/续/交付结论 | 本地客户档案与合规报告 |
 
@@ -78,7 +80,7 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 claude plugin marketplace add maojiebc/majia-siyu-team
 ```
 
-WorkBuddy / CodeBuddy 的单插件安装定义在 [`.codebuddy-plugin/plugin.json`](.codebuddy-plugin/plugin.json)，一次安装会统一带上入口、16 个能力、4 个专家 Agent 与编排命令；Claude Code 的安装单元仍定义在 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)。
+WorkBuddy / CodeBuddy 的单插件安装定义在 [`.codebuddy-plugin/plugin.json`](.codebuddy-plugin/plugin.json)，一次安装会统一带上入口、17 个能力、4 个专家 Agent 与编排命令；Claude Code 的安装单元仍定义在 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)。
 
 两个商店都只保留一个条目：ClawHub 使用 `majia-siyu`；SkillHub 为保留原条目的下载量、收藏与版本历史，继续沿用历史安装名 `siyu`。代码入口、WorkBuddy 插件和 GitHub 真源统一为 `majia-siyu`。发布前运行 `python3 tools/build_skillhub_bundle.py`，它会从当前仓库的模块真源生成自包含包到 `skillhub/majia-siyu/`：主入口位于根级，全部能力收进 `modules/` 供内部路由，不把子能力拆成零散商店条目。
 
@@ -95,6 +97,7 @@ flowchart LR
     F --> G
 ```
 
+- **证据层（动态事实硬门）**：厂商、产品、报价、案例与政策先实时检索；候选对象来自本次检索，证据不足不得推荐。
 - **计划层（代码边界）**：`Task → RouteDecision` 固定任务类型、渠道、目标、风险与缺失字段；信息不足时先补问。
 - **执行层（入口·高频）**：`siyu-pyq` / `siyu-qunfa` / `siyu-huashu`，各自内置边写边合规。
 - **诊断层（升舱·低频）**：四官先经过 `AgentContext` 白名单隔离，再由团长主持收口并过质量门。
@@ -121,9 +124,9 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v1.1.0** — 新增动态外部事实三道硬门和 `siyu-market-research`；厂商、产品、价格与市场事实必须实时检索留证后才能进入推荐和专家分析。
 - **v1.0.1** — 修正渠道身份：ClawHub 使用 `majia-siyu`，SkillHub 在原 `siyu` 条目上升级并保留历史统计；同步修正安装命令。
 - **v1.0.0** — 顶层 Skill、WorkBuddy 插件与 ClawHub slug 统一为 `majia-siyu`；保留 `/siyu` 命令，修正官方真源，并与 majia-huiyuan 建立互斥触发边界。
-- **v0.8.0** — 新增 WorkBuddy / CodeBuddy 原生单插件分发：用户只安装一个入口插件，即可获得完整私域专家团。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

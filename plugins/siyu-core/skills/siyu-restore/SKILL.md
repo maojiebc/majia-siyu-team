@@ -3,7 +3,8 @@ name: siyu-restore
 description: |
   从本地客户档案拉出最近一次私域咨询状态并接续工作，配合 siyu-save 使用。
   触发方式：/siyu-restore、/续上、「上次」「接着」「之前聊到哪了」；支持序号、list 和 --client。
-version: 1.0.1
+metadata:
+  version: "1.1.0"
 ---
 
 # siyu-restore：接续客户档案
