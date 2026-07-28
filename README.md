@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.0.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -11,7 +11,7 @@
 
 <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
 
-![majia-siyu v1.0.0 框架全局：客户私域诉求→结构化任务→经营动作路由或四官评审→主持收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.0.1 框架全局：客户私域诉求→结构化任务→经营动作路由或四官评审→主持收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -68,6 +68,9 @@
 # ClawHub（装入口）
 clawhub install majia-siyu
 
+# SkillHub（沿用原条目，保留历史与统计）
+skillhub install siyu
+
 # skills.sh（从公开仓装全套）
 npx -y skills add maojiebc/majia-siyu-team -g --all
 
@@ -77,7 +80,7 @@ claude plugin marketplace add maojiebc/majia-siyu-team
 
 WorkBuddy / CodeBuddy 的单插件安装定义在 [`.codebuddy-plugin/plugin.json`](.codebuddy-plugin/plugin.json)，一次安装会统一带上入口、16 个能力、4 个专家 Agent 与编排命令；Claude Code 的安装单元仍定义在 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)。
 
-ClawHub 与 SkillHub 都使用单一 `majia-siyu` 商店条目。发布前运行 `python3 tools/build_skillhub_bundle.py`，它会从当前仓库的模块真源生成自包含包到 `skillhub/majia-siyu/`：主入口位于根级，全部能力收进 `modules/` 供内部路由，不把子能力拆成零散商店条目。该生成包随 Git commit 追踪，确保 GitHub、ClawHub 与 SkillHub 发布内容一致。
+两个商店都只保留一个条目：ClawHub 使用 `majia-siyu`；SkillHub 为保留原条目的下载量、收藏与版本历史，继续沿用历史安装名 `siyu`。代码入口、WorkBuddy 插件和 GitHub 真源统一为 `majia-siyu`。发布前运行 `python3 tools/build_skillhub_bundle.py`，它会从当前仓库的模块真源生成自包含包到 `skillhub/majia-siyu/`：主入口位于根级，全部能力收进 `modules/` 供内部路由，不把子能力拆成零散商店条目。
 
 ## 怎样工作
 
@@ -118,9 +121,9 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
-- **v1.0.0** — 顶层 Skill、WorkBuddy 插件与商店 slug 统一为 `majia-siyu`；保留 `/siyu` 命令，修正官方真源，并与 majia-huiyuan 建立互斥触发边界。
+- **v1.0.1** — 修正渠道身份：ClawHub 使用 `majia-siyu`，SkillHub 在原 `siyu` 条目上升级并保留历史统计；同步修正安装命令。
+- **v1.0.0** — 顶层 Skill、WorkBuddy 插件与 ClawHub slug 统一为 `majia-siyu`；保留 `/siyu` 命令，修正官方真源，并与 majia-huiyuan 建立互斥触发边界。
 - **v0.8.0** — 新增 WorkBuddy / CodeBuddy 原生单插件分发：用户只安装一个入口插件，即可获得完整私域专家团。
-- **v0.7.0** — 通用兼容层：新增零依赖「整盘怎么搭·餐饮老板版」向导（讲人话 + 出图 + 网页，只装入口的环境也能用），入口全面去黑话（playbook / 团长 / 四官 / 升舱 全翻大白话）并立讲人话铁律。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

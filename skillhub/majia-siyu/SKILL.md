@@ -5,7 +5,7 @@ description: |
   边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   author: "超级马甲 / maojiebc"
 ---
 
@@ -115,9 +115,9 @@ metadata:
 
 ## 📋 版本记录
 
-- **v1.0.0** — 顶层 Skill 与商店名称从 `siyu` 统一为 `majia-siyu`；保留 `/siyu` 命令，并与 majia-huiyuan 建立数据层/经营动作层互斥边界。
+- **v1.0.1** — 修正分发身份：ClawHub 使用 `majia-siyu`；SkillHub 沿用原 `siyu` 条目并保留历史统计与版本记录。
+- **v1.0.0** — 顶层 Skill、WorkBuddy 插件与 ClawHub 名称统一为 `majia-siyu`；保留 `/siyu` 命令，并与 majia-huiyuan 建立数据层/经营动作层互斥边界。
 - **v0.8.0** — WorkBuddy / CodeBuddy 新增原生单插件安装；一次安装完整私域专家团，不再逐个选装能力。
-- **v0.7.0** — 零依赖「整盘怎么搭·老板版」向导（讲人话 + 出图 + 网页，纯入口环境也能用）+ 入口全面去黑话 + 讲人话铁律。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

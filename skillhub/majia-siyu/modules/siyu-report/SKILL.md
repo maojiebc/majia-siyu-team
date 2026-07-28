@@ -3,7 +3,7 @@ name: siyu-report
 description: |
   合并同一客户的多份本地存档，生成经过合规扫描的可交付 markdown 私域咨询报告。
   触发方式：/siyu-report、/出报告、「打包」「整理一份」「给老板或客户看」；支持 --client 和 --since。
-version: 1.0.0
+version: 1.0.1
 ---
 
 # siyu-report：客户咨询报告

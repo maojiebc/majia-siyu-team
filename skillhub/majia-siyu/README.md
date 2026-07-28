@@ -1,13 +1,13 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.0.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 
 > 中文私域运营工具箱。日常文案直接干活，结构问题升舱四官诊断。入口只有一个：`/siyu`。
 
 <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
 
-![majia-siyu v1.0.0 框架全局：客户私域诉求→结构化任务→经营动作路由或四官评审→主持收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.0.1 框架全局：客户私域诉求→结构化任务→经营动作路由或四官评审→主持收口→质量门](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## 这个入口做什么
 
@@ -25,18 +25,18 @@ v0.4.0 起，请求会先整理成结构化 Task，再由 Runtime 只选择当�
 /plugin marketplace add maojiebc/majia-siyu-team
 /plugin install majia-siyu@majia-siyu
 
-# ClawHub / SkillHub：安装一个自包含入口包
+# ClawHub / SkillHub：各自安装同一个自包含入口包
 clawhub install majia-siyu
-skillhub install majia-siyu
+skillhub install siyu
 ```
 
 完整说明、框架图与源码：**https://github.com/maojiebc/majia-siyu-team**
 
 ## 📋 版本记录
 
-- **v1.0.0** — 顶层 Skill 与商店 slug 统一为 `majia-siyu`，保留 `/siyu` 命令，并与 majia-huiyuan 建立互斥触发边界。
+- **v1.0.1** — ClawHub 使用 `majia-siyu`；SkillHub 沿用原 `siyu` 条目并保留历史统计，修正安装命令。
+- **v1.0.0** — 顶层 Skill、WorkBuddy 插件与 ClawHub slug 统一为 `majia-siyu`，保留 `/siyu` 命令，并与 majia-huiyuan 建立互斥触发边界。
 - **v0.8.0** — WorkBuddy / CodeBuddy 单插件安装；ClawHub / SkillHub 单入口包内置全部模块。
-- **v0.7.0** — 零依赖老板版向导与入口去黑话。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

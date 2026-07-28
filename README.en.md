@@ -1,6 +1,6 @@
 # Majia Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.0.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 > **Siyu Expert Team · 马甲实战版**
@@ -11,7 +11,7 @@
   <img src="assets/icon.png" alt="Siyu Expert Team icon" width="160">
 </p>
 
-![majia-siyu v1.0.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.0.1 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## What it does
 
@@ -37,7 +37,14 @@ The repository's `.codebuddy-plugin/` manifest exposes the full team as one plug
 
 ### ClawHub / SkillHub — one bundled skill
 
-Install the single published entry `majia-siyu` on ClawHub or SkillHub. The release bundle embeds the router and all internal modules, so users do not need to install the specialists separately.
+The release bundle embeds the router and all internal modules, so users do not need to install specialists separately:
+
+```bash
+clawhub install majia-siyu
+skillhub install siyu
+```
+
+SkillHub keeps the historical `siyu` entry so downloads, stars, and version history remain attached to the same store identity. The code, GitHub source, WorkBuddy plugin, and ClawHub slug use `majia-siyu`.
 
 ### Generic Skills CLI
 
@@ -47,9 +54,9 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 
 ## Version History
 
-- **v1.0.0** — Renamed the top-level Skill, WorkBuddy plugin, and registry slug to `majia-siyu`; kept `/siyu` as the user command, corrected the canonical source, and added an explicit routing boundary with `majia-huiyuan`.
+- **v1.0.1** — Corrected registry identity: ClawHub uses `majia-siyu`, while SkillHub updates the historical `siyu` entry and preserves its stats and version history.
+- **v1.0.0** — Renamed the top-level Skill, WorkBuddy plugin, and ClawHub slug to `majia-siyu`; kept `/siyu` as the user command, corrected the canonical source, and added an explicit routing boundary with `majia-huiyuan`.
 - **v0.8.0** — One-install distribution: WorkBuddy / CodeBuddy now sees the entire expert team as one plugin, while ClawHub and SkillHub receive a self-contained single-entry bundle. Added a unified minimalist icon and reproducible bundle builder.
-- **v0.7.0** — Universal-compatibility layer: a zero-dependency "how to build private-domain · restaurant-owner edition" guide (plain language + a shareable map + an interactive page, works even where only the entry skill is installed); entry point fully de-jargoned with a plain-language rule established.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 

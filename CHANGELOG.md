@@ -2,9 +2,14 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.0.1] - 2026-07-28
+### 修复
+- SkillHub 沿用历史 `siyu` 条目原位升级，保留下载量、收藏与版本历史；删除误建的零数据重复条目。
+- 修正渠道安装命令：ClawHub 使用 `majia-siyu`，SkillHub 使用历史 slug `siyu`。代码入口、WorkBuddy 插件与 GitHub 真源仍统一为 `majia-siyu`。
+
 ## [1.0.0] - 2026-07-28
 ### BREAKING
-- 顶层 Skill、WorkBuddy / CodeBuddy 插件与 ClawHub / SkillHub slug 从 `siyu` 统一改为 `majia-siyu`；重新安装时使用新名称，用户命令 `/siyu` 保持兼容。
+- 顶层 Skill、WorkBuddy / CodeBuddy 插件与 ClawHub slug 从 `siyu` 统一改为 `majia-siyu`；用户命令 `/siyu` 保持兼容。SkillHub 为保留历史条目身份继续使用 `siyu`。
 
 ### 修复
 - 重写主入口触发描述，与 `majia-huiyuan` 按“经营动作 / 会员数据”互斥分工，避免私域会员问题同时触发。
