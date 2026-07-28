@@ -1,19 +1,19 @@
 {
-  "name": "siyu-expert-team",
+  "name": "majia-siyu",
   "owner": {
     "name": "maojiebc"
   },
   "metadata": {
     "description": "私域专家团 WorkBuddy / CodeBuddy 插件市场",
-    "version": "0.8.0"
+    "version": "1.0.0"
   },
   "plugins": [
     {
-      "name": "siyu",
+      "name": "majia-siyu",
       "source": "./",
       "strict": true,
       "description": "一次安装完整私域专家团，由统一入口根据真实任务自动路由。",
-      "version": "0.8.0",
+      "version": "1.0.0",
       "homepage": "https://github.com/maojiebc/majia-siyu-team",
       "repository": "https://github.com/maojiebc/majia-siyu-team",
       "license": "MIT",

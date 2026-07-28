@@ -1,6 +1,6 @@
 {
-  "name": "siyu",
-  "version": "0.8.0",
+  "name": "majia-siyu",
+  "version": "1.0.0",
   "description": "私域专家团完整工具箱：一次安装统一入口、执行能力、轻问诊、客户档案与四位专家。",
   "author": {
     "name": "maojiebc"
@@ -26,7 +26,7 @@
     "./plugins/compliance-critic/agents/compliance-critic.md"
   ],
   "skills": [
-    "./plugins/siyu-core/skills/siyu",
+    "./plugins/siyu-core/skills/majia-siyu",
     "./plugins/siyu-execution/skills/siyu-pyq",
     "./plugins/siyu-execution/skills/siyu-qunfa",
     "./plugins/siyu-execution/skills/siyu-huashu",

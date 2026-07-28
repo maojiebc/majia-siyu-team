@@ -1,5 +1,5 @@
 <svg width="100%" viewBox="0 0 760 940" role="img" xmlns="http://www.w3.org/2000/svg">
-<title>私域专家团 v0.4.0 结构化 Runtime 架构图</title>
+<title>majia-siyu v1.0.0 私域专家团架构图</title>
 <desc>用户请求先进入统一入口和结构化 Runtime，生成 Task、RouteDecision 与风险信息；随后只选择执行、问诊或全盘评审中的一条路径。全盘评审通过白名单上下文隔离四官，团长收口后进入质量门。底层由原子状态、脱敏追踪、知识库和本地连接器支撑。</desc>
 <defs>
   <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
@@ -25,12 +25,12 @@
 </defs>
 
 <rect x="0" y="0" width="760" height="940" rx="20" fill="#FAFAF8"/>
-<text x="38" y="38" font-size="21" class="title">私域专家团 · 结构化 Runtime</text>
+<text x="38" y="38" font-size="21" class="title">majia-siyu · 私域专家团</text>
 <g class="violet">
   <rect x="648" y="18" width="76" height="28" rx="14"/>
-  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v0.4.0</text>
+  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.0.0</text>
 </g>
-<text x="38" y="60" font-size="12" class="muted">每次只决定当前一步：先结构化，再路由；需要时才升舱四官</text>
+<text x="38" y="60" font-size="12" class="muted">经营动作归本入口；会员指标、SQL 与数仓交给 majia-huiyuan</text>
 
 <g class="gray">
   <rect x="240" y="82" width="280" height="54" rx="12"/>

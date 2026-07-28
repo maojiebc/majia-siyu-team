@@ -2,6 +2,15 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.0.0] - 2026-07-28
+### BREAKING
+- 顶层 Skill、WorkBuddy / CodeBuddy 插件与 ClawHub / SkillHub slug 从 `siyu` 统一改为 `majia-siyu`；重新安装时使用新名称，用户命令 `/siyu` 保持兼容。
+
+### 修复
+- 重写主入口触发描述，与 `majia-huiyuan` 按“经营动作 / 会员数据”互斥分工，避免私域会员问题同时触发。
+- `siyu-update` 的官方真源从历史地址修正为 `maojiebc/majia-siyu-team`。
+- 自包含发布包改为仓库内可追踪的 `skillhub/majia-siyu/`，确保三渠道对应同一 Git commit。
+
 ## [0.8.0] - 2026-07-28
 ### 新增
 - 新增 WorkBuddy / CodeBuddy 原生 `.codebuddy-plugin` 清单与市场入口。用户只需安装一个 `siyu` 插件，即可一次获得统一入口、16 个能力、4 个专家 Agent 和编排命令。
@@ -12,7 +21,7 @@
 
 ## [0.7.0] - 2026-07-23
 ### 新增
-- siyu 入口内置零依赖「整盘怎么搭·餐饮老板版」向导（`plugins/siyu-core/skills/siyu/references/整盘怎么搭-老板版.md`）：黑话→大白话对照表、五步全貌讲法、起步四件套大白话版、可转发地图（SVG→PNG）与交互自测网页（单文件 HTML）的生成指令。只装入口、没有 runtime 的宿主环境不再降级成术语版，直接产出店老板看得懂、能落地的向导。
+- siyu 入口内置零依赖「整盘怎么搭·餐饮老板版」向导（现位于 `plugins/siyu-core/skills/majia-siyu/references/整盘怎么搭-老板版.md`）：黑话→大白话对照表、五步全貌讲法、起步四件套大白话版、可转发地图（SVG→PNG）与交互自测网页（单文件 HTML）的生成指令。只装入口、没有 runtime 的宿主环境不再降级成术语版，直接产出店老板看得懂、能落地的向导。
 - 「整盘怎么搭」路由按环境与人群分档：店老板 / 纯入口环境 → 老板版向导；完整仓库 + 专业运营 → `siyu-onboard` 深度评审。`siyu-onboard` 头部新增讲人话与优先走老板版的提示。
 
 ### 变更

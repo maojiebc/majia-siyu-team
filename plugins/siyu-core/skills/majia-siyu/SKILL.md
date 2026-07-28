@@ -1,16 +1,15 @@
 ---
-name: siyu
+name: majia-siyu
 description: |
-  私域专家团主入口。三种模式：新手教程、任务前路由、任务后导航。
-  触发方式：/siyu、/私域、「帮我看看私域」、「下一步怎么走」
-  Main entry point for siyu expert team. Trigger: /siyu, "help with my private domain"
+  私域经营行动入口·马甲实战版（majia-siyu）。处理朋友圈、群发、欢迎语、社群触达、企微引流、具体私域问题诊断、整盘怎么搭、客户档案与任务后导航。明确触发：/siyu、/私域、私域运营、朋友圈文案、群发、欢迎语、群不活跃、没人加微；“下一步怎么走”仅在当前对话已经是私域任务时触发。
+  边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "0.8.0"
+  version: "1.0.0"
   author: "超级马甲 / maojiebc"
 ---
 
-# siyu：私域工具箱入口 · 马甲实战版
+# majia-siyu：私域工具箱入口 · 马甲实战版
 
 你负责识别模式、选择 skill、组织衔接；具体工作由被路由到的 skill 完成。
 
@@ -100,9 +99,15 @@ metadata:
 
 面向用户一律中文；不用 slug、session 等英文术语，**也不用中文黑话**——playbook / 团长 / 四官 / 升舱 等黑话一律翻成大白话（对照表见 [`references/整盘怎么搭-老板版.md`](references/整盘怎么搭-老板版.md)）。面对店老板尤其守这条：他要查字典的词，就是失败。
 
-## 完整工具箱
+完整能力与安装说明见公开仓库：**https://github.com/maojiebc/majia-siyu-team**。
 
-完整能力在公开仓库 **https://github.com/maojiebc/majia-siyu-team**：执行层 `siyu-pyq`/`siyu-qunfa`/`siyu-huashu`（朋友圈 / 群发 / 话术，各自内置合规扫描）、诊断层「整盘怎么搭」深度版、配套 `siyu-save`/`siyu-wenzhen`/`siyu-report`。整套装法见 `.claude-plugin/marketplace.json`。
+## 📋 版本记录
+
+- **v1.0.0** — 顶层 Skill 与商店名称从 `siyu` 统一为 `majia-siyu`；保留 `/siyu` 命令，并与 majia-huiyuan 建立数据层/经营动作层互斥边界。
+- **v0.8.0** — WorkBuddy / CodeBuddy 新增原生单插件安装；一次安装完整私域专家团，不再逐个选装能力。
+- **v0.7.0** — 零依赖「整盘怎么搭·老板版」向导（讲人话 + 出图 + 网页，纯入口环境也能用）+ 入口全面去黑话 + 讲人话铁律。
+
+完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 
 ---
 
@@ -113,27 +118,6 @@ metadata:
 这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
 并直接路由到对应 skill。迷路了就回 `/siyu`。
 
-## 📋 版本记录
-
-- **v0.8.0** — WorkBuddy / CodeBuddy 新增原生单插件安装；一次安装完整私域专家团，不再逐个选装能力。
-- **v0.7.0** — 零依赖「整盘怎么搭·老板版」向导（讲人话 + 出图 + 网页，纯入口环境也能用）+ 入口全面去黑话 + 讲人话铁律。
-- **v0.6.0** — 餐饮企微冷启动基建知识包：四件套脱敏方法论 + SCRM 选型阶梯 + 成本口径 + 老客迁移玩法卡（完整能力见 GitHub）。
-
-完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
-
 ## 👤 作者 / 联系
 
-**马甲（@maojiebc）** · 超级马甲
-
-如果这份 skill 帮到你，欢迎在以下任意渠道找我交流踩坑实录、提需求、报 bug，也欢迎勾兑用户运营 / 数据中台 / BI 工程的实战经验：
-
-| 渠道 | 链接 |
-|---|---|
-| 📧 Email | [m9224@163.com](mailto:m9224@163.com) |
-| 🐙 GitHub | [github.com/maojiebc](https://github.com/maojiebc) |
-| 🪝 ClawHub | [clawhub.ai/p/maojiebc](https://clawhub.ai/p/maojiebc) |
-| 🐦 X | [@maojiebc](https://x.com/maojiebc) |
-| 📕 小红书 | [超级马甲](https://xhslink.com/m/4fQMJeHHWKC) |
-| 📰 微信公众号 | [超级马甲](https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzY5NzIzODk2NA==#wechat_redirect) |
-
-> 这份 skill 是 14 年用户运营 + 数据中台 + BI 工程实战沉淀出来的，问题/合作随时聊。
+**马甲（@maojiebc）** · [GitHub](https://github.com/maojiebc) · [Email](mailto:m9224@163.com)

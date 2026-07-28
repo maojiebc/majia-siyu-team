@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Build one self-contained `siyu` SkillHub package from all public modules.
+"""Build one self-contained `majia-siyu` registry package from all public modules.
 
 The repository keeps modular Skills for plugin-capable hosts. SkillHub receives
 one generated package: the router at the root plus every capability under
-`modules/`. Generated output lives under ignored `dist/` and is never a second
-source of truth.
+`modules/`. Generated output is committed under `skillhub/majia-siyu/` so
+GitHub, ClawHub, and SkillHub can publish the exact same commit artifact.
 """
 
 from __future__ import annotations
@@ -17,8 +17,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ROUTER = ROOT / "plugins/siyu-core/skills/siyu"
-DEFAULT_OUTPUT = ROOT / "dist/skillhub/siyu"
+ROUTER = ROOT / "plugins/siyu-core/skills/majia-siyu"
+DEFAULT_OUTPUT = ROOT / "skillhub/majia-siyu"
 RASTER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico"}
 
 
@@ -37,18 +37,9 @@ def metadata_version(skill_md: Path) -> str:
     return match.group(1).strip()
 
 
-def add_skillhub_metadata(skill_md: Path, version: str) -> None:
+def add_bundle_rules(skill_md: Path) -> None:
     text = skill_md.read_text(encoding="utf-8")
-    addition = (
-        'slug: "siyu"\n'
-        f'version: "{version}"\n'
-        'displayName: "私域专家团 · 马甲实战版"\n'
-        'summary: "一个入口完成私域内容、触达、话术、诊断、存档与专家评审。"\n'
-        'homepage: "https://github.com/maojiebc/majia-siyu-team"\n'
-    )
-    text = text.replace("\n---", "\n" + addition + "---", 1)
-
-    marker = "# siyu：私域工具箱入口 · 马甲实战版\n"
+    marker = "# majia-siyu：私域工具箱入口 · 马甲实战版\n"
     bundle_rule = """
 
 ## 单入口内置模块执行规则
@@ -115,7 +106,7 @@ def build(output: Path) -> dict[str, object]:
     output.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(ROUTER, output)
     index = copy_modules(output, modules)
-    add_skillhub_metadata(output / "SKILL.md", version)
+    add_bundle_rules(output / "SKILL.md")
     license_file = ROOT / "LICENSE"
     if license_file.exists():
         shutil.copy2(license_file, output / "LICENSE.md")
@@ -128,7 +119,7 @@ def build(output: Path) -> dict[str, object]:
         raise RuntimeError(f"包大小 {total} 超过 SkillHub 上限 10 MB")
     return {
         "output": str(output),
-        "slug": "siyu",
+        "slug": "majia-siyu",
         "version": version,
         "moduleCount": len(index),
         "fileCount": len(files),
@@ -138,7 +129,7 @@ def build(output: Path) -> dict[str, object]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="构建单入口 siyu SkillHub 包")
+    parser = argparse.ArgumentParser(description="构建单入口 majia-siyu 发布包")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     result = build(args.output.expanduser().resolve())
