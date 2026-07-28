@@ -11,6 +11,7 @@ Task Schema
   ↓
 RouteDecision
   ├─ 高频执行：siyu-pyq / siyu-qunfa / siyu-huashu
+  ├─ 动态事实：siyu-market-research → 证据快照 → 问诊或全盘评审
   ├─ 轻问诊：siyu-wenzhen
   ├─ 全盘升舱：siyu-onboard → 四官 → 团长 → 质量门
   └─ 档案管理：siyu-save / restore / report
@@ -24,7 +25,7 @@ Runtime 只生成执行计划，不直接调用模型。Skill 仍负责业务产
 
 定义在 `src/siyu_team/task.py`，固定以下字段：
 
-- `kind`：朋友圈、群发、话术、问诊、全盘评审、存档等任务类型。
+- `kind`：朋友圈、群发、话术、市场调研、问诊、全盘评审、存档等任务类型。
 - `channel`：朋友圈、群聊、私聊、多渠道或未知。
 - `goal`：转化、留存、获客、互动、信任、诊断或归档。
 - `industry` / `stage`：行业与业务阶段。
@@ -44,6 +45,8 @@ Runtime 只生成执行计划，不直接调用模型。Skill 仍负责业务产
 - 阶段重点与知识库引用。
 
 整盘评审缺少行业或阶段时，只返回待补字段，不创建四官上下文。
+
+厂商、产品、价格、功能、案例、政策、平台规则和公司存续等动态事实，确定性路由到 `siyu-market-research`。该路径不加载内部行业知识作为事实来源；候选对象必须来自本次公开网络检索，完成带日期和链接的证据快照后，才进入问诊或全盘评审。
 
 ### AgentContext
 
@@ -87,7 +90,7 @@ make check
 
 当前会执行：
 
-1. 16 个 Runtime、路由、状态和脱敏回归测试；
+1. 43 个 Runtime、路由、状态、脱敏、质量门和连接器回归测试；
 2. SKILL frontmatter、目录名和 8KB 上限检查；
 3. VERSION、marketplace、README 徽章一致性检查；
 4. 全库 footer、用户措辞和护城河占位检查。

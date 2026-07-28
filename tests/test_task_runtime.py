@@ -31,6 +31,20 @@ class TaskParsingTests(unittest.TestCase):
         self.assertEqual(task.channel, Channel.WECHAT_GROUP)
         self.assertEqual(task.goal, Goal.CONVERSION)
 
+    def test_vendor_selection_routes_to_market_research(self) -> None:
+        plan = SiyuRuntime().plan(
+            "帮我对比现在还在卖的企微 SCRM 厂商、功能和价格",
+            trace=False,
+        )
+        self.assertEqual(plan.task.kind, TaskKind.MARKET_RESEARCH)
+        self.assertEqual(plan.decision.skill, "siyu-market-research")
+        self.assertFalse(plan.decision.needs_clarification)
+        self.assertEqual(plan.decision.knowledge_refs, ())
+
+    def test_market_research_precedes_strategy_review(self) -> None:
+        task = parse_task("帮我做整盘私域方案，并比较当前 SCRM 厂商")
+        self.assertEqual(task.kind, TaskKind.MARKET_RESEARCH)
+
     def test_explicit_hints_override_inference(self) -> None:
         task = parse_task(
             "看看这个",

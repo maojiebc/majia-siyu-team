@@ -1,6 +1,6 @@
 # Majia Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.0.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.1.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 > **Siyu Expert Team · 马甲实战版**
@@ -11,13 +11,14 @@
   <img src="assets/icon.png" alt="Siyu Expert Team icon" width="160">
 </p>
 
-![majia-siyu v1.0.1 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.1.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## What it does
 
 `/siyu` picks the single most useful capability for your current situation, runs it, then re-routes based on the real outcome — no fixed long chain.
 
 - **Planning layer**: natural language becomes a validated `Task`, then a deterministic `RouteDecision`.
+- **Evidence layer**: vendor, product, pricing, case-study, and policy claims require current web research with dated source links before recommendation.
 - **Execution layer**: `siyu-pyq` (Moments copy), `siyu-qunfa` (group broadcast), `siyu-huashu` (welcome & FAQ scripts) — each with **write-time compliance scanning** (blocks WeCom-ban triggers / absolute-claim ad-law words / share-bait).
 - **Diagnostic layer**: structural issues escalate to four isolated officer contexts (PR / product / ads / compliance), host synthesis, and a quality gate.
 - **Runtime foundation**: atomic state storage, redacted JSONL traces, layered knowledge, and connector boundaries.
@@ -33,7 +34,7 @@ Technical architecture: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md).
 /plugin install majia-siyu@majia-siyu
 ```
 
-The repository's `.codebuddy-plugin/` manifest exposes the full team as one plugin: 16 skills, four specialist agents, and one `/siyu` entry point.
+The repository's `.codebuddy-plugin/` manifest exposes the full team as one plugin: 17 skills, four specialist agents, and one `/siyu` entry point.
 
 ### ClawHub / SkillHub — one bundled skill
 
@@ -54,9 +55,9 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 
 ## Version History
 
+- **v1.1.0** — Added a hard external-fact gate and `siyu-market-research`; vendor, product, pricing, and market claims must be researched and evidenced before expert analysis.
 - **v1.0.1** — Corrected registry identity: ClawHub uses `majia-siyu`, while SkillHub updates the historical `siyu` entry and preserves its stats and version history.
 - **v1.0.0** — Renamed the top-level Skill, WorkBuddy plugin, and ClawHub slug to `majia-siyu`; kept `/siyu` as the user command, corrected the canonical source, and added an explicit routing boundary with `majia-huiyuan`.
-- **v0.8.0** — One-install distribution: WorkBuddy / CodeBuddy now sees the entire expert team as one plugin, while ClawHub and SkillHub receive a self-contained single-entry bundle. Added a unified minimalist icon and reproducible bundle builder.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 

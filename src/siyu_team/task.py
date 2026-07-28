@@ -25,6 +25,7 @@ class TaskKind(str, Enum):
     MOMENTS_COPY = "moments_copy"
     GROUP_CAMPAIGN = "group_campaign"
     CONVERSATION_SCRIPT = "conversation_script"
+    MARKET_RESEARCH = "market_research"
     DIAGNOSIS = "diagnosis"
     STRATEGY_REVIEW = "strategy_review"
     SAVE_MEMORY = "save_memory"
@@ -62,7 +63,20 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str]], ...] = (
     (TaskKind.SAVE_MEMORY, re.compile(r"(保存|存档|记下来|留下结论)")),
     (TaskKind.RESTORE_MEMORY, re.compile(r"(恢复|接着上次|上次聊|之前聊到哪)")),
     (TaskKind.REPORT, re.compile(r"(出报告|生成报告|打包给.{0,6}(老板|客户))")),
-    (TaskKind.STRATEGY_REVIEW, re.compile(r"(全盘|整盘|战略评审|私域体系|怎么搭|四官)")),
+    (
+        TaskKind.MARKET_RESEARCH,
+        re.compile(
+            r"(厂商|供应商|服务商|竞品|市场格局|市场地图|产品选型|"
+            r"公司存续|客户案例|最新政策|平台规则|"
+            r"(产品|软件|平台).{0,8}(价格|报价|收费|功能|版本|接口|停服|在营)|"
+            r"(价格|报价|功能|版本|接口).{0,8}(厂商|供应商|服务商|软件|平台|产品)|"
+            r"是否.{0,8}(经营|停服|注销))"
+        ),
+    ),
+    (
+        TaskKind.STRATEGY_REVIEW,
+        re.compile(r"(全盘|整盘|战略评审|私域体系|怎么搭|四官)"),
+    ),
     (
         TaskKind.DIAGNOSIS,
         re.compile(
@@ -71,7 +85,10 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str]], ...] = (
         ),
     ),
     (TaskKind.MOMENTS_COPY, re.compile(r"(朋友圈|发圈|内容池|节日文案|导购素材)")),
-    (TaskKind.GROUP_CAMPAIGN, re.compile(r"(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本)")),
+    (
+        TaskKind.GROUP_CAMPAIGN,
+        re.compile(r"(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本)"),
+    ),
     (
         TaskKind.CONVERSATION_SCRIPT,
         re.compile(r"(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本)"),
@@ -231,7 +248,11 @@ def _infer_channel(kind: TaskKind, text: str) -> Channel:
 
 
 def _infer_goal(kind: TaskKind, text: str) -> Goal:
-    if kind in {TaskKind.DIAGNOSIS, TaskKind.STRATEGY_REVIEW}:
+    if kind in {
+        TaskKind.DIAGNOSIS,
+        TaskKind.MARKET_RESEARCH,
+        TaskKind.STRATEGY_REVIEW,
+    }:
         fallback = Goal.DIAGNOSIS
     elif kind in {
         TaskKind.SAVE_MEMORY,

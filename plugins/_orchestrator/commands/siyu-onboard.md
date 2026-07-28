@@ -21,6 +21,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 5. **只用本地 agent**。所有 `subagent_type` 指向本 repo plugins 里的 agent 或 `general-purpose`。
 6. **不自行进 plan mode**。这个 command 就是计划——执行它。
 7. **先结构化再派发**。没有通过 `SiyuRuntime.plan()` 生成有效 Task 和 RouteDecision，不得把原始文本直接交给 Skill 或四官。
+8. **动态事实先留证**。厂商、产品、价格、功能、案例、政策、平台规则、市场排名或公司存续等事实，必须先完成 `siyu-market-research`；内部知识、Get 笔记和 BI 数据不能替代公开网络证据。
 
 （1–6 照搬 full-stack-feature.md:8-18，仅第 4 条补了合规红线；第 7 条是 Runtime 边界。）
 
@@ -35,6 +36,18 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 4. **初始化 state.json**（字段见 `src/siyu_team/state.py` / docs/blueprint.md §3c），调 `state.init_state(client, industry, stage)`。
 
 ---
+
+## Gate 0 · 公开网络证据（条件触发）
+
+先扫描原始请求和已有材料。只要涉及动态外部事实：
+
+1. 完整执行 `siyu-market-research`；单入口包读取 `modules/siyu-market-research/SKILL.md`。候选对象必须来自本次检索，禁止四官凭记忆补名单。
+2. 将合格结果写入 `.siyu-team/00-market-research.md`，必须含本次核验日期、来源链接和核验状态。
+3. 公司存续与产品仍售分别核验；只有“已核验在营”可进入正式建议。
+4. 当前环境不能联网时立即停止具体选型，只输出调研框架，不输出名单、价格或存续判断。
+5. 后续步骤只能引用该文件内已核验事实；需要新增对象或动态事实时退回本门重新检索。
+
+未命中动态事实时跳过本门。内部知识、Get 笔记和 BI 只用于客户自身现状与方法论分析，不能替代本门。
 
 ## Step 0 · 调研诊断（Interactive，团长亲自做）
 用 `AskUserQuestion` 一次问一个，收齐：
