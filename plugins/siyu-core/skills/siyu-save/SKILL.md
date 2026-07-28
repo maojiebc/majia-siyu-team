@@ -3,6 +3,7 @@ name: siyu-save
 description: |
   把当前私域咨询的关键结论写入本地客户档案，供下次接续或汇总报告。
   触发方式：/siyu-save、/存档、「保存」「记下来」「这个结论留着」；支持 list 和 --client。
+version: 0.8.0
 ---
 
 # siyu-save：客户档案存档

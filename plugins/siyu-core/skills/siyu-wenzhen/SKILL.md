@@ -3,6 +3,7 @@ name: siyu-wenzhen
 description: |
   私域业务轻问诊：先用五层消解漏斗判断具体问题是否成立，再给答案或升舱全盘诊断。
   触发方式：/siyu-wenzhen、/问诊、「转化差怎么办」「群不活跃」「没人加微」「我有个私域问题」。
+version: 0.8.0
 ---
 
 # siyu-wenzhen：私域问诊

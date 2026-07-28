@@ -1,0 +1,46 @@
+{
+  "name": "siyu",
+  "version": "0.8.0",
+  "description": "私域专家团完整工具箱：一次安装统一入口、执行能力、轻问诊、客户档案与四位专家。",
+  "author": {
+    "name": "maojiebc"
+  },
+  "homepage": "https://github.com/maojiebc/majia-siyu-team",
+  "repository": "https://github.com/maojiebc/majia-siyu-team",
+  "license": "MIT",
+  "keywords": [
+    "private-domain",
+    "wechat",
+    "operations",
+    "expert-team",
+    "chinese"
+  ],
+  "category": "Business Tools",
+  "commands": [
+    "./plugins/_orchestrator/commands/siyu-onboard.md"
+  ],
+  "agents": [
+    "./plugins/private-pr-officer/agents/private-pr-officer.md",
+    "./plugins/content-product-officer/agents/content-product-officer.md",
+    "./plugins/ops-ad-officer/agents/ops-ad-officer.md",
+    "./plugins/compliance-critic/agents/compliance-critic.md"
+  ],
+  "skills": [
+    "./plugins/siyu-core/skills/siyu",
+    "./plugins/siyu-execution/skills/siyu-pyq",
+    "./plugins/siyu-execution/skills/siyu-qunfa",
+    "./plugins/siyu-execution/skills/siyu-huashu",
+    "./plugins/siyu-core/skills/siyu-wenzhen",
+    "./plugins/siyu-core/skills/siyu-save",
+    "./plugins/siyu-core/skills/siyu-restore",
+    "./plugins/siyu-core/skills/siyu-report",
+    "./plugins/siyu-core/skills/siyu-update",
+    "./plugins/private-pr-officer/skills/trust-asset-playbook",
+    "./plugins/private-pr-officer/skills/crisis-response-sop",
+    "./plugins/content-product-officer/skills/content-as-product",
+    "./plugins/content-product-officer/skills/reactivation-playbook",
+    "./plugins/ops-ad-officer/skills/ops-as-ad-funnel",
+    "./plugins/ops-ad-officer/skills/conversion-caliber",
+    "./plugins/compliance-critic/skills/wechat-compliance-redlines"
+  ]
+}

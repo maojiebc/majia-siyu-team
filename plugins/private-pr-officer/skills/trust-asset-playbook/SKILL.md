@@ -1,7 +1,7 @@
 ---
 name: trust-asset-playbook
 description: 信任资产打法（IP人设/朋友圈/口碑/转介绍）。Use this skill when 设计 IP 人设、朋友圈信任建设、口碑与转介绍机制时。
-version: 0.1.0
+version: 0.8.0
 ---
 
 # 信任资产打法（IP人设/朋友圈/口碑/转介绍）

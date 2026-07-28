@@ -6,7 +6,7 @@ description: |
   Main entry point for siyu expert team. Trigger: /siyu, "help with my private domain"
 license: MIT
 metadata:
-  version: "0.7.0"
+  version: "0.8.0"
   author: "超级马甲 / maojiebc"
 ---
 
@@ -115,9 +115,9 @@ metadata:
 
 ## 📋 版本记录
 
+- **v0.8.0** — WorkBuddy / CodeBuddy 新增原生单插件安装；一次安装完整私域专家团，不再逐个选装能力。
 - **v0.7.0** — 零依赖「整盘怎么搭·老板版」向导（讲人话 + 出图 + 网页，纯入口环境也能用）+ 入口全面去黑话 + 讲人话铁律。
 - **v0.6.0** — 餐饮企微冷启动基建知识包：四件套脱敏方法论 + SCRM 选型阶梯 + 成本口径 + 老客迁移玩法卡（完整能力见 GitHub）。
-- **v0.5.0** — 质量门四层落地（判官 + 蒙卡走 B 路径，宿主评分零 API）+ 连接器骨架 + 四官方法框架补全。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

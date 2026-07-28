@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v0.7.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v0.8.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu--team-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu-team)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -9,7 +9,9 @@
 >
 > **从日常文案直接干活、遇到结构问题再升舱诊断的中文私域工具箱。** 你只需记住 `/siyu`：它按当前处境选一个能力，干完再按真实结论导航下一步——不预设固定长链。
 
-![私域专家团 v0.7.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+<img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
+
+![私域专家团 v0.8.0 框架全局：客户私域诉求→结构化任务→团长按行业/阶段路由→公关/产品/广告/合规四官独立评审→团长主持收口→质量门→可落地 playbook](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -59,6 +61,10 @@
 ## 安装
 
 ```bash
+# WorkBuddy / CodeBuddy（推荐：只安装一个 siyu 插件，完整能力一次到位）
+/plugin marketplace add maojiebc/majia-siyu-team
+/plugin install siyu@siyu-expert-team
+
 # ClawHub（装入口）
 clawhub install majia-siyu-team
 
@@ -69,7 +75,9 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 claude plugin marketplace add maojiebc/majia-siyu-team
 ```
 
-安装单元定义在 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)。
+WorkBuddy / CodeBuddy 的单插件安装定义在 [`.codebuddy-plugin/plugin.json`](.codebuddy-plugin/plugin.json)，一次安装会统一带上入口、16 个能力、4 个专家 Agent 与编排命令；Claude Code 的安装单元仍定义在 [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)。
+
+SkillHub 使用单一 `siyu` 商店条目。发布前运行 `python3 tools/build_skillhub_bundle.py`，它会从当前仓库的模块真源生成一个自包含临时包：主入口位于根级，全部能力收进 `modules/` 供内部路由，不把子能力拆成零散商店条目。
 
 ## 怎样工作
 
@@ -110,9 +118,9 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v0.8.0** — 新增 WorkBuddy / CodeBuddy 原生单插件分发：用户只安装一个 `siyu` 插件，即可获得完整私域专家团，同时保留 Claude Code、ClawHub 与通用 Skills 安装方式。
 - **v0.7.0** — 通用兼容层：新增零依赖「整盘怎么搭·餐饮老板版」向导（讲人话 + 出图 + 网页，只装入口的环境也能用），入口全面去黑话（playbook / 团长 / 四官 / 升舱 全翻大白话）并立讲人话铁律。
 - **v0.6.0** — 新增餐饮企业微信冷启动基建知识包：企微四件套（好友码/资料页/欢迎语/群活码）脱敏方法论、SCRM 选型阶梯与产品成本口径、老客迁移玩法卡；私有护城河层首建 23 条真实 SOP 原子。
-- **v0.5.0** — 质量门四层落地（判官 + 蒙卡走 B 路径，宿主评分零 API）、连接器 keychain 骨架、四官方法框架补全、合规 lint 脱离 repo 降级兜底。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

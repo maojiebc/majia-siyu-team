@@ -2,6 +2,14 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [0.8.0] - 2026-07-28
+### 新增
+- 新增 WorkBuddy / CodeBuddy 原生 `.codebuddy-plugin` 清单与市场入口。用户只需安装一个 `siyu` 插件，即可一次获得统一入口、16 个能力、4 个专家 Agent 和编排命令。
+- 新增 `tools/build_skillhub_bundle.py`：从模块真源生成自包含的单一 `siyu` SkillHub 包，子能力仅作为内部路由模块，不再独立占用商店条目。
+
+### 变更
+- README 将 WorkBuddy 单插件安装设为推荐路径；Claude Code、ClawHub 与通用 Skills 安装方式继续保留。
+
 ## [0.7.0] - 2026-07-23
 ### 新增
 - siyu 入口内置零依赖「整盘怎么搭·餐饮老板版」向导（`plugins/siyu-core/skills/siyu/references/整盘怎么搭-老板版.md`）：黑话→大白话对照表、五步全貌讲法、起步四件套大白话版、可转发地图（SVG→PNG）与交互自测网页（单文件 HTML）的生成指令。只装入口、没有 runtime 的宿主环境不再降级成术语版，直接产出店老板看得懂、能落地的向导。

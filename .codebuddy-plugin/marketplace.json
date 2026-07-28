@@ -1,0 +1,30 @@
+{
+  "name": "siyu-expert-team",
+  "owner": {
+    "name": "maojiebc"
+  },
+  "metadata": {
+    "description": "私域专家团 WorkBuddy / CodeBuddy 插件市场",
+    "version": "0.8.0"
+  },
+  "plugins": [
+    {
+      "name": "siyu",
+      "source": "./",
+      "strict": true,
+      "description": "一次安装完整私域专家团，由统一入口根据真实任务自动路由。",
+      "version": "0.8.0",
+      "homepage": "https://github.com/maojiebc/majia-siyu-team",
+      "repository": "https://github.com/maojiebc/majia-siyu-team",
+      "license": "MIT",
+      "keywords": [
+        "private-domain",
+        "wechat",
+        "operations",
+        "expert-team",
+        "chinese"
+      ],
+      "category": "Business Tools"
+    }
+  ]
+}
