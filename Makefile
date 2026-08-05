@@ -1,4 +1,4 @@
-.PHONY: eval validate test check report
+.PHONY: eval validate pilot test check report
 
 # 对一份产物方案打质量门分（低于阈值或踩合规红线 exit 1）
 eval:
@@ -8,12 +8,16 @@ eval:
 validate:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli validate plugins/
 
+# 校验 v1.2.1 Knowledge Pilot 的 30 题与合成 fixture（不读取私有 Atom）
+pilot:
+	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.pilot.cli validate --fixtures
+
 # Runtime 与状态层回归测试（stdlib unittest，零额外依赖）
 test:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests -v
 
 # 总质量门：测试、结构、发布版本、全库 footer/措辞/体积
-check: test validate
+check: test validate pilot
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_versions.py
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_consistency.py
 
