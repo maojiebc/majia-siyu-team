@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -11,7 +11,7 @@
 
 <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
 
-![majia-siyu v1.2.0 框架全局：动态事实先检索留证，知识原子按范围隔离，贡献先预览授权](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.2.1 框架全局：动态事实先检索留证，知识原子按范围隔离，Pilot 只做离线验证](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -85,15 +85,16 @@ WorkBuddy / CodeBuddy 的单插件安装定义在 [`.codebuddy-plugin/plugin.jso
 
 两个商店都只保留一个条目：ClawHub 使用 `majia-siyu`；SkillHub 为保留原条目的下载量、收藏与版本历史，继续沿用历史安装名 `siyu`。代码入口、WorkBuddy 插件和 GitHub 真源统一为 `majia-siyu`。发布前运行 `python3 tools/build_skillhub_bundle.py`，它会从当前仓库的模块真源生成自包含包到 `skillhub/majia-siyu/`：主入口位于根级，全部能力收进 `modules/` 供内部路由，不把子能力拆成零散商店条目。
 
-## 同行知识共建（v1.2 Phase 0）
+## 同行知识共建（v1.2.1 邀请制 Pilot）
 
-把你亲历的一次判断变化，贡献成同行少走的一次弯路：
+本轮只邀请小样本同行验证三件事：知识是否真能改善答案、案例卡与完整脱敏知识包是否构成有价值的交换、人工审核成本是否可持续。当前 H1/H2/H3 均尚未完成真实试验，不宣称已形成知识飞轮。
 
-- [填写《连锁加盟餐饮私域真实案例采集卡》](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)（约 3—5 分钟）
 - [查看飞书同行共建知识库](https://supermjbc.feishu.cn/wiki/XdrvwbtIyif61Pku8yQcSCj6nWf)
+- [填写 v1.2.1 真实案例采集表](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)
 - [阅读贡献与授权说明](docs/community-knowledge/contributor-guide.md)
+- [查看 Pilot 协议与当前结果状态](docs/pilot/README.md)
 
-飞书只负责采集、协作和人工审核，不是 Runtime 的实时数据库。原始案例不会直接进入 Skill；只有完成脱敏、人工批准并进入明确发布批次的知识原子，才会导出为版本化 JSONL。当前 Runtime 仅建立 `KnowledgeAtomV2` 契约与贡献安全原语，尚未启用自动提交或线上检索注入。
+飞书公开入口已原位切换为 v1.2.1：保留同一分享链接，现为 7 个核心问题、5 项轻量元数据和 1 个语音/附件入口，共 13 题。切换前确认同步表无真实投稿，因此已清除 v1.2.0 的 21 题旧字段；未创建伪造试填记录。飞书仅用于采集和人工审核，不是 Runtime 实时真源。本版不启用自动批准、正式知识检索或 Runtime 注入。
 
 ## 怎样工作
 
@@ -127,17 +128,18 @@ flowchart LR
 ```bash
 make validate
 make test
+PYTHONPATH=src python3 -m siyu_team.pilot.cli validate --fixtures
 PYTHONPATH=src python3 -m siyu_team.eval.cli score <方案.md> --threshold 80
 PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在哪？" --industry catering
 ```
 
-自然语言请求先进入结构化 Runtime，生成 `Task → RouteDecision → AgentContext`，再交给现有 Skill。运行追踪默认写入本地 `.siyu-team/traces/`，敏感字段、手机号、身份证号和 Bearer 凭据会在落盘前脱敏。v1.2.0 新增的知识与贡献代码仍处于契约层，不会自行联网提交或把未审核内容注入答案。能力定义的唯一真源是 `plugins/` 与 `src/siyu_team/`。质量门命中 `COMPLIANCE_RED` 直接失败，不交付。
+自然语言请求先进入结构化 Runtime，生成 `Task → RouteDecision → AgentContext`，再交给现有 Skill。运行追踪默认写入本地 `.siyu-team/traces/`，敏感字段、手机号、身份证号和 Bearer 凭据会在落盘前脱敏。v1.2.1 新增的 `siyu-pilot` 只做离线 Prompt 准备、盲化、评分和审核报表，不调用模型或飞书 API，也不把 Atom 接入 Runtime。能力定义的唯一真源是 `plugins/` 与 `src/siyu_team/`。质量门命中 `COMPLIANCE_RED` 直接失败，不交付。
 
 ## 📋 版本记录
 
+- **v1.2.1** — 新增离线知识价值盲测、30 个 Golden Tasks 和审核吞吐报表；同行共建收敛为邀请制验证，真实 H1/H2/H3 尚未执行。
 - **v1.2.0** — 建立 `KnowledgeAtomV2` 契约与贡献预览/授权/隐私/幂等安全层，完成飞书六表治理和 21 题问卷 Phase 0；尚不自动上传或自动批准知识。
 - **v1.1.0** — 新增动态外部事实三道硬门和 `siyu-market-research`；厂商、产品、价格与市场事实必须实时检索留证后才能进入推荐和专家分析。
-- **v1.0.1** — 修正渠道身份：ClawHub 使用 `majia-siyu`，SkillHub 在原 `siyu` 条目上升级并保留历史统计；同步修正安装命令。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

@@ -1,6 +1,6 @@
 # Majia Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 > **Siyu Expert Team · 马甲实战版**
@@ -11,7 +11,7 @@
   <img src="assets/icon.png" alt="Siyu Expert Team icon" width="160">
 </p>
 
-![majia-siyu v1.2.0 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.2.1 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## What it does
 
@@ -26,12 +26,13 @@
 
 Technical architecture: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md).
 
-## Community knowledge pilot
+## Community knowledge pilot (v1.2.1, invitation only)
 
-- [Contribute one anonymized field case](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg) (3–5 minutes)
 - [Open the Feishu collaboration space](https://supermjbc.feishu.cn/wiki/XdrvwbtIyif61Pku8yQcSCj6nWf)
+- [Submit a v1.2.1 field case](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)
+- [Read the offline pilot protocol](docs/pilot/README.md)
 
-Feishu is used for intake and human review only. A submission never enters runtime directly; only anonymized, approved atoms included in a versioned release batch can become public JSONL knowledge.
+This release tests knowledge value, contribution demand, and editorial throughput; no real H1/H2/H3 run has been completed yet. The public Feishu entry now serves the v1.2.1 intake in place: seven core questions, five lightweight metadata fields, and one voice/attachment prompt. The legacy v1.2.0 question fields were removed only after confirming that the synchronized table contained no real submissions. Feishu remains an intake and human-review workspace, not a runtime source. v1.2.1 does not enable automatic approval, retrieval, or runtime injection.
 
 ## Install
 
@@ -63,9 +64,9 @@ npx -y skills add maojiebc/majia-siyu-team -g --all
 
 ## Version History
 
+- **v1.2.1** — Added an offline knowledge blind-test tool, 30 Golden Tasks, synthetic fixtures, and an editorial-throughput report. The community effort is now explicitly an invitation-only validation; real H1/H2/H3 results are still not evaluated.
 - **v1.2.0** — Added the `KnowledgeAtomV2` contract, scoped knowledge paths, safe contribution preview/authorization/privacy/idempotency primitives, and a human-reviewed Feishu Phase 0 pilot.
 - **v1.1.0** — Added a hard external-fact gate and `siyu-market-research`; vendor, product, pricing, and market claims must be researched and evidenced before expert analysis.
-- **v1.0.1** — Corrected registry identity: ClawHub uses `majia-siyu`, while SkillHub updates the historical `siyu` entry and preserves its stats and version history.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 

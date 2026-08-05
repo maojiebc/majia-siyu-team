@@ -1,13 +1,13 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 
 > 中文私域运营工具箱。日常文案直接干活，结构问题升舱四官诊断。入口只有一个：`/siyu`。
 
 <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
 
-![majia-siyu v1.2.0 框架全局：动态事实先检索留证，知识原子按范围隔离](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.2.1 框架全局：动态事实先检索留证，知识 Pilot 仅做离线验证](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 ## 这个入口做什么
 
@@ -39,9 +39,9 @@ skillhub install siyu
 
 ## 📋 版本记录
 
+- **v1.2.1** — 新增离线 Knowledge Pilot 盲测、30 个 Golden Tasks 和审核吞吐报表；真实 H1/H2/H3 尚未执行。
 - **v1.2.0** — 建立 `KnowledgeAtomV2` 契约与贡献安全层，完成飞书同行共建 Phase 0；未审核内容不会进入正式检索。
 - **v1.1.0** — 新增动态外部事实硬门与 `siyu-market-research`，厂商、产品、价格和市场结论先实时检索留证。
-- **v1.0.1** — ClawHub 使用 `majia-siyu`；SkillHub 沿用原 `siyu` 条目并保留历史统计，修正安装命令。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 
