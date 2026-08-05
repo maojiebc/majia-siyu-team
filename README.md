@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.1.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
@@ -11,7 +11,7 @@
 
 <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="私域专家团高级极简图标" width="160">
 
-![majia-siyu v1.1.0 框架全局：动态事实先检索留证，再进入经营动作或专家分析](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.2.0 框架全局：动态事实先检索留证，知识原子按范围隔离，贡献先预览授权](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 > **一张图看懂**：`/siyu` 每次只选当前一步；结构问题升舱后，四官各自独立采样、互不可见，团长主持只评推理质量、合规官红线一票否决，最终收口成可埋点、可交付客户的 playbook。全程由「企微官方文档 + 行业册 + 真实 SOP」三层知识库和工具链底座支撑。
 
@@ -24,6 +24,7 @@
 | 新客加进来不知道第一句说什么 | 分场景欢迎语、破冰流程与高频答疑话术 |
 | 有个具体私域问题，但不知道问题出在哪 | 五层问诊：先判断问题是否成立，再回答或升舱 |
 | 要选厂商、比竞品或核对当前报价 | 实时检索、存续与产品状态分开核验、带链接和日期的证据快照 |
+| 想把一次真实踩坑贡献给同行 | 结构化案例采集、授权范围选择和人工审核，不上传完整聊天 |
 | 整盘私域不知道怎么搭 | 团长调研 → 四官独立评审 → 主持收口成可执行 playbook |
 | 上次结论散在聊天里，下次又要重讲 | 本地客户档案、跨对话接续与合规报告 |
 
@@ -84,6 +85,16 @@ WorkBuddy / CodeBuddy 的单插件安装定义在 [`.codebuddy-plugin/plugin.jso
 
 两个商店都只保留一个条目：ClawHub 使用 `majia-siyu`；SkillHub 为保留原条目的下载量、收藏与版本历史，继续沿用历史安装名 `siyu`。代码入口、WorkBuddy 插件和 GitHub 真源统一为 `majia-siyu`。发布前运行 `python3 tools/build_skillhub_bundle.py`，它会从当前仓库的模块真源生成自包含包到 `skillhub/majia-siyu/`：主入口位于根级，全部能力收进 `modules/` 供内部路由，不把子能力拆成零散商店条目。
 
+## 同行知识共建（v1.2 Phase 0）
+
+把你亲历的一次判断变化，贡献成同行少走的一次弯路：
+
+- [填写《连锁加盟餐饮私域真实案例采集卡》](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)（约 3—5 分钟）
+- [查看飞书同行共建知识库](https://supermjbc.feishu.cn/wiki/XdrvwbtIyif61Pku8yQcSCj6nWf)
+- [阅读贡献与授权说明](docs/community-knowledge/contributor-guide.md)
+
+飞书只负责采集、协作和人工审核，不是 Runtime 的实时数据库。原始案例不会直接进入 Skill；只有完成脱敏、人工批准并进入明确发布批次的知识原子，才会导出为版本化 JSONL。当前 Runtime 仅建立 `KnowledgeAtomV2` 契约与贡献安全原语，尚未启用自动提交或线上检索注入。
+
 ## 怎样工作
 
 ```mermaid
@@ -101,9 +112,9 @@ flowchart LR
 - **计划层（代码边界）**：`Task → RouteDecision` 固定任务类型、渠道、目标、风险与缺失字段；信息不足时先补问。
 - **执行层（入口·高频）**：`siyu-pyq` / `siyu-qunfa` / `siyu-huashu`，各自内置边写边合规。
 - **诊断层（升舱·低频）**：四官先经过 `AgentContext` 白名单隔离，再由团长主持收口并过质量门。
-- **共用底座**：原子状态、脱敏追踪、三层知识库、合规词库单一真源与连接器预留接口（未接入）。
+- **共用底座**：原子状态、脱敏追踪、`KnowledgeAtomV2` 分层知识契约、prompt-once 贡献状态、合规词库单一真源与连接器预留接口（尚未接入线上提交/检索）。
 
-当前 Runtime 说明见 [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md)，完整能力图见 [`docs/framework.svg`](docs/framework.svg)；工程范式来源见 [`docs/标杆移植说明.md`](docs/标杆移植说明.md)。
+当前 Runtime 说明见 [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md)，Knowledge Runtime 契约见 [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md)，完整能力图见 [`docs/framework.svg`](docs/framework.svg)；工程范式来源见 [`docs/标杆移植说明.md`](docs/标杆移植说明.md)。
 
 ## 方法论引擎：三句话
 
@@ -120,13 +131,13 @@ PYTHONPATH=src python3 -m siyu_team.eval.cli score <方案.md> --threshold 80
 PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在哪？" --industry catering
 ```
 
-自然语言请求先进入结构化 Runtime，生成 `Task → RouteDecision → AgentContext`，再交给现有 Skill。运行追踪默认写入本地 `.siyu-team/traces/`，敏感字段、手机号、身份证号和 Bearer 凭据会在落盘前脱敏。能力定义的唯一真源是 `plugins/` 与 `src/siyu_team/`。质量门命中 `COMPLIANCE_RED` 直接失败，不交付。
+自然语言请求先进入结构化 Runtime，生成 `Task → RouteDecision → AgentContext`，再交给现有 Skill。运行追踪默认写入本地 `.siyu-team/traces/`，敏感字段、手机号、身份证号和 Bearer 凭据会在落盘前脱敏。v1.2.0 新增的知识与贡献代码仍处于契约层，不会自行联网提交或把未审核内容注入答案。能力定义的唯一真源是 `plugins/` 与 `src/siyu_team/`。质量门命中 `COMPLIANCE_RED` 直接失败，不交付。
 
 ## 📋 版本记录
 
+- **v1.2.0** — 建立 `KnowledgeAtomV2` 契约与贡献预览/授权/隐私/幂等安全层，完成飞书六表治理和 21 题问卷 Phase 0；尚不自动上传或自动批准知识。
 - **v1.1.0** — 新增动态外部事实三道硬门和 `siyu-market-research`；厂商、产品、价格与市场事实必须实时检索留证后才能进入推荐和专家分析。
 - **v1.0.1** — 修正渠道身份：ClawHub 使用 `majia-siyu`，SkillHub 在原 `siyu` 条目上升级并保留历史统计；同步修正安装命令。
-- **v1.0.0** — 顶层 Skill、WorkBuddy 插件与 ClawHub slug 统一为 `majia-siyu`；保留 `/siyu` 命令，修正官方真源，并与 majia-huiyuan 建立互斥触发边界。
 
 完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
 

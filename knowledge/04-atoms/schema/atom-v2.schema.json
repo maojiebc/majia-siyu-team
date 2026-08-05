@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/maojiebc/majia-siyu-team/schemas/atom-v2.schema.json",
+  "title": "KnowledgeAtomV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "id", "statement", "type", "topics", "skills", "source",
+    "scope", "applicability", "quality", "lifecycle", "privacy"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "id": {"type": "string", "pattern": "^ka_[0-9a-f]{16}$"},
+    "statement": {"type": "string", "minLength": 1},
+    "type": {
+      "enum": ["principle", "method", "case", "anti-pattern", "insight", "tool", "compliance"]
+    },
+    "topics": {"$ref": "#/$defs/uniqueStrings"},
+    "skills": {"$ref": "#/$defs/uniqueStrings"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "source_type", "label", "path", "locator", "observed_at"],
+      "properties": {
+        "source_id": {"type": "string", "pattern": "^src_[0-9a-f]{12}$"},
+        "source_type": {"enum": ["official", "internal_case", "public_case", "expert_judgment", "legacy"]},
+        "label": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "observed_at": {"type": "string", "format": "date"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibility", "client_id", "industry", "subindustry", "business_model", "channels", "lifecycle_stages", "roles", "scenarios"],
+      "properties": {
+        "visibility": {"enum": ["public", "expert_private", "client_private"]},
+        "client_id": {"type": "string"},
+        "industry": {"type": "string"},
+        "subindustry": {"type": "string"},
+        "business_model": {"type": "string"},
+        "channels": {"$ref": "#/$defs/uniqueStrings"},
+        "lifecycle_stages": {"$ref": "#/$defs/uniqueStrings"},
+        "roles": {"$ref": "#/$defs/uniqueStrings"},
+        "scenarios": {"$ref": "#/$defs/uniqueStrings"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"visibility": {"const": "client_private"}}},
+          "then": {"properties": {"client_id": {"minLength": 1}}},
+          "else": {"properties": {"client_id": {"maxLength": 0}}}
+        }
+      ]
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preconditions", "recommended_action", "metrics", "failure_modes", "counterexamples"],
+      "properties": {
+        "preconditions": {"$ref": "#/$defs/uniqueStrings"},
+        "recommended_action": {"$ref": "#/$defs/uniqueStrings"},
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "definition", "time_window"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "definition": {"type": "string", "minLength": 1},
+              "time_window": {"type": "string"}
+            }
+          }
+        },
+        "failure_modes": {"$ref": "#/$defs/uniqueStrings"},
+        "counterexamples": {"$ref": "#/$defs/uniqueStrings"}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_grade", "confidence", "review_status", "reviewer", "reviewed_at"],
+      "properties": {
+        "evidence_grade": {"enum": ["A1", "A2", "B1", "B2", "C1", "C2", "D"]},
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "review_status": {"enum": ["draft", "in_review", "approved", "superseded", "retired", "rejected"]},
+        "reviewer": {"type": "string"},
+        "reviewed_at": {"type": "string"}
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valid_from", "valid_until", "supersedes", "contradicts"],
+      "properties": {
+        "valid_from": {"type": "string", "format": "date"},
+        "valid_until": {"type": ["string", "null"], "format": "date"},
+        "supersedes": {"$ref": "#/$defs/atomIds"},
+        "contradicts": {"$ref": "#/$defs/atomIds"}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contains_pii", "contains_client_secret", "exportable"],
+      "properties": {
+        "contains_pii": {"type": "boolean"},
+        "contains_client_secret": {"type": "boolean"},
+        "exportable": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "uniqueStrings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "atomIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^ka_[0-9a-f]{16}$"}
+    }
+  }
+}
