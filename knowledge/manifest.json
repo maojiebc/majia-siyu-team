@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "corpus_version": "0.1.0-draft",
+  "atom_schema": "04-atoms/schema/atom-v2.schema.json",
+  "public_corpora": [],
+  "status": "contract-only",
+  "notes": "KnowledgeAtomV2 契约已建立；正式公开原子仍须人工审核和批次发布。"
+}

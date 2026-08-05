@@ -1,0 +1,1 @@
+"""Knowledge Runtime contract tests."""
