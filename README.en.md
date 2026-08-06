@@ -1,74 +1,170 @@
-# Majia Siyu Expert Team · Majia Field Edition
+# Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2.2-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
+[![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
+[![skills.sh](https://img.shields.io/badge/skills.sh-install-24a148.svg)](https://skills.sh/maojiebc/majia-siyu-team)
+[![Release](https://img.shields.io/github/v/release/maojiebc/majia-siyu-team?label=release&color=success)](https://github.com/maojiebc/majia-siyu-team/releases)
 
 > **Siyu Expert Team · 马甲实战版**
 >
-> A Chinese private-domain (WeCom / 私域) operations toolbox. Install one plugin, enter through `/siyu`, and let the router select the right specialist.
+> A Chinese private-domain (WeCom / 私域) operations toolbox. One entry point — `/siyu` — routes you to the single most useful capability, runs it, then re-routes from the real outcome.
 
 <p align="center">
-  <img src="assets/icon.png" alt="Siyu Expert Team icon" width="160">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="Siyu Expert Team icon" width="120">
 </p>
 
-![majia-siyu v1.2.1 architecture](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.2.2 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to four officers; knowledge pilot stays offline">
+</p>
 
-## What it does
+> **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
 
-`/siyu` picks the single most useful capability for your current situation, runs it, then re-routes based on the real outcome — no fixed long chain.
+---
 
-- **Planning layer**: natural language becomes a validated `Task`, then a deterministic `RouteDecision`.
-- **Evidence layer**: vendor, product, pricing, case-study, and policy claims require current web research with dated source links before recommendation.
-- **Execution layer**: `siyu-pyq` (Moments copy), `siyu-qunfa` (group broadcast), `siyu-huashu` (welcome & FAQ scripts) — each with **write-time compliance scanning** (blocks WeCom-ban triggers / absolute-claim ad-law words / share-bait).
-- **Diagnostic layer**: structural issues escalate to four isolated officer contexts (PR / product / ads / compliance), host synthesis, and a quality gate.
-- **Runtime foundation**: atomic state storage, redacted JSONL traces, layered knowledge, and connector boundaries.
-- **Knowledge contract preview**: `KnowledgeAtomV2`, stable IDs, scope isolation, contribution preview/authorization, privacy checks, and idempotency — without automatic upload or approval.
+**Where to go:**
 
-Technical architecture: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md).
+| I want to… | Go to |
+|---|---|
+| Start for the first time | [Quick start](#quick-start) → type `/siyu` |
+| Write Moments / broadcasts / welcome copy | [Capability map · execution](#2-high-frequency-execution) |
+| Diagnose conversion or quiet groups | [Capability map · diagnosis](#3-diagnosis--research) |
+| Compare SCRM vendors or verify pricing | `siyu-market-research` |
+| Design the whole private-domain system | owner guide or `siyu-onboard` |
+| Resume last client thread / ship a report | `/siyu-save` · `/siyu-restore` · `/siyu-report` |
+| Install for an AI agent | [Install](#install) |
 
-## Community knowledge pilot (v1.2.1, invitation only)
+Full Chinese manual: [README.md](./README.md).
 
-- [Open the Feishu collaboration space](https://supermjbc.feishu.cn/wiki/XdrvwbtIyif61Pku8yQcSCj6nWf)
-- [Submit a v1.2.1 field case](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)
-- [Read the offline pilot protocol](docs/pilot/README.md)
+## What it is
 
-This release tests knowledge value, contribution demand, and editorial throughput; no real H1/H2/H3 run has been completed yet. The public Feishu entry now serves the v1.2.1 intake in place: seven core questions, five lightweight metadata fields, and one voice/attachment prompt. The legacy v1.2.0 question fields were removed only after confirming that the synchronized table contained no real submissions. Feishu remains an intake and human-review workspace, not a runtime source. v1.2.1 does not enable automatic approval, retrieval, or runtime injection.
+Private-domain work usually falls into three buckets:
+
+1. **Daily writing** — Moments, group pushes, welcome scripts (and compliance risk)
+2. **Occasional judgment** — is the drop a copy problem or a mechanism problem? can this vendor/price be trusted?
+3. **Heavy but rare** — whole-system design, client memory, handoff reports
+
+Generic copy tools cover most of bucket 1. This toolbox finishes the last 20% and also covers buckets 2–3:
+
+- **One entry** — remember `/siyu`, not 17 skill names
+- **Write-time compliance** — blocks WeCom-ban triggers, absolute ad-law claims, share-bait before output ships
+- **External-fact gate** — vendors, products, pricing, and policy require live research with dated sources
+- **Escalate only when structural** — four officers review in isolation; compliance has veto power
+- **Continuity** — local client archives for save / resume / report
+
+The public repo ships framework, methodology, and installable Skills. Real client operating SOPs stay private.
+
+## Capability map
+
+### 1. Entry
+
+| Skill | When | Output |
+|---|---|---|
+| `/siyu` | Unknown next step | Tutorial, routing, post-task navigation |
+| `/siyu-update` | Upgrade the toolbox | Sync official project; never touch local client files |
+
+### 2. High-frequency execution
+
+| Skill | When | Output |
+|---|---|---|
+| `/siyu-pyq` | Moments / content pool | Ready-to-post Moments copy |
+| `/siyu-qunfa` | Group broadcast / campaigns | Scripts, CTA, mechanism notes |
+| `/siyu-huashu` | Welcome / FAQ / ice-break | Scenario scripts + account IP templates |
+
+### 3. Diagnosis & research
+
+| Skill | When | Output |
+|---|---|---|
+| `siyu-wenzhen` | Concrete ops problems | 5-layer diagnosis or clear prescription |
+| `siyu-market-research` | Vendor / competitor / pricing | Evidence snapshot with links and dates |
+| `siyu-onboard` | Whole-system design | Four-officer playbook |
+| Client archive trio | Save / resume / deliver | `/siyu-save` · `/siyu-restore` · `/siyu-report` |
+
+One WorkBuddy / CodeBuddy install = **17 skills + 4 specialist agents + orchestrator**. ClawHub / SkillHub ship the same self-contained entry package; modules route internally and are not separate store listings.
+
+## Quick start
+
+```text
+/siyu
+```
+
+Or just describe the situation:
+
+```text
+We pushed three campaign rounds to store groups and open rates are still low. Fix the copy first, or fix the group mechanism?
+```
 
 ## Install
 
-### WorkBuddy / CodeBuddy — one plugin
+### WorkBuddy / CodeBuddy (recommended)
 
 ```bash
 /plugin marketplace add maojiebc/majia-siyu-team
 /plugin install majia-siyu@majia-siyu
 ```
 
-The repository's `.codebuddy-plugin/` manifest exposes the full team as one plugin: 17 skills, four specialist agents, and one `/siyu` entry point.
-
-### ClawHub / SkillHub — one bundled skill
-
-The release bundle embeds the router and all internal modules, so users do not need to install specialists separately:
+### ClawHub / SkillHub
 
 ```bash
 clawhub install majia-siyu
 skillhub install siyu
 ```
 
-SkillHub keeps the historical `siyu` entry so downloads, stars, and version history remain attached to the same store identity. The code, GitHub source, WorkBuddy plugin, and ClawHub slug use `majia-siyu`.
+ClawHub uses `majia-siyu`. SkillHub keeps the historical store identity `siyu` so downloads, stars, and version history stay attached. Code, GitHub source, and WorkBuddy plugin all use `majia-siyu`.
 
-### Generic Skills CLI
+### skills.sh / Claude Code
 
 ```bash
 npx -y skills add maojiebc/majia-siyu-team -g --all
+claude plugin marketplace add maojiebc/majia-siyu-team
 ```
 
-## Version History
+## How it works
 
-- **v1.2.1** — Added an offline knowledge blind-test tool, 30 Golden Tasks, synthetic fixtures, and an editorial-throughput report. The community effort is now explicitly an invitation-only validation; real H1/H2/H3 results are still not evaluated.
-- **v1.2.0** — Added the `KnowledgeAtomV2` contract, scoped knowledge paths, safe contribution preview/authorization/privacy/idempotency primitives, and a human-reviewed Feishu Phase 0 pilot.
-- **v1.1.0** — Added a hard external-fact gate and `siyu-market-research`; vendor, product, pricing, and market claims must be researched and evidenced before expert analysis.
+```mermaid
+flowchart LR
+    A["Real situation"] --> B["Structure the task"]
+    B --> C["Pick only the current step"]
+    C --> D["Execute: ship content"]
+    C --> E["Diagnose: dissolve the problem first"]
+    E --> F["Escalate true structural issues"]
+    D --> G["Save / resume / re-route"]
+    F --> G
+```
 
-Full history: [CHANGELOG.md](./CHANGELOG.md) or [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
+1. **Evidence** — live research for vendors, pricing, cases, policy; no recommendation without sources  
+2. **Planning** — natural language becomes a structured task; ask only the one field that unblocks routing  
+3. **Execution** — Moments / broadcast / scripts with built-in compliance  
+4. **Diagnosis** — four isolated officers + host quality gate + compliance veto  
+5. **Foundation** — local state, redacted traces, layered knowledge contract, connector stubs (online submit/retrieve not enabled by default)
+
+Runtime notes: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · knowledge contract: [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md).
+
+## Community knowledge pilot (invitation only)
+
+This release validates knowledge value, contribution demand, and editorial throughput. No real H1/H2/H3 result is claimed yet.
+
+- [Feishu collaboration space](https://supermjbc.feishu.cn/wiki/XdrvwbtIyif61Pku8yQcSCj6nWf)
+- [Field case form](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)
+- [Pilot protocol](docs/pilot/README.md)
+
+Feishu is intake + human review only — not a runtime source. No auto-approval, retrieval, or runtime injection in this release.
+
+## Methodology
+
+- **Private domain = PR** — relationship, reputation, trust; not a harvest field  
+- **Content = product** — every piece needs a hook, a handoff, and reuse value  
+- **Ops = ads** — every operating action should carry its own distribution and conversion  
+
+## Version history
+
+- **v1.2.2** — Public page refresh: role navigation, full capability map, channel-split install, CN/EN + ClawHub package page alignment. No API/behavior change.  
+- **v1.2.1** — Offline knowledge pilot, 30 Golden Tasks, editorial throughput report.  
+- **v1.2.0** — `KnowledgeAtomV2` contract and contribution safety layer.  
+- **v1.1.0** — External-fact hard gate + `siyu-market-research`.  
+
+Full history: [CHANGELOG.md](./CHANGELOG.md).
 
 ## 👤 Author / Contact
 
@@ -85,7 +181,7 @@ If this skill helps you, find me on any of these channels — happy to chat abou
 | 📕 Xiaohongshu | [Super Majia](https://xhslink.com/m/4fQMJeHHWKC) |
 | 📰 WeChat Official Account | [超级马甲](https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzY5NzIzODk2NA==#wechat_redirect) |
 
-> Built from 14 years of user-operations work and hands-on data platform &amp; BI engineering in production.
+> Built from 14 years of user-operations work and hands-on data platform & BI engineering in production.
 
 ## License
 

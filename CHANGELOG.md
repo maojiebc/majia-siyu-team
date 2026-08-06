@@ -2,6 +2,18 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.2] - 2026-08-06
+### 文档
+- 按 majia-ota 品牌面规范重梳公开首页：角色导航表、完整能力地图（入口 / 执行 / 问诊 / 诊断 / 档案）、安装分渠道、中英文 README 对齐。
+- ClawHub 包页（`skillhub/majia-siyu/README.md`）同步装修：完整框架图 + 一行功能说明 + 能力清单 + 作者块。
+- 用户向文案去黑话：首页少用 Task Schema / RouteDecision 等内部术语，技术细节下沉到 `docs/`。
+- SKILL.md H1 改为「私域专家团 · 马甲实战版」（对齐 majia-huiyuan）；frontmatter `name:` 仍为 `majia-siyu`，SkillHub 历史 slug 仍为 `siyu`。发布时 `displayName` 必须走品牌标题，禁止把 `siyu` / `majia-siyu` 当卡片标题。
+- 框架图版本芯片与 PNG 预览同步到 v1.2.2。
+
+### 说明
+- 本次为 docs / 品牌面 patch，**功能、API、安装命令、skill slug 完全不变**。
+- 老版本用户无需为功能升级；若要看新首页与 ClawHub 包页，更新到本版即可。
+
 ## [1.2.1] - 2026-08-06
 ### 新增
 - 新增维护者侧离线知识价值盲测工具：校验试验输入、生成基线/知识双版 Prompt 包、稳定盲化、聚合 7 维评分并计算 Wilson 95% 区间。工具不调用模型或飞书 API。

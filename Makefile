@@ -8,7 +8,7 @@ eval:
 validate:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli validate plugins/
 
-# 校验 v1.2.1 Knowledge Pilot 的 30 题与合成 fixture（不读取私有 Atom）
+# 校验 v1.2.2 Knowledge Pilot 的 30 题与合成 fixture（不读取私有 Atom）
 pilot:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.pilot.cli validate --fixtures
 

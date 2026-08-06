@@ -39,7 +39,7 @@ def metadata_version(skill_md: Path) -> str:
 
 def add_bundle_rules(skill_md: Path) -> None:
     text = skill_md.read_text(encoding="utf-8")
-    marker = "# majia-siyu：私域工具箱入口 · 马甲实战版\n"
+    marker = "# 私域专家团 · 马甲实战版\n"
     bundle_rule = """
 
 ## 单入口内置模块执行规则
