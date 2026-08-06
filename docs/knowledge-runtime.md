@@ -38,3 +38,8 @@ ID 由代码生成。修改来源身份、来源定位或来源内序号会得�
 - 本地检索、KnowledgeBundle 和冲突处理
 - Runtime、四官上下文和 Trace 注入
 - 正式语料、发布批次与版本升级
+
+## 公开方法层（v1.2.4）
+
+`knowledge/00-methodology/用增方法映射-餐饮零售.md` 是可引用的增长方法真源（非 Atom JSONL）。Skill 与问诊可直接引用；**不等于**已批准 Atom，也不自动进入 Runtime 检索。
+

@@ -10,3 +10,6 @@ __pycache__/
 .env
 .DS_Store
 dist/
+
+# 维护者本地过程稿（不进公开发布）
+docs/source-materials/.local/

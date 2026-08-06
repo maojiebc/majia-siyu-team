@@ -2,6 +2,21 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.4] - 2026-08-06
+### 新增
+- 公开方法层新增 `knowledge/00-methodology/用增方法映射-餐饮零售.md`：连锁加盟餐饮/门店零售用户增长 16 条 Know-how 主句、指标字典、九项体检与 skill 绑定。
+- 餐饮行业册增加用增层指针；维护者侧 source-materials 收录 atom 草案与大宁语料清洗过程稿。
+- `docs/THIRD_PARTY_INSPIRATIONS.md` 登记用增方法骨架的第三方灵感来源与改写边界。
+
+### 文档
+- README / ClawHub 包页同步 v1.2.4 版本说明与框架图芯片。
+- `knowledge/manifest.json` 注明公开用增映射已就绪，仍不启用正式 Runtime 检索。
+
+### 说明
+- 本版补齐**可公开引用的增长方法真源**，便于问诊/漏斗/促活技能挂口径；不改变 API、安装命令、skill slug。
+- 不自动批准知识、不把私有 SOP 或未审核 Atom 注入 Runtime。
+- 真实客户阈值与门店 SOP 仍在私有护城河层。
+
 ## [1.2.3] - 2026-08-06
 ### 修复
 - SkillHub 详情页主标题显示 `siyu` 而非「私域专家团 · 马甲实战版」。

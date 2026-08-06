@@ -2,7 +2,7 @@
 name: content-as-product
 description: 把内容当产品做（选题/钩子/承接）。Use this skill when 做内容选题、设计钩子、写承接话术时。
 metadata:
-  version: "1.2.3"
+  version: "1.2.4"
 ---
 
 # 把内容当产品做（选题/钩子/承接）
