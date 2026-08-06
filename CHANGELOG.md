@@ -2,6 +2,13 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.3] - 2026-08-06
+### 修复
+- SkillHub 详情页主标题显示 `siyu` 而非「私域专家团 · 马甲实战版」。
+- 根因：历史改名后商店 slug=`siyu`、frontmatter name=`majia-siyu`（name≠slug），SkillHub UI 回退用 slug 当标题。
+- 修复：`publish_skillhub.py` 仅在临时发布包内把 `name` 对齐为商店 slug，并刷新 `displayName`；GitHub 真源 `name: majia-siyu` 不变。
+- 功能、API、安装命令、ClawHub slug、SkillHub 历史条目均不变。
+
 ## [1.2.2] - 2026-08-06
 ### 文档
 - 按 majia-ota 品牌面规范重梳公开首页：角色导航表、完整能力地图（入口 / 执行 / 问诊 / 诊断 / 档案）、安装分渠道、中英文 README 对齐。
