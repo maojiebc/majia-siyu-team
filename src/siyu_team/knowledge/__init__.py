@@ -41,6 +41,7 @@ from .growth_layers import (
     load_growth_draft_atoms,
     select_growth_doc_refs,
     select_growth_topics,
+    format_growth_atoms_for_context,
 )
 
 __all__ += [
@@ -52,4 +53,5 @@ __all__ += [
     "load_growth_draft_atoms",
     "select_growth_doc_refs",
     "select_growth_topics",
+    "format_growth_atoms_for_context",
 ]

@@ -2,7 +2,7 @@
 name: crisis-response-sop
 description: 私域舆情/差评应对 SOP。Use this skill when 处理差评、私域负面、客诉危机时。
 metadata:
-  version: "1.2.6"
+  version: "1.2.7"
 ---
 
 # 私域舆情/差评应对 SOP

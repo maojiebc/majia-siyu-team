@@ -33,6 +33,15 @@ _COMMON_FIELDS = frozenset(
     }
 )
 
+# 增长/方法类共享字段：所有官可见（非客户隐私）
+_SHARED_KNOWLEDGE_FIELDS = frozenset(
+    {
+        "growth_atoms",
+        "growth_load_note",
+        "knowledge_refs",
+    }
+)
+
 
 @dataclass(frozen=True)
 class AgentContext:
@@ -43,7 +52,12 @@ class AgentContext:
         return {"officer": self.officer, "fields": dict(self.fields)}
 
 
-def build_agent_context(task: Task, officer: str) -> AgentContext:
+def build_agent_context(
+    task: Task,
+    officer: str,
+    *,
+    shared_fields: Mapping[str, Any] | None = None,
+) -> AgentContext:
     if officer not in OFFICER_ALLOWED_CONTEXT:
         raise ValueError(f"未知角色：{officer}")
 
@@ -58,4 +72,11 @@ def build_agent_context(task: Task, officer: str) -> AgentContext:
         fields["source_text"] = redact(task.source_text)
         fields["risk"] = task.risk.value
         fields["need_compliance_check"] = task.need_compliance_check
+
+    if shared_fields:
+        for key, value in shared_fields.items():
+            if key not in _SHARED_KNOWLEDGE_FIELDS:
+                raise ValueError(f"不允许的共享字段：{key}")
+            fields[key] = redact(value, key)
+
     return AgentContext(officer=officer, fields=fields)

@@ -112,3 +112,37 @@ def describe_growth_load(industry: str = "") -> str:
     if normalized in L1_INDUSTRIES:
         return f"业态={normalized}：加载通用原则（L0）+ 餐饮零售门店专包（L1）。"
     return f"业态={normalized}：尚无专属 L1，只加载通用用户增长原则（L0）。"
+
+
+def format_growth_atoms_for_context(
+    industry: str = "",
+    *,
+    max_atoms: int = 40,
+    resolver: KnowledgePathResolver | None = None,
+) -> tuple[tuple[dict, ...], str]:
+    """供诊断/全盘诊断上下文使用的精简原子列表 + 人话加载说明。
+
+    只输出 locator/statement/type/layer，控制体积；draft 也允许进入诊断上下文
+    （仍不是 Pilot approved 检索真源）。
+    """
+    atoms = load_growth_draft_atoms(industry, resolver=resolver)
+    note = describe_growth_load(industry)
+    rows: list[dict] = []
+    for atom in atoms[: max(0, max_atoms)]:
+        layer = "l0"
+        if L1_CATERING_TOPIC in atom.topics:
+            layer = "l1_catering"
+        elif L0_TOPIC in atom.topics:
+            layer = "l0"
+        rows.append(
+            {
+                "id": atom.id,
+                "locator": atom.source.locator,
+                "layer": layer,
+                "type": atom.type,
+                "statement": atom.statement,
+            }
+        )
+    if len(atoms) > max_atoms:
+        note = f"{note}（上下文仅附前 {max_atoms} 条，共 {len(atoms)} 条 draft）"
+    return tuple(rows), note

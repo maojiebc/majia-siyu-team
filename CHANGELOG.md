@@ -2,6 +2,17 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.7] - 2026-08-06
+### 新增
+- 诊断 / 全盘诊断 Runtime 上下文注入增长 draft 原子：`ExecutionPlan.growth_atoms` + `growth_load_note`。
+- 全盘诊断时四位专家共享 `growth_atoms`（非隐私字段）；独立 prompt 增加「增长参考」段（按 locator 引用）。
+- 轻问诊 skill 优先读计划中的 `growth_atoms`，无 Runtime 时回退 L0/L1 文档。
+- 追踪事件 `growth_atoms.attached`。
+
+### 说明
+- 仍按业态过滤：无 industry 只有 L0；catering/retail 含 L1；市场调研不注入。
+- 原子仍为 draft，不进 Pilot approved。
+
 ## [1.2.6] - 2026-08-06
 ### 新增
 - 用户增长 **L0/L1 分层接入路由**：`route_task` 未声明业态只挂 L0；`catering`/`retail` 叠加 L1 餐饮零售专包。

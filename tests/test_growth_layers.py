@@ -11,7 +11,10 @@ from siyu_team.knowledge.growth_layers import (
     select_growth_doc_refs,
     select_growth_topics,
 )
+from siyu_team.context import build_agent_context
+from siyu_team.perspectives import build_isolated_officer_prompt
 from siyu_team.routing import route_task
+from siyu_team.runtime import SiyuRuntime
 from siyu_team.task import TaskKind, parse_task
 
 
@@ -83,6 +86,54 @@ class GrowthLayerTests(unittest.TestCase):
         self.assertIn("未声明业态", describe_growth_load(""))
         self.assertIn("L1", describe_growth_load("catering"))
 
+    def test_officer_prompt_lists_growth_locators(self) -> None:
+        plan = SiyuRuntime().plan(
+            "帮我做整盘私域战略评审",
+            hints={"industry": "catering", "stage": "growth"},
+            trace=False,
+        )
+        ctx = plan.agent_contexts[0]
+        prompt = build_isolated_officer_prompt(
+            {"name": ctx.officer, "engine": "测", "description": "测"},
+            ctx,
+            routing="test",
+        )
+        self.assertIn("增长参考", prompt)
+        self.assertIn("L0-01", prompt)
+
 
 if __name__ == "__main__":
     unittest.main()
+
+class GrowthContextInjectionTests(unittest.TestCase):
+    def test_diagnosis_plan_attaches_l0_atoms_without_industry(self) -> None:
+        from siyu_team.runtime import SiyuRuntime
+        plan = SiyuRuntime().plan("群转化差、复购不行，帮我看看", trace=False)
+        self.assertEqual(plan.decision.skill, "siyu-wenzhen")
+        self.assertGreater(len(plan.growth_atoms), 0)
+        self.assertTrue(all(a.get("layer") == "l0" for a in plan.growth_atoms))
+        self.assertIn("未声明业态", plan.growth_load_note)
+        # 诊断不派四位专家，但计划上必须带得上原子
+        self.assertEqual(plan.agent_contexts, ())
+
+    def test_strategy_contexts_include_growth_atoms(self) -> None:
+        from siyu_team.runtime import SiyuRuntime
+        plan = SiyuRuntime().plan(
+            "帮我做整盘私域战略评审",
+            hints={"industry": "catering", "stage": "growth"},
+            trace=False,
+        )
+        self.assertFalse(plan.decision.needs_clarification)
+        self.assertEqual(len(plan.agent_contexts), 4)
+        self.assertGreater(len(plan.growth_atoms), 0)
+        self.assertTrue(any(a.get("layer") == "l1_catering" for a in plan.growth_atoms))
+        for ctx in plan.agent_contexts:
+            self.assertIn("growth_atoms", ctx.fields)
+            self.assertIn("growth_load_note", ctx.fields)
+            self.assertGreater(len(ctx.fields["growth_atoms"]), 0)
+
+    def test_market_research_has_no_growth_atoms(self) -> None:
+        from siyu_team.runtime import SiyuRuntime
+        plan = SiyuRuntime().plan("对比 SCRM 厂商报价", trace=False)
+        self.assertEqual(plan.growth_atoms, ())
+        self.assertEqual(plan.growth_load_note, "")

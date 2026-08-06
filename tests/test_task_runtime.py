@@ -135,10 +135,13 @@ class RuntimeTests(unittest.TestCase):
                 json.loads(line)
                 for line in trace_path.read_text(encoding="utf-8").splitlines()
             ]
-            self.assertEqual(
-                [record["event"] for record in records],
-                ["task.created", "task.routed", "contexts.created"],
-            )
+            events = [record["event"] for record in records]
+            self.assertEqual(events[0], "task.created")
+            self.assertEqual(events[1], "task.routed")
+            self.assertIn("contexts.created", events)
+            # 全盘诊断会附带增长原子
+            self.assertIn("growth_atoms.attached", events)
+            self.assertGreater(len(plan.growth_atoms), 0)
 
     def test_empty_request_requires_clarification(self) -> None:
         plan = SiyuRuntime().plan("", trace=False)

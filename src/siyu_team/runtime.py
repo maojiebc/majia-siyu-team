@@ -4,16 +4,25 @@ Runtime 只制定可验证的执行计划，不直接调用模型，也不替 Sk
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 from .context import AgentContext, build_agent_context
+from .knowledge.growth_layers import format_growth_atoms_for_context
 from .routing import RouteDecision, route_task
 from .task import Task, TaskKind, parse_task
 from .tracing import TraceRecorder
 
 
 PANEL_OFFICERS = ("公关官", "产品官", "广告官", "合规官")
+
+# 诊断与全盘诊断注入增长 draft 原子
+_GROWTH_CONTEXT_KINDS = frozenset(
+    {
+        TaskKind.DIAGNOSIS,
+        TaskKind.STRATEGY_REVIEW,
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -22,6 +31,8 @@ class ExecutionPlan:
     task: Task
     decision: RouteDecision
     agent_contexts: tuple[AgentContext, ...] = ()
+    growth_atoms: tuple[dict[str, Any], ...] = ()
+    growth_load_note: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -31,6 +42,8 @@ class ExecutionPlan:
             "agent_contexts": [
                 context.to_dict() for context in self.agent_contexts
             ],
+            "growth_atoms": [dict(row) for row in self.growth_atoms],
+            "growth_load_note": self.growth_load_note,
         }
 
 
@@ -49,13 +62,29 @@ class SiyuRuntime:
         decision = route_task(task)
         trace_id = self.trace_recorder.new_trace_id()
 
+        growth_atoms: tuple[dict[str, Any], ...] = ()
+        growth_note = ""
+        if task.kind in _GROWTH_CONTEXT_KINDS:
+            growth_atoms, growth_note = format_growth_atoms_for_context(
+                task.industry
+            )
+
+        shared: dict[str, Any] | None = None
+        if growth_atoms or growth_note:
+            shared = {
+                "growth_atoms": [dict(row) for row in growth_atoms],
+                "growth_load_note": growth_note,
+                "knowledge_refs": list(decision.knowledge_refs),
+            }
+
         contexts: tuple[AgentContext, ...] = ()
         if (
             task.kind is TaskKind.STRATEGY_REVIEW
             and not decision.needs_clarification
         ):
             contexts = tuple(
-                build_agent_context(task, officer) for officer in PANEL_OFFICERS
+                build_agent_context(task, officer, shared_fields=shared)
+                for officer in PANEL_OFFICERS
             )
 
         plan = ExecutionPlan(
@@ -63,6 +92,8 @@ class SiyuRuntime:
             task=task,
             decision=decision,
             agent_contexts=contexts,
+            growth_atoms=growth_atoms,
+            growth_load_note=growth_note,
         )
         if trace:
             self.trace_recorder.emit(
@@ -71,6 +102,18 @@ class SiyuRuntime:
             self.trace_recorder.emit(
                 trace_id, task.task_id, "task.routed", decision.to_dict()
             )
+            if growth_atoms or growth_note:
+                self.trace_recorder.emit(
+                    trace_id,
+                    task.task_id,
+                    "growth_atoms.attached",
+                    {
+                        "count": len(growth_atoms),
+                        "note": growth_note,
+                        "locators": [row.get("locator") for row in growth_atoms[:20]],
+                        "kind": task.kind.value,
+                    },
+                )
             if contexts:
                 self.trace_recorder.emit(
                     trace_id,
