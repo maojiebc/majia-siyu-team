@@ -1,6 +1,6 @@
 <svg width="100%" viewBox="0 0 760 940" role="img" xmlns="http://www.w3.org/2000/svg">
 <title>majia-siyu v1.2.5 私域专家团架构图</title>
-<desc>用户请求先进入统一入口和结构化 Runtime；动态外部事实先实时检索留证，KnowledgeAtomV2 按范围隔离，v1.2.5 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入 Runtime。</desc>
+<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，KnowledgeAtomV2 按范围隔离，v1.2.5 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
 <defs>
   <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
     <path d="M0,0 L7,3 L0,6 Z" fill="#77766F"/>
@@ -40,7 +40,7 @@
 <line x1="380" y1="136" x2="380" y2="158" class="line" marker-end="url(#arrow)"/>
 
 <rect x="30" y="162" width="700" height="156" rx="16" fill="#F7F3FC" stroke="#B8A8CF" stroke-width="1.3"/>
-<text x="48" y="187" font-size="14" class="title">① Runtime 计划层</text>
+<text x="48" y="187" font-size="14" class="title">① 后台 计划层</text>
 <text x="708" y="187" text-anchor="end" font-size="11" class="muted">自然语言不直接喂给 Skill</text>
 
 <g class="blue">
@@ -73,7 +73,7 @@
 
 <rect x="30" y="370" width="350" height="316" rx="16" fill="#F4FAF7" stroke="#8ABCA9" stroke-width="1.3"/>
 <text x="48" y="397" font-size="14" class="title">②A 高频执行 / 档案</text>
-<text x="360" y="397" text-anchor="end" font-size="11" class="muted">直接出活，不强制升舱</text>
+<text x="360" y="397" text-anchor="end" font-size="11" class="muted">直接出活，不强制升级全盘诊断</text>
 
 <g class="teal">
   <rect x="48" y="418" width="94" height="64" rx="10"/>
@@ -111,8 +111,8 @@
 </g>
 
 <rect x="400" y="370" width="330" height="316" rx="16" fill="#F7F5FC" stroke="#AE9BC8" stroke-width="1.3"/>
-<text x="418" y="397" font-size="14" class="title">②B 问诊 / 全盘升舱</text>
-<text x="712" y="397" text-anchor="end" font-size="11" class="muted">结构问题才进四官</text>
+<text x="418" y="397" font-size="14" class="title">②B 问诊 / 全盘升级全盘诊断</text>
+<text x="712" y="397" text-anchor="end" font-size="11" class="muted">结构问题才进四位专家</text>
 
 <g class="violet">
   <rect x="448" y="418" width="234" height="50" rx="10"/>
@@ -124,7 +124,7 @@
 <g class="blue">
   <rect x="424" y="496" width="282" height="44" rx="10"/>
   <text x="565" y="515" text-anchor="middle" font-size="12.5" font-weight="600">AgentContext 代码级白名单</text>
-  <text x="565" y="531" text-anchor="middle" font-size="10.5">四官互不可见 · 原始请求仅合规官可读</text>
+  <text x="565" y="531" text-anchor="middle" font-size="10.5">四位专家互不可见 · 原始请求仅合规官可读</text>
 </g>
 <line x1="565" y1="540" x2="565" y2="556" class="line"/>
 <g class="teal">
@@ -165,7 +165,7 @@
 <g class="gray">
   <rect x="386" y="740" width="164" height="66" rx="10"/>
   <text x="468" y="765" text-anchor="middle" font-size="12.5" font-weight="600">知识契约 / Pilot</text>
-  <text x="468" y="784" text-anchor="middle" font-size="10.5">离线盲测 · 未接 Runtime</text>
+  <text x="468" y="784" text-anchor="middle" font-size="10.5">离线盲测 · 未接 后台</text>
 </g>
 <g class="gray">
   <rect x="560" y="740" width="164" height="66" rx="10"/>

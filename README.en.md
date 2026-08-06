@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.2.5 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to four officers; knowledge pilot stays offline">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.2.5 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
 </p>
 
 > **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
@@ -50,7 +50,7 @@ Generic copy tools cover most of bucket 1. This toolbox finishes the last 20% an
 - **One entry** — remember `/siyu`, not 17 skill names
 - **Write-time compliance** — blocks WeCom-ban triggers, absolute ad-law claims, share-bait before output ships
 - **External-fact gate** — vendors, products, pricing, and policy require live research with dated sources
-- **Escalate only when structural** — four officers review in isolation; compliance has veto power
+- **Escalate only when structural** — four experts review in isolation; compliance has veto power
 - **Continuity** — local client archives for save / resume / report
 
 The public repo ships framework, methodology, and installable Skills. Real client operating SOPs stay private.
@@ -139,7 +139,7 @@ flowchart LR
 4. **Diagnosis** — four isolated officers + host quality gate + compliance veto  
 5. **Foundation** — local state, redacted traces, layered knowledge contract, connector stubs (online submit/retrieve not enabled by default)
 
-Runtime notes: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · knowledge contract: [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md).
+runtime backend notes: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · knowledge contract: [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md).
 
 ## Community knowledge pilot (invitation only)
 
@@ -160,7 +160,7 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 ## Version history
 
 - **v1.2.5** — Same growth know-how map as 1.2.4; SkillHub channel synced (store 1.2.4 slot anomaly, content unchanged).  
-- **v1.2.4** — Public catering/retail growth know-how map (16 statements, metric dictionary, 9-point checkup); skills can cite it; still no Runtime auto-inject.  
+- **v1.2.4** — Public catering/retail growth know-how map (16 statements, metric dictionary, 9-point checkup); skills can cite it; still no runtime backend auto-inject.  
 - **v1.2.3** — Fix SkillHub detail title: temp package aligns name=slug so the page title shows the Chinese brand name. No API change.  
 - **v1.2.2** — Public page refresh: role navigation, full capability map, channel-split install, CN/EN + ClawHub package page alignment. No API/behavior change.  
 - **v1.2.1** — Offline knowledge pilot, 30 Golden Tasks, editorial throughput report.  

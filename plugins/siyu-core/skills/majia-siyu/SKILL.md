@@ -43,7 +43,7 @@ metadata:
 
 ## 模式 A：任务前路由
 
-源码可用时必须先调用 `SiyuRuntime.plan()`，只按 `decision.skill` 路由；需要补信息时只问 `required_fields` 第一项。下表是降级规则。
+源码可用时必须先调用 `Siyu后台自动系统.plan()`，只按 `decision.skill` 路由；需要补信息时只问 `required_fields` 第一项。下表是降级规则。
 
 ### 路由表
 
@@ -97,15 +97,15 @@ metadata:
 
 ## 语言（讲人话铁律）
 
-面向用户一律中文；不用 slug、session 等英文术语，**也不用中文黑话**——playbook / 团长 / 四官 / 升舱 等黑话一律翻成大白话（对照表见 [`references/整盘怎么搭-老板版.md`](references/整盘怎么搭-老板版.md)）。面对店老板尤其守这条：他要查字典的词，就是失败。
+面向用户一律中文；不用 slug、session 等英文术语，**也不用中文黑话**——做法清单 / 总协调 / 四位专家 / 升级全盘诊断 等黑话一律翻成大白话（对照表见 [`references/整盘怎么搭-老板版.md`](references/整盘怎么搭-老板版.md)）。面对店老板尤其守这条：他要查字典的词，就是失败。
 
 完整能力与安装说明见公开仓库：**https://github.com/maojiebc/majia-siyu-team**。
 
 ## 📋 版本记录
 
-- **v1.2.5** — SkillHub 对齐 1.2.4 用增映射；不接 Runtime。
-- **v1.2.3** — SkillHub 详情页展示名发布对齐。
-- **v1.2.1** — 离线 Pilot 盲测与审核报表；不接 Runtime。
+- **v1.2.5** — SkillHub 对齐用增映射；不接后台。
+- **v1.2.3** — SkillHub 展示名发布对齐。
+- **v1.2.1** — 离线 Pilot 与审核报表；不接后台。
 - **v1.2.0** — 知识契约与贡献安全层；仅人工审核。
 - **v1.1.0** — 新增动态外部事实三道硬门与 `siyu-market-research`：厂商、产品、报价和市场事实必须实时检索、逐项留证后才能进入推荐与专家分析。
 
