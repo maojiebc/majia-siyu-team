@@ -51,3 +51,13 @@ python3 tools/atoms_query.py --file knowledge/04-atoms/atoms.example.jsonl 留�
 - `atoms.example.jsonl`：公开脱敏测试数据，不含真实品牌、人名、客户数据和私有阈值。
 - `knowledge/03-majia-sop/atoms.jsonl`：真实原子库，不提交、不复制进文档、不出现在 commit。
 - 原文含敏感内容时，在进入私有库前也应做最小化处理；本地纯文本不等于加密存储。
+
+## 增长正式集（L0/L1）
+
+- 文件：`growth-layers.approved.jsonl`（公开方法，可进 Git）
+- 重建：`PYTHONPATH=src python3 tools/build_growth_atoms.py`
+- 主题：每条恰好一个 Pilot 主题（`add_wechat` / `activity_increment` / `repurchase_recall`）+ `growth_l0` 或 `growth_l1_catering`
+- 任务计划/问诊诊断：`load_growth_atoms(industry)` 优先读本文件
+- Pilot 夹具：`tests/fixtures/pilot/growth-approved-atoms.jsonl` + `growth-task-atom-map.json`
+- 本机私有副本（0600）：`~/.siyu-team/knowledge/approved/growth-layers.atoms.jsonl`
+

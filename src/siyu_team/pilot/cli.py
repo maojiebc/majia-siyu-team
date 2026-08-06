@@ -40,6 +40,11 @@ def _parser() -> argparse.ArgumentParser:
     validate.add_argument("--tasks", type=Path)
     validate.add_argument("--atoms", type=Path)
     validate.add_argument("--mapping", type=Path)
+    validate.add_argument(
+        "--allow-public-atoms",
+        action="store_true",
+        help="允许校验仓库内公开 approved 原子（跳过 0600 权限要求）",
+    )
 
     prepare = commands.add_parser("prepare", help="生成私有双版 Prompt 试验包")
     prepare.add_argument("--tasks", required=True, type=Path)
@@ -84,7 +89,8 @@ def _paths(args: argparse.Namespace) -> tuple[Path, Path, Path, bool]:
         raise PilotValidationError(
             "未使用 --fixtures 时必须提供：" + ", ".join(f"--{name}" for name in missing)
         )
-    return args.tasks, args.atoms, args.mapping, False
+    allow_public = bool(getattr(args, "allow_public_atoms", False))
+    return args.tasks, args.atoms, args.mapping, allow_public
 
 
 def _validate_inputs(

@@ -2,7 +2,7 @@
 name: ops-as-ad-funnel
 description: 运营即广告投放（漏斗/埋点）。Use this skill when 把运营动作设计成自带传播/转化的漏斗、做埋点时。
 metadata:
-  version: "1.2.7"
+  version: "1.2.8"
 ---
 
 # 运营即广告投放（漏斗/埋点）
@@ -10,7 +10,7 @@ metadata:
 ## Overview
 
 
-> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.7）。
+> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.8）。
 对齐方法论引擎「运营即广告」。本 skill 给方法论框架；具体话术/阈值/配比是马甲护城河，标【待马甲填真实SOP】。
 
 ## 方法框架（行业通行版，真实节奏见护城河注入点）

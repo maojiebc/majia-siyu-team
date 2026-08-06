@@ -2,6 +2,17 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.8] - 2026-08-06
+### 新增
+- 增长原子正式集：`knowledge/04-atoms/growth-layers.approved.jsonl`（35 条，`review_status=approved`）。
+- Pilot 正式集夹具：`tests/fixtures/pilot/growth-approved-atoms.jsonl` + `growth-task-atom-map.json`；`make pilot` 双校验。
+- `load_growth_atoms(industry)` 优先读 approved；本机副本 `~/.siyu-team/knowledge/approved/growth-layers.atoms.jsonl`（0600）。
+- 每条原子绑定唯一 Pilot 主题（加微/活动/召回），满足正式集 ≥8 条/主题。
+
+### 说明
+- draft 文件已移除；重建命令：`PYTHONPATH=src python3 tools/build_growth_atoms.py`。
+- 诊断上下文继续注入该正式集（按业态过滤）。
+
 ## [1.2.7] - 2026-08-06
 ### 新增
 - 诊断 / 全盘诊断 Runtime 上下文注入增长 draft 原子：`ExecutionPlan.growth_atoms` + `growth_load_note`。

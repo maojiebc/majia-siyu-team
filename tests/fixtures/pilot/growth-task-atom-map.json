@@ -1,0 +1,152 @@
+{
+  "pilot_add_wechat_001": [
+    "ka_624f03d84c00cdc9",
+    "ka_d7f654813c2b78a4",
+    "ka_f3e11aceb36afde8"
+  ],
+  "pilot_add_wechat_002": [
+    "ka_d7f654813c2b78a4",
+    "ka_f3e11aceb36afde8",
+    "ka_1dab2a707a3c0eea"
+  ],
+  "pilot_add_wechat_003": [
+    "ka_f3e11aceb36afde8",
+    "ka_1dab2a707a3c0eea",
+    "ka_f1492675e27ecdd6"
+  ],
+  "pilot_add_wechat_004": [
+    "ka_1dab2a707a3c0eea",
+    "ka_f1492675e27ecdd6",
+    "ka_7d70343d8db80d09"
+  ],
+  "pilot_add_wechat_005": [
+    "ka_f1492675e27ecdd6",
+    "ka_7d70343d8db80d09",
+    "ka_14db012b0ab25459"
+  ],
+  "pilot_add_wechat_006": [
+    "ka_7d70343d8db80d09",
+    "ka_14db012b0ab25459",
+    "ka_ca54b23a6b701792"
+  ],
+  "pilot_add_wechat_007": [
+    "ka_14db012b0ab25459",
+    "ka_ca54b23a6b701792",
+    "ka_36fb178eb9229c87"
+  ],
+  "pilot_add_wechat_008": [
+    "ka_ca54b23a6b701792",
+    "ka_36fb178eb9229c87",
+    "ka_0faa02a29a76264d"
+  ],
+  "pilot_add_wechat_009": [
+    "ka_36fb178eb9229c87",
+    "ka_0faa02a29a76264d",
+    "ka_60557cf131ff072a"
+  ],
+  "pilot_add_wechat_010": [
+    "ka_624f03d84c00cdc9",
+    "ka_d7f654813c2b78a4",
+    "ka_f3e11aceb36afde8"
+  ],
+  "pilot_activity_increment_001": [
+    "ka_2848b4e8ddf16f82",
+    "ka_f1082d697499cb87",
+    "ka_17747801da3b5320"
+  ],
+  "pilot_activity_increment_002": [
+    "ka_f1082d697499cb87",
+    "ka_17747801da3b5320",
+    "ka_66ff32bf50bf2165"
+  ],
+  "pilot_activity_increment_003": [
+    "ka_17747801da3b5320",
+    "ka_66ff32bf50bf2165",
+    "ka_4d24cfe41a603f82"
+  ],
+  "pilot_activity_increment_004": [
+    "ka_66ff32bf50bf2165",
+    "ka_4d24cfe41a603f82",
+    "ka_49d2e7505edbefe1"
+  ],
+  "pilot_activity_increment_005": [
+    "ka_4d24cfe41a603f82",
+    "ka_49d2e7505edbefe1",
+    "ka_a248490fc2ca77b9"
+  ],
+  "pilot_activity_increment_006": [
+    "ka_49d2e7505edbefe1",
+    "ka_a248490fc2ca77b9",
+    "ka_ecff5778f91bc5e8"
+  ],
+  "pilot_activity_increment_007": [
+    "ka_a248490fc2ca77b9",
+    "ka_ecff5778f91bc5e8",
+    "ka_7719c14fbb80c41b"
+  ],
+  "pilot_activity_increment_008": [
+    "ka_ecff5778f91bc5e8",
+    "ka_7719c14fbb80c41b",
+    "ka_56cfafb0a474ef50"
+  ],
+  "pilot_activity_increment_009": [
+    "ka_7719c14fbb80c41b",
+    "ka_56cfafb0a474ef50",
+    "ka_9dd2e4e9767fa71e"
+  ],
+  "pilot_activity_increment_010": [
+    "ka_2848b4e8ddf16f82",
+    "ka_f1082d697499cb87",
+    "ka_17747801da3b5320"
+  ],
+  "pilot_repurchase_recall_001": [
+    "ka_b6d7f1d2bedc43fa",
+    "ka_4bf14766964f6652",
+    "ka_a50ad88e19d3a01c"
+  ],
+  "pilot_repurchase_recall_002": [
+    "ka_4bf14766964f6652",
+    "ka_a50ad88e19d3a01c",
+    "ka_be877954b40189e2"
+  ],
+  "pilot_repurchase_recall_003": [
+    "ka_a50ad88e19d3a01c",
+    "ka_be877954b40189e2",
+    "ka_a5983a9785d385a1"
+  ],
+  "pilot_repurchase_recall_004": [
+    "ka_be877954b40189e2",
+    "ka_a5983a9785d385a1",
+    "ka_4b97123fdd7d0998"
+  ],
+  "pilot_repurchase_recall_005": [
+    "ka_a5983a9785d385a1",
+    "ka_4b97123fdd7d0998",
+    "ka_c82434fdd1dc5a05"
+  ],
+  "pilot_repurchase_recall_006": [
+    "ka_4b97123fdd7d0998",
+    "ka_c82434fdd1dc5a05",
+    "ka_abefc536187dd47e"
+  ],
+  "pilot_repurchase_recall_007": [
+    "ka_c82434fdd1dc5a05",
+    "ka_abefc536187dd47e",
+    "ka_4265e91225894db2"
+  ],
+  "pilot_repurchase_recall_008": [
+    "ka_abefc536187dd47e",
+    "ka_4265e91225894db2",
+    "ka_b8c91b63c87d46f6"
+  ],
+  "pilot_repurchase_recall_009": [
+    "ka_4265e91225894db2",
+    "ka_b8c91b63c87d46f6",
+    "ka_8accdfd6157bbbbc"
+  ],
+  "pilot_repurchase_recall_010": [
+    "ka_b6d7f1d2bedc43fa",
+    "ka_4bf14766964f6652",
+    "ka_a50ad88e19d3a01c"
+  ]
+}

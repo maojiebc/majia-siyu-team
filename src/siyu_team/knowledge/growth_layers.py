@@ -23,7 +23,8 @@ from .paths import KnowledgePathResolver
 L0_DOC = "knowledge/00-methodology/L0-通用用户增长原则.md"
 L1_CATERING_DOC = "knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md"
 GROWTH_INDEX_DOC = "knowledge/00-methodology/用户增长分层索引.md"
-GROWTH_ATOMS_DRAFT = "04-atoms/growth-layers.draft.jsonl"
+GROWTH_ATOMS_APPROVED = "04-atoms/growth-layers.approved.jsonl"
+GROWTH_ATOMS_DRAFT = "04-atoms/growth-layers.draft.jsonl"  # 兼容旧路径；优先 approved
 
 L0_TOPIC = "growth_l0"
 L1_CATERING_TOPIC = "growth_l1_catering"
@@ -77,11 +78,14 @@ def filter_atoms_by_growth_layer(
     return tuple(out)
 
 
-def _find_draft_file(resolver: KnowledgePathResolver) -> Path | None:
+def _find_growth_atoms_file(resolver: KnowledgePathResolver) -> Path | None:
+    """优先正式 approved，其次 draft（兼容）。"""
+    names = (GROWTH_ATOMS_APPROVED, GROWTH_ATOMS_DRAFT)
     for root in resolver.candidates():
-        candidate = root / GROWTH_ATOMS_DRAFT
-        if candidate.is_file():
-            return candidate
+        for name in names:
+            candidate = root / name
+            if candidate.is_file():
+                return candidate
     return None
 
 
@@ -90,9 +94,18 @@ def load_growth_draft_atoms(
     *,
     resolver: KnowledgePathResolver | None = None,
 ) -> tuple[KnowledgeAtomV2, ...]:
-    """读取 draft 增长原子并按业态过滤。文件不存在则返回空。"""
+    """读取增长原子并按业态过滤（函数名保留兼容；优先 approved 正式集）。"""
+    return load_growth_atoms(industry, resolver=resolver)
+
+
+def load_growth_atoms(
+    industry: str = "",
+    *,
+    resolver: KnowledgePathResolver | None = None,
+) -> tuple[KnowledgeAtomV2, ...]:
+    """读取增长正式集（approved）并按业态过滤；无文件则空。"""
     resolver = resolver or KnowledgePathResolver()
-    path = _find_draft_file(resolver)
+    path = _find_growth_atoms_file(resolver)
     if path is None:
         return ()
     atoms: list[KnowledgeAtomV2] = []
@@ -122,10 +135,10 @@ def format_growth_atoms_for_context(
 ) -> tuple[tuple[dict, ...], str]:
     """供诊断/全盘诊断上下文使用的精简原子列表 + 人话加载说明。
 
-    只输出 locator/statement/type/layer，控制体积；draft 也允许进入诊断上下文
+    只输出 locator/statement/type/layer，控制体积；正式集进入诊断上下文
     （仍不是 Pilot approved 检索真源）。
     """
-    atoms = load_growth_draft_atoms(industry, resolver=resolver)
+    atoms = load_growth_atoms(industry, resolver=resolver)
     note = describe_growth_load(industry)
     rows: list[dict] = []
     for atom in atoms[: max(0, max_atoms)]:
@@ -144,5 +157,5 @@ def format_growth_atoms_for_context(
             }
         )
     if len(atoms) > max_atoms:
-        note = f"{note}（上下文仅附前 {max_atoms} 条，共 {len(atoms)} 条 draft）"
+        note = f"{note}（上下文仅附前 {max_atoms} 条，共 {len(atoms)} 条）"
     return tuple(rows), note

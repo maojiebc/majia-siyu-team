@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""从 L0/L1 Markdown 生成 growth-layers.draft.jsonl（KnowledgeAtomV2 draft）。"""
+"""从 L0/L1 Markdown 生成增长原子 JSONL（approved 正式集 + 可选 draft）。"""
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -22,15 +23,56 @@ from siyu_team.knowledge.models import (  # noqa: E402
     Applicability,
     KnowledgeAtomV2,
     Lifecycle,
-    Metric,
     Privacy,
     Quality,
     Scope,
     SourceRef,
 )
+from siyu_team.pilot.models import THEMES  # noqa: E402
 
 SECTION_RE = re.compile(r"^### (L0-\d+|L1-C\d+|L1-\d+)\s+(.+)$", re.M)
 FIELD_RE = re.compile(r"^- \*\*(.+?)：\*\*\s*(.+)$", re.M)
+
+# 每个逻辑 id 绑定唯一 Pilot 主题（add_wechat / activity_increment / repurchase_recall）
+PILOT_THEME_BY_LOCATOR: dict[str, str] = {
+    # L0 → 拉新 / 活动 / 召回
+    "L0-01": "add_wechat",
+    "L0-02": "add_wechat",
+    "L0-03": "add_wechat",
+    "L0-04": "add_wechat",
+    "L0-05": "repurchase_recall",
+    "L0-06": "repurchase_recall",
+    "L0-07": "repurchase_recall",
+    "L0-08": "activity_increment",
+    "L0-09": "activity_increment",
+    "L0-10": "activity_increment",
+    "L0-11": "activity_increment",
+    "L0-12": "activity_increment",
+    "L0-13": "repurchase_recall",
+    "L0-14": "activity_increment",
+    "L0-15": "add_wechat",
+    "L0-16": "repurchase_recall",
+    # L1 约束 + 方法
+    "L1-C01": "add_wechat",
+    "L1-C02": "add_wechat",
+    "L1-C03": "activity_increment",
+    "L1-C04": "repurchase_recall",
+    "L1-C05": "repurchase_recall",
+    "L1-01": "activity_increment",
+    "L1-02": "add_wechat",
+    "L1-03": "add_wechat",
+    "L1-04": "add_wechat",
+    "L1-05": "repurchase_recall",
+    "L1-06": "activity_increment",
+    "L1-07": "activity_increment",
+    "L1-08": "repurchase_recall",
+    "L1-09": "activity_increment",
+    "L1-10": "repurchase_recall",
+    "L1-11": "add_wechat",
+    "L1-12": "repurchase_recall",
+    "L1-13": "add_wechat",
+    "L1-14": "repurchase_recall",
+}
 
 
 def _parse_sections(text: str) -> list[dict[str, str]]:
@@ -41,7 +83,6 @@ def _parse_sections(text: str) -> list[dict[str, str]]:
         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
         body = text[start:end].strip()
         fields = {"id": m.group(1), "title": m.group(2).strip()}
-        # 判断
         jm = re.search(r"^- \*\*判断：\*\*\s*(.+)$", body, re.M)
         if jm:
             fields["statement"] = jm.group(1).strip()
@@ -52,29 +93,23 @@ def _parse_sections(text: str) -> list[dict[str, str]]:
                     continue
                 line = re.sub(r"^\*\*判断：\*\*\s*", "", line)
                 line = line.lstrip("- ").strip()
-                line = re.sub(r"^\*\*判断：\*\*\s*", "", line)
-                if line.startswith("**判断**"):
-                    line = re.sub(r"^\*\*判断\*\*[：:]\s*", "", line)
+                line = re.sub(r"^\*\*判断\*\*[：:]\s*", "", line)
                 if line:
                     fields["statement"] = line
                     break
-        # final clean
-        if "statement" in fields:
+        for fm in FIELD_RE.finditer(body):
+            fields[fm.group(1).strip()] = fm.group(2).strip()
+        if fields.get("statement"):
             s = fields["statement"]
             s = re.sub(r"^\*\*判断：\*\*\s*", "", s)
             s = re.sub(r"^\*\*判断\*\*[：:]\s*", "", s)
             fields["statement"] = s.strip()
-        for fm in FIELD_RE.finditer(body):
-            key, val = fm.group(1).strip(), fm.group(2).strip()
-            fields[key] = val
-        if fields.get("statement"):
             out.append(fields)
     return out
 
 
-def _type_of(title: str, body_fields: dict[str, str]) -> str:
-    t = title + body_fields.get("statement", "")
-    if "反面" in title or "不是核心" in t or "禁止" in t[:20]:
+def _type_of(title: str) -> str:
+    if "反面" in title or "不是核心" in title:
         return "anti-pattern"
     if title.startswith("L1-C") or "原则" in title:
         return "principle"
@@ -82,21 +117,18 @@ def _type_of(title: str, body_fields: dict[str, str]) -> str:
 
 
 def _skills_from(text: str) -> list[str]:
-    # lightweight defaults
     skills = ["siyu-wenzhen"]
-    blob = text
-    if any(k in blob for k in ("拉新", "渠道", "实验", "断点", "活动")):
+    if any(k in text for k in ("拉新", "渠道", "实验", "断点", "活动", "加微", "扫码")):
         skills.append("ops-as-ad-funnel")
-    if any(k in blob for k in ("成本", "指标", "转化", "贡献", "口径")):
+    if any(k in text for k in ("成本", "指标", "转化", "贡献", "口径")):
         skills.append("conversion-caliber")
-    if any(k in blob for k in ("召回", "沉默", "休眠")):
+    if any(k in text for k in ("召回", "沉默", "休眠", "再来")):
         skills.append("reactivation-playbook")
-    if any(k in blob for k in ("合规", "分享")):
+    if any(k in text for k in ("合规", "分享")):
         skills.append("wechat-compliance-redlines")
-    if any(k in blob for k in ("群", "分群", "社群")):
+    if any(k in text for k in ("群", "分群", "社群")):
         skills.append("siyu-qunfa")
-    # unique keep order
-    seen = []
+    seen: list[str] = []
     for s in skills:
         if s not in seen:
             seen.append(s)
@@ -109,34 +141,53 @@ def build_atom(
     fields: dict[str, str],
     layer_topic: str,
     industry: str,
+    approved: bool,
     observed_at: str = "2026-08-06",
+    reviewer: str = "maojiebc",
 ) -> KnowledgeAtomV2:
     locator = fields["id"]
+    if locator not in PILOT_THEME_BY_LOCATOR:
+        raise SystemExit(f"locator 未映射 Pilot 主题：{locator}")
+    pilot_theme = PILOT_THEME_BY_LOCATOR[locator]
+    if pilot_theme not in THEMES:
+        raise SystemExit(f"非法主题 {pilot_theme}")
+
     statement = fields["statement"]
     title = fields.get("title", "")
     action = fields.get("怎么干", fields.get("建议动作", ""))
     failure = fields.get("失效", fields.get("常见翻车", ""))
     boundary = fields.get("边界", fields.get("失效边界", ""))
     why = fields.get("原始依据", fields.get("来源", ""))
-    atom_type = _type_of(title, fields)
+    atom_type = _type_of(locator + title)
     preconditions = []
     if why:
-        preconditions.append(f"依据：{why[:120]}")
-    if industry:
-        preconditions.append(f"业态层：{industry}")
-    else:
-        preconditions.append("业态：通用（L0）")
+        preconditions.append(f"依据：{why[:160]}")
+    preconditions.append("业态：通用（L0）" if not industry else f"业态层：{industry}")
     recommended = [action] if action else []
     failure_modes = [failure] if failure else []
     counterexamples = [boundary] if boundary else []
-    metrics = []
-    # optional metric line not structured — skip
-    scope_industry = industry
+
+    quality = (
+        Quality(
+            evidence_grade="C1",
+            confidence="medium",
+            review_status="approved",
+            reviewer=reviewer,
+            reviewed_at=observed_at,
+        )
+        if approved
+        else Quality(
+            evidence_grade="C1",
+            confidence="medium",
+            review_status="draft",
+        )
+    )
     return KnowledgeAtomV2(
         id=growth_atom_id(doc_path, locator, 0),
         statement=statement,
         type=atom_type,
-        topics=(layer_topic, "用户增长"),
+        # 恰好一个 Pilot 主题 + 分层标签
+        topics=(pilot_theme, layer_topic, "用户增长"),
         skills=tuple(_skills_from(statement + action + title)),
         source=SourceRef(
             source_id=growth_source_id(doc_path),
@@ -148,55 +199,150 @@ def build_atom(
         ),
         scope=Scope(
             visibility="public",
-            industry=scope_industry,
+            industry=industry,
             business_model="franchise" if industry == "catering" else "",
             channels=("wecom_friend", "wecom_group", "instore") if industry else (),
-            scenarios=("user_growth",),
+            scenarios=("user_growth", pilot_theme),
         ),
         applicability=Applicability(
             preconditions=tuple(preconditions),
             recommended_action=tuple(recommended),
-            metrics=tuple(metrics),
+            metrics=(),
             failure_modes=tuple(failure_modes),
             counterexamples=tuple(counterexamples),
         ),
-        quality=Quality(
-            evidence_grade="C1",
-            confidence="medium",
-            review_status="draft",
-        ),
+        quality=quality,
         lifecycle=Lifecycle(valid_from=observed_at),
-        privacy=Privacy(exportable=False),
+        privacy=Privacy(exportable=bool(approved)),
     )
 
 
+def _write_jsonl(path: Path, atoms: list[KnowledgeAtomV2]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        json.dumps(a.to_dict(), ensure_ascii=False, separators=(",", ":")) for a in atoms
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def build_task_map(atoms: list[KnowledgeAtomV2], tasks_path: Path) -> dict[str, list[str]]:
+    """每个 Golden Task 映射同主题的 2～3 条增长原子。"""
+    by_theme: dict[str, list[str]] = {t: [] for t in THEMES}
+    for atom in atoms:
+        for theme in THEMES:
+            if theme in atom.topics:
+                by_theme[theme].append(atom.id)
+                break
+    mapping: dict[str, list[str]] = {}
+    for line in tasks_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        task = json.loads(line)
+        theme = task["theme"]
+        pool = by_theme[theme]
+        # stable pick 3 by hashing task id
+        if not pool:
+            continue
+        idx = sum(ord(c) for c in task["id"]) % len(pool)
+        picked = [pool[idx], pool[(idx + 1) % len(pool)], pool[(idx + 2) % len(pool)]]
+        # unique preserve order
+        seen: list[str] = []
+        for a in picked:
+            if a not in seen:
+                seen.append(a)
+        mapping[task["id"]] = seen
+    return mapping
+
+
 def main() -> int:
-    l0_path = ROOT / L0_DOC
-    l1_path = ROOT / L1_CATERING_DOC
-    l0_sections = _parse_sections(l0_path.read_text(encoding="utf-8"))
-    l1_sections = _parse_sections(l1_path.read_text(encoding="utf-8"))
-    atoms: list[KnowledgeAtomV2] = []
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--reviewer", default="maojiebc")
+    parser.add_argument("--date", default="2026-08-06")
+    parser.add_argument("--keep-draft", action="store_true", help="同时写出 draft 副本")
+    args = parser.parse_args()
+
+    l0_sections = _parse_sections((ROOT / L0_DOC).read_text(encoding="utf-8"))
+    l1_sections = _parse_sections((ROOT / L1_CATERING_DOC).read_text(encoding="utf-8"))
+
+    approved: list[KnowledgeAtomV2] = []
     for sec in l0_sections:
-        atoms.append(
-            build_atom(doc_path=L0_DOC, fields=sec, layer_topic=L0_TOPIC, industry="")
+        approved.append(
+            build_atom(
+                doc_path=L0_DOC,
+                fields=sec,
+                layer_topic=L0_TOPIC,
+                industry="",
+                approved=True,
+                observed_at=args.date,
+                reviewer=args.reviewer,
+            )
         )
     for sec in l1_sections:
-        atoms.append(
+        approved.append(
             build_atom(
                 doc_path=L1_CATERING_DOC,
                 fields=sec,
                 layer_topic=L1_CATERING_TOPIC,
                 industry="catering",
+                approved=True,
+                observed_at=args.date,
+                reviewer=args.reviewer,
             )
         )
-    out = ROOT / "knowledge" / "04-atoms" / "growth-layers.draft.jsonl"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    lines = [json.dumps(a.to_dict(), ensure_ascii=False, separators=(",", ":")) for a in atoms]
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"wrote {out} atoms={len(atoms)} l0={len(l0_sections)} l1={len(l1_sections)}")
-    # print sample ids
-    for a in atoms[:3]:
-        print(a.source.locator, a.id, a.statement[:40])
+
+    approved_path = ROOT / "knowledge" / "04-atoms" / "growth-layers.approved.jsonl"
+    _write_jsonl(approved_path, approved)
+
+    if args.keep_draft:
+        draft = [
+            build_atom(
+                doc_path=a.source.path,
+                fields={
+                    "id": a.source.locator,
+                    "title": "",
+                    "statement": a.statement,
+                    "怎么干": (a.applicability.recommended_action or ("",))[0],
+                    "失效": (a.applicability.failure_modes or ("",))[0],
+                    "边界": (a.applicability.counterexamples or ("",))[0],
+                },
+                layer_topic=L0_TOPIC if L0_TOPIC in a.topics else L1_CATERING_TOPIC,
+                industry=a.scope.industry,
+                approved=False,
+                observed_at=args.date,
+            )
+            for a in approved
+        ]
+        _write_jsonl(ROOT / "knowledge" / "04-atoms" / "growth-layers.draft.jsonl", draft)
+    else:
+        # 正式集取代 draft：draft 指向说明文件或删除后写 stub 注释
+        draft_path = ROOT / "knowledge" / "04-atoms" / "growth-layers.draft.jsonl"
+        if draft_path.exists():
+            draft_path.unlink()
+
+    # Pilot 夹具：正式集副本 + task map
+    fixture_atoms = ROOT / "tests" / "fixtures" / "pilot" / "growth-approved-atoms.jsonl"
+    _write_jsonl(fixture_atoms, approved)
+    tasks_path = ROOT / "tests" / "fixtures" / "pilot" / "golden-tasks.jsonl"
+    mapping = build_task_map(approved, tasks_path)
+    map_path = ROOT / "tests" / "fixtures" / "pilot" / "growth-task-atom-map.json"
+    map_path.write_text(
+        json.dumps(mapping, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+    # theme counts
+    from collections import Counter
+
+    c = Counter()
+    for a in approved:
+        for th in THEMES:
+            if th in a.topics:
+                c[th] += 1
+    print(
+        f"approved={approved_path} n={len(approved)} themes={dict(c)} "
+        f"fixture={fixture_atoms.name} map={map_path.name}"
+    )
+    for a in approved[:2]:
+        print(a.source.locator, a.id, a.quality.review_status, a.topics)
     return 0
 
 

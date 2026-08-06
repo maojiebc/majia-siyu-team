@@ -7,7 +7,7 @@ from siyu_team.knowledge.growth_layers import (
     L1_CATERING_DOC,
     describe_growth_load,
     growth_atom_id,
-    load_growth_draft_atoms,
+    load_growth_atoms,
     select_growth_doc_refs,
     select_growth_topics,
 )
@@ -42,9 +42,18 @@ class GrowthLayerTests(unittest.TestCase):
             ("growth_l0", "growth_l1_catering"),
         )
 
+    def test_growth_atoms_are_approved(self) -> None:
+        atoms = load_growth_atoms("catering")
+        self.assertGreater(len(atoms), 0)
+        for atom in atoms:
+            self.assertEqual(atom.quality.review_status, "approved")
+            self.assertTrue(atom.quality.reviewer)
+            themes = [t for t in ("add_wechat", "activity_increment", "repurchase_recall") if t in atom.topics]
+            self.assertEqual(len(themes), 1)
+
     def test_draft_atoms_filter_by_industry(self) -> None:
-        bare = load_growth_draft_atoms("")
-        cat = load_growth_draft_atoms("catering")
+        bare = load_growth_atoms("")
+        cat = load_growth_atoms("catering")
         self.assertGreater(len(bare), 0)
         self.assertGreater(len(cat), len(bare))
         for atom in bare:
