@@ -36,3 +36,11 @@ uv.lock:
 
 美妆集合
 休眠人群
+# v1.2.8 growth atoms / L0 L1 false chinese_name_shape
+刚需
+强追
+路人
+正餐
+强压
+活动日历
+花得多
