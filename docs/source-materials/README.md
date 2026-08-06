@@ -1,12 +1,9 @@
 # Source materials（维护者侧）
 
-本目录存放**尚未进入 Runtime** 的素材整理稿与 atom 草案。
-
 | 文件 | 说明 |
 |---|---|
-| `catering-retail-growth-knowhow-atoms.md` | 餐饮零售 16 条 Know-how atom 卡片草案 |
-| `.local/` | 本机过程稿（git-ignore，不发布） |
+| `用增能干货原子-说人话版.md` | **优先**：16 条用增大白话原子卡 |
+| `v1.2.5-餐饮零售用增Know-how知识原子.md` | 同上（文件名兼容） |
+| `.local/` | 过程稿/术语版（git-ignore，不发布、不进大白话扫描） |
 
-**公开可引用的稳定方法真源**：
-
-`knowledge/00-methodology/用增方法映射-餐饮零售.md`
+**公开方法真源**：`knowledge/00-methodology/用增方法映射-餐饮零售.md`

@@ -1,6 +1,6 @@
-# 私域知识原子库
+# 私域「一条条能干货」库（知识原子）
 
-知识原子把长语料拆成可检索、可追溯、可反向绑定 skill 的最小陈述。公开仓库只保存 schema 与脱敏示例；真实语料固定写入 `knowledge/03-majia-sop/atoms.jsonl`，受 `.gitignore` 保护。
+「知识原子」就是把长语料拆成可检索、可追溯、可反向绑定 skill 的最小陈述。公开仓库只保存 schema 与脱敏示例；真实语料固定写入 `knowledge/03-majia-sop/atoms.jsonl`，受 `.gitignore` 保护。
 
 ## 三层知识分工
 
