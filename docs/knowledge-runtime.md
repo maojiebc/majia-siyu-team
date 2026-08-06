@@ -39,7 +39,18 @@ ID 由代码生成。修改来源身份、来源定位或来源内序号会得�
 - Runtime、四官上下文和 Trace 注入
 - 正式语料、发布批次与版本升级
 
-## 公开方法层（v1.2.4/v1.2.5）
+## 公开方法层（v1.2.4/v1.2.6）
 
 `knowledge/00-methodology/用增方法映射-餐饮零售.md` 是可引用的增长方法真源（非 Atom JSONL）。Skill 与问诊可直接引用；**不等于**已批准 Atom，也不自动进入 Runtime 检索。
+
+
+## 增长分层 L0/L1（已实现文档路由）
+
+- 选择器：`siyu_team.knowledge.growth_layers`
+- `route_task` 对非市场调研任务自动注入：
+  - 无业态 → `L0-通用用户增长原则.md`
+  - catering/retail → L0 + `L1-餐饮零售用增Know-how.md`
+- draft 原子：`knowledge/04-atoms/growth-layers.draft.jsonl`（`load_growth_draft_atoms(industry)`）
+- **仍不**把 draft 原子自动当 approved 检索真源；Pilot 正式集规则不变
+- 旧文 `用增方法映射-餐饮零售.md` 降级为中间稿
 

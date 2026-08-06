@@ -2,6 +2,17 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.6] - 2026-08-06
+### 新增
+- 用户增长 **L0/L1 分层接入路由**：`route_task` 未声明业态只挂 L0；`catering`/`retail` 叠加 L1 餐饮零售专包。
+- `growth_layers.py`：文档选择、主题过滤、`load_growth_draft_atoms`、稳定 `ka_` 原子 ID。
+- `knowledge/04-atoms/growth-layers.draft.jsonl`（35 条 draft，从原始语料 L0/L1 生成）；`tools/build_growth_atoms.py` 可重建。
+- 单测 `tests/test_growth_layers.py`。
+
+### 说明
+- draft 原子不进 Pilot approved；市场调研任务仍不加载内部增长文档。
+- 内容真源为原始语料重拆的 L0/L1，不是旧 16 条中间稿。
+
 ## [1.2.5] - 2026-08-06
 ### 修复
 - SkillHub 发布链路：1.2.4 版本号在商店侧出现「已存在但列表不可见」的槽位异常，无法原位写入；本版以 1.2.5 完成 SkillHub 与全渠道 SemVer 对齐。

@@ -1,6 +1,6 @@
 <svg width="100%" viewBox="0 0 760 940" role="img" xmlns="http://www.w3.org/2000/svg">
-<title>majia-siyu v1.2.5 私域专家团架构图</title>
-<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，知识条目V2 按范围隔离，v1.2.5 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
+<title>majia-siyu v1.2.6 私域专家团架构图</title>
+<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，知识条目V2 按范围隔离，v1.2.6 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
 <defs>
   <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
     <path d="M0,0 L7,3 L0,6 Z" fill="#77766F"/>
@@ -28,7 +28,7 @@
 <text x="38" y="38" font-size="21" class="title">majia-siyu · 私域专家团</text>
 <g class="violet">
   <rect x="648" y="18" width="76" height="28" rx="14"/>
-  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.2.5</text>
+  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.2.6</text>
 </g>
 <text x="38" y="60" font-size="12" class="muted">经营动作归本入口；会员指标、SQL 与数仓交给 majia-huiyuan</text>
 

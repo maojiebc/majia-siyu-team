@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .task import Task, TaskKind
+from .knowledge.growth_layers import describe_growth_load, select_growth_doc_refs
 
 
 INDUSTRIES = {"catering": "餐饮", "retail": "零售", "edu": "教培"}
@@ -47,7 +48,7 @@ TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
     ),
     TaskKind.STRATEGY_REVIEW: (
         "siyu-onboard",
-        "请求涉及整盘结构，进入四官独立评审和团长收口。",
+        "请求涉及整盘结构，进入四位专家分头评审和总协调收口。",
     ),
     TaskKind.SAVE_MEMORY: (
         "/siyu-save",
@@ -125,7 +126,7 @@ def route_task(task: Task) -> RouteDecision:
         if not industry_route["stage"]:
             required.append("stage")
 
-    knowledge_refs = []
+    knowledge_refs: list[str] = []
     if task.kind is not TaskKind.MARKET_RESEARCH:
         knowledge_refs.extend(
             [
@@ -133,17 +134,27 @@ def route_task(task: Task) -> RouteDecision:
                 "knowledge/00-methodology/私域公理与消解案例库.md",
             ]
         )
+        # 增长分层：未声明业态只 L0；catering/retail 叠加 L1
+        knowledge_refs.extend(select_growth_doc_refs(task.industry))
     industry_book = (
         None
         if task.kind is TaskKind.MARKET_RESEARCH
         else industry_route["industry_book"]
     )
     if industry_book and task.kind is not TaskKind.MARKET_RESEARCH:
-        knowledge_refs.append(industry_book)
+        # industry_book 是目录；L1 文档已在 select_growth_doc_refs 精确挂上
+        if industry_book not in knowledge_refs:
+            knowledge_refs.append(industry_book)
 
     focus = industry_route["focus"]
     if task.kind is TaskKind.MARKET_RESEARCH:
         focus = "先完成实时检索与证据快照；证据不足的对象不得进入正式推荐。"
+    elif task.kind is not TaskKind.MARKET_RESEARCH:
+        growth_note = describe_growth_load(task.industry)
+        if focus:
+            focus = f"{focus} {growth_note}"
+        else:
+            focus = growth_note
 
     return RouteDecision(
         skill=skill,

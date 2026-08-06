@@ -2,7 +2,7 @@
 name: conversion-caliber
 description: 转化口径定义库（UV→加微→首单→复购）。Use this skill when 定义/核对转化漏斗每一跳的分子分母与时间窗时。
 metadata:
-  version: "1.2.5"
+  version: "1.2.6"
 ---
 
 # 转化口径定义库（UV→加微→首单→复购）
@@ -10,7 +10,7 @@ metadata:
 ## Overview
 
 
-> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.5）。
+> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.6）。
 对齐方法论引擎「运营即广告」。本 skill 给方法论框架；具体话术/阈值/配比是马甲护城河，标【待马甲填真实SOP】。
 
 ## 方法框架（行业通行版，真实阈值见护城河注入点）
