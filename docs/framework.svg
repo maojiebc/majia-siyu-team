@@ -1,6 +1,6 @@
 <svg width="100%" viewBox="0 0 760 940" role="img" xmlns="http://www.w3.org/2000/svg">
 <title>majia-siyu v1.2.5 私域专家团架构图</title>
-<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，KnowledgeAtomV2 按范围隔离，v1.2.5 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
+<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，知识条目V2 按范围隔离，v1.2.5 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
 <defs>
   <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
     <path d="M0,0 L7,3 L0,6 Z" fill="#77766F"/>
@@ -146,7 +146,7 @@
 <line x1="565" y1="600" x2="565" y2="616" class="line" marker-end="url(#arrow)"/>
 <g class="violet">
   <rect x="444" y="620" width="242" height="48" rx="10"/>
-  <text x="565" y="640" text-anchor="middle" font-size="12.5" font-weight="600">团长主持收口 → 质量门</text>
+  <text x="565" y="640" text-anchor="middle" font-size="12.5" font-weight="600">总协调主持收口 → 质量门</text>
   <text x="565" y="657" text-anchor="middle" font-size="10.5">不投票 · 评推理质量 · 红线否决</text>
 </g>
 
@@ -178,7 +178,7 @@
 <line x1="468" y1="806" x2="468" y2="828" class="dash"/>
 <line x1="642" y1="806" x2="642" y2="828" class="dash"/>
 <rect x="38" y="830" width="686" height="58" rx="12" fill="#E8F5EF" stroke="#4D9278" stroke-width="1.3"/>
-<text x="381" y="854" text-anchor="middle" font-size="14" font-weight="650" fill="#174F3D">输出：证据快照、当前内容、处方或可落地 playbook</text>
+<text x="381" y="854" text-anchor="middle" font-size="14" font-weight="650" fill="#174F3D">输出：证据快照、当前内容、处方或可落地 做法清单</text>
 <text x="381" y="875" text-anchor="middle" font-size="11.5" fill="#496B5E">可验证 · 可追踪 · 可恢复 · 可继续导航</text>
 
 <text x="380" y="919" text-anchor="middle" font-size="12" class="muted">把私域操盘手的判断链，变成可复制、可验证、可交付的运营系统</text>
