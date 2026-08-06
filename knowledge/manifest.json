@@ -4,7 +4,7 @@
   "atom_schema": "04-atoms/schema/atom-v2.schema.json",
   "public_corpora": [],
   "status": "pilot-validation",
-  "notes": "KnowledgeAtomV2 契约已建立；v1.2.4 新增公开用增方法映射（餐饮零售 16 主句），仍不启用正式 Runtime 检索；private atoms 与 Pilot 试验边界不变。",
+  "notes": "KnowledgeAtomV2 契约已建立；v1.2.5 新增公开用增方法映射（餐饮零售 16 主句），仍不启用正式 Runtime 检索；private atoms 与 Pilot 试验边界不变。",
   "methodology": [
     "00-methodology/私域公理与消解案例库.md",
     "00-methodology/用增方法映射-餐饮零售.md"

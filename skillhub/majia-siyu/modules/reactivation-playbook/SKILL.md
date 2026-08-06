@@ -2,7 +2,7 @@
 name: reactivation-playbook
 description: 私域社群促活方法论库，含沉默用户分层、唤醒路径、三端话术模板、活动节奏表与转化口径。Use this skill when 设计社群促活方案、唤醒沉默用户、排活动节奏、或需要可直接群发的促活话术时。
 metadata:
-  version: "1.2.4"
+  version: "1.2.5"
 ---
 
 # 沉默用户唤醒与社群促活 Playbook（社群促活官）
@@ -10,7 +10,7 @@ metadata:
 ## Overview
 
 
-> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.4）。
+> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.5）。
 把促活拆成五步可执行流程：分层 → 选钩子 → 选话术 → 排节奏 → 看指标。
 对齐方法论引擎「内容即产品」：每一个促活动作都当一个小产品来做（有钩子、有承接、有复购）。
 

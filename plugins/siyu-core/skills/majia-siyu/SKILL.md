@@ -5,7 +5,7 @@ description: |
   边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.2.4"
+  version: "1.2.5"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-siyu-team
 ---
@@ -103,7 +103,7 @@ metadata:
 
 ## 📋 版本记录
 
-- **v1.2.4** — 公开餐饮零售用增方法映射；不接 Runtime。
+- **v1.2.5** — SkillHub 对齐 1.2.4 用增映射；不接 Runtime。
 - **v1.2.3** — SkillHub 详情页展示名发布对齐。
 - **v1.2.1** — 离线 Pilot 盲测与审核报表；不接 Runtime。
 - **v1.2.0** — 知识契约与贡献安全层；仅人工审核。

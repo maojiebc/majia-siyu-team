@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.4-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.2.5-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-majia--siyu--team-171515.svg)](https://github.com/maojiebc/majia-siyu-team)
 
@@ -10,7 +10,7 @@
 
 私域经营动作全景图（统一入口 → 当前一步 → 执行 / 问诊 / 四官升舱；动态事实先检索留证；知识 Pilot 仅离线验证）：
 
-![majia-siyu v1.2.4 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.2.5 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 完整框架 SVG 与源码说明见 [GitHub docs/framework.svg](https://github.com/maojiebc/majia-siyu-team/blob/main/docs/framework.svg)。
 
@@ -62,9 +62,10 @@ skillhub install siyu
 
 ## 📋 版本记录
 
+- **v1.2.5** — 与 1.2.4 相同的用增方法映射；SkillHub 渠道对齐（1.2.4 槽位异常）。  
 - **v1.2.4** — 公开「用增方法映射·餐饮零售」16 条增长 Know-how；问诊/漏斗/促活可挂口径；不自动注入 Runtime。  
 - **v1.2.3** — 修复 SkillHub 详情页标题：发布临时包对齐 name=slug，主标题显示「私域专家团 · 马甲实战版」。功能不变。  
-- **v1.2.2** — 公开首页与包页全面重梳；H1 / displayName 固定为「私域专家团 · 马甲实战版」，避免被 slug `siyu` 盖住标题。  
+- **v1.2.2** — 公开首页与包页全面重梳；H1 / displayName 固定为「私域专家团 · 马甲实战版」，避免被商店短名盖住标题。  
 - **v1.2.1** — 离线 Knowledge Pilot 盲测、30 Golden Tasks、审核吞吐报表。  
 - **v1.2.0** — `KnowledgeAtomV2` 与贡献安全层；飞书 Phase 0。  
 - **v1.1.0** — 动态外部事实硬门 + `siyu-market-research`。  
