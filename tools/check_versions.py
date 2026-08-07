@@ -47,6 +47,18 @@ if not pyproject_match:
 elif pyproject_match.group(1) != version:
     errors.append(f"pyproject.toml version {pyproject_match.group(1)!r} 与 VERSION 不一致")
 
+# CodeBuddy 分发面同样漂移过（marketplace 停 1.2.1、plugin 停 1.2.8 直到 1.4.0 才发现）。
+for rel in (".codebuddy-plugin/marketplace.json", ".codebuddy-plugin/plugin.json"):
+    cb_path = ROOT / rel
+    if not cb_path.exists():
+        continue
+    cb_data = json.loads(cb_path.read_text(encoding="utf-8"))
+    cb_versions = [cb_data.get("version"), cb_data.get("metadata", {}).get("version")]
+    cb_versions += [plugin.get("version") for plugin in cb_data.get("plugins", [])]
+    for found in cb_versions:
+        if found is not None and found != version:
+            errors.append(f"{rel} 版本 {found!r} 与 VERSION 不一致")
+
 badge = re.search(
     r"img\.shields\.io/badge/(?:skill-)?v?([0-9.]+)-[A-Fa-f0-9]+\.svg",
     readme,

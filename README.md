@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.3.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.3.0 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.4.0 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
 </p>
 
 > **一张图看懂**：说真实处境 → `/siyu` 只选当前最该做的一步 → 高频任务直接写朋友圈 / 群发 / 话术（边写边合规）→ 真结构问题才升级全盘诊断评审 → 结论可存档、可续聊、可出报告。经营动作归本仓；会员指标 / SQL / 数仓请用 [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan)。
@@ -230,20 +230,11 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
-- **v1.3.0** — 统一错误码体系、知识原子缓存、低置信度主动追问；合规绝对化软化语境窗口。
-- **v1.2.9** — Runtime 硬化：kind 积分路由、合规加权惩罚、路径常量化、host 提示词外置、追踪清理与回归测试补齐。
-- **v1.2.8** — 增长原子正式集 approved 并进入 Pilot；诊断继续按业态注入。
-- **v1.2.7** — 诊断/全盘诊断上下文注入增长 draft 原子（按业态 L0/L1）。
-- **v1.2.6** — 增长知识 L0/L1 接入路由：未声明业态只加载通用原则；餐饮/零售叠加门店专包。
-- **v1.2.5** — 与 1.2.4 相同的餐饮零售用增方法映射；SkillHub 渠道对齐（商店 1.2.4 槽位异常，内容不变）。  
-- **v1.2.4** — 公开「用增方法映射·餐饮零售」：16 条增长 Know-how、指标字典、九项体检；方法可挂问诊/漏斗/促活，仍不自动灌进后台。  
-- **v1.2.3** — 修复 SkillHub 详情页标题：发布临时包对齐 name=slug，主标题显示「私域专家团 · 马甲实战版」。功能不变。  
-- **v1.2.2** — 公开首页全面重梳：角色导航、完整能力地图、安装分渠道、ClawHub 包页与中英文 README 对齐；功能与 API 不变。  
-- **v1.2.1** — 离线知识价值盲测、30 个 Golden Tasks、审核吞吐报表；同行共建为邀请制验证。  
-- **v1.2.0** — `KnowledgeAtomV2` 契约与贡献安全层，飞书 Phase 0；不自动上传或批准知识。  
-- **v1.1.0** — 动态外部事实硬门 + `siyu-market-research`。  
+- **v1.4.0** — 原子工具链双轨（v2 检索/校验 + `make atoms` 闸门）；skills 绑定接线；roster 官名单可配置；发布包随包分发公开知识层与查询工具；CLI 冒烟测试补齐。
+- **v1.3.0** — 统一错误码体系、干货判断（知识原子）缓存、低置信度主动追问；合规绝对化软化语境窗口。
+- **v1.2.9** — 后台运行层（Runtime）硬化：kind 积分路由、合规加权惩罚、路径常量化、host 提示词外置、追踪清理与回归测试补齐。
 
-完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
+完整变更历史见 [CHANGELOG.md](./CHANGELOG.md) 或 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 
 ## 👤 作者 / 联系
 

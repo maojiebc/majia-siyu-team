@@ -2,7 +2,7 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
-## [Unreleased]
+## [1.4.0] - 2026-08-08
 ### 新增
 - 原子工具链双轨：`atoms_query` 关键词检索兼容 v2（statement/适用性字段，此前对正式集静默 0 命中）；`atoms_validate` 按行嗅探版本，v2 走 `KnowledgeAtomV2` 契约校验 + skills 存在性；新增 `make atoms` 闸门（v1 示例 + v2 正式集本体 + 本体与 Pilot 夹具零漂移）并入 `make check`。
 - skills 绑定接线（消费方落地）：`filter_atoms_by_skills` / `select_atoms_for_skill` API；诊断上下文原子行携带 `skills` 字段；被绑定的五个能力 skill 在 SKILL.md 提供绑定原子查询入口；`build_growth_atoms` 构建期对照 plugins 目录硬校验绑定，悬空即失败。

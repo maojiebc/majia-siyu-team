@@ -1,6 +1,6 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.3.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.3.0 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.4.0 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
 </p>
 
 > **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
@@ -159,19 +159,11 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 
 ## Version history
 
+- **v1.4.0** — Dual-track atom toolchain (v2 query/validate + `make atoms` gate); skills-binding wiring; configurable officer roster; bundle ships public knowledge layer + query tools; CLI smoke tests.
 - **v1.3.0** — Runtime hardening: scored kind routing, weighted compliance penalties, path constants, external host prompt, trace cleanup, and regression tests.
-- **v1.2.8** — Growth atoms approved into Pilot formal set; diagnosis still injects by industry.
-- **v1.2.7** — Diagnosis/strategy contexts attach growth draft atoms (L0/L1 by industry).
-- **v1.2.6** — Growth L0/L1 routing: no industry → L0 only; catering/retail → L0+L1.
-- **v1.2.5** — Same growth know-how map as 1.2.4; SkillHub channel synced (store 1.2.4 slot anomaly, content unchanged).  
-- **v1.2.4** — Public catering/retail growth know-how map (16 statements, metric dictionary, 9-point checkup); skills can cite it; still no runtime backend auto-inject.  
-- **v1.2.3** — Fix SkillHub detail title: temp package aligns name=slug so the page title shows the Chinese brand name. No API change.  
-- **v1.2.2** — Public page refresh: role navigation, full capability map, channel-split install, CN/EN + ClawHub package page alignment. No API/behavior change.  
-- **v1.2.1** — Offline knowledge pilot, 30 Golden Tasks, editorial throughput report.  
-- **v1.2.0** — `KnowledgeAtomV2` contract and contribution safety layer.  
-- **v1.1.0** — External-fact hard gate + `siyu-market-research`.  
+- **v1.2.9** — Runtime hardening groundwork: scored routing, weighted penalties, trace cleanup.
 
-Full history: [CHANGELOG.md](./CHANGELOG.md).
+Full history: [CHANGELOG.md](./CHANGELOG.md) · [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 
 ## 👤 Author / Contact
 
