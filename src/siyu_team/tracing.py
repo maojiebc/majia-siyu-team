@@ -51,8 +51,8 @@ def redact(value: Any, key: str = "") -> Any:
     if isinstance(value, (list, tuple)):
         return [redact(item) for item in value]
     if isinstance(value, (set, frozenset)):
-        # set 不能 JSON 序列化，落盘前统一转 list 并逐项脱敏。
-        return [redact(item) for item in value]
+        # set 不能 JSON 序列化；稳定排序保证同一内容跨运行序列化一致。
+        return sorted((redact(item) for item in value), key=str)
     if isinstance(value, bool):
         return value
     if isinstance(value, int):
@@ -106,3 +106,37 @@ class TraceRecorder:
         finally:
             os.close(descriptor)
         return path
+
+
+def cleanup_old_traces(
+    directory: str | Path = ".siyu-team/traces",
+    days: int = 30,
+) -> tuple[int, int]:
+    """删除超过 N 天的追踪文件。
+
+    返回 ``(删除的文件数, 清理释放的字节数)``。
+    """
+    from datetime import timedelta
+
+    root = Path(directory)
+    if not root.exists():
+        return 0, 0
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max(0, days))
+    deleted_count = 0
+    deleted_bytes = 0
+
+    for path in root.glob("trace_*.jsonl"):
+        try:
+            stat = path.stat()
+            mtime = datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc)
+            if mtime < cutoff:
+                size = stat.st_size
+                path.unlink()
+                deleted_count += 1
+                deleted_bytes += size
+        except OSError:
+            continue
+
+    return deleted_count, deleted_bytes
+

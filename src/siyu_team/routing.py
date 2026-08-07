@@ -10,6 +10,7 @@ from typing import Any
 
 from .task import Task, TaskKind
 from .knowledge.growth_layers import describe_growth_load, select_growth_doc_refs
+from .knowledge.paths import COMPLIANCE_REDLINES_DOC, METHODOLOGY_AXIOMS_DOC
 
 
 INDUSTRIES = {"catering": "餐饮", "retail": "零售", "edu": "教培"}
@@ -130,8 +131,8 @@ def route_task(task: Task) -> RouteDecision:
     if task.kind is not TaskKind.MARKET_RESEARCH:
         knowledge_refs.extend(
             [
-                "knowledge/01-wechat-official/compliance/redlines.md",
-                "knowledge/00-methodology/私域公理与消解案例库.md",
+                COMPLIANCE_REDLINES_DOC,
+                METHODOLOGY_AXIOMS_DOC,
             ]
         )
         # 增长分层：未声明业态只 L0；catering/retail 叠加 L1
@@ -149,7 +150,7 @@ def route_task(task: Task) -> RouteDecision:
     focus = industry_route["focus"]
     if task.kind is TaskKind.MARKET_RESEARCH:
         focus = "先完成实时检索与证据快照；证据不足的对象不得进入正式推荐。"
-    elif task.kind is not TaskKind.MARKET_RESEARCH:
+    else:
         growth_note = describe_growth_load(task.industry)
         if focus:
             focus = f"{focus} {growth_note}"

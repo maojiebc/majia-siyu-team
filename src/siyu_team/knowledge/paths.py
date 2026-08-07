@@ -10,6 +10,18 @@ from typing import Mapping
 ENV_NAME = "SIYU_KNOWLEDGE_HOME"
 
 
+# 通用合规与方法论（相对仓库根，供路由/上下文引用）
+COMPLIANCE_REDLINES_DOC = "knowledge/01-wechat-official/compliance/redlines.md"
+METHODOLOGY_AXIOMS_DOC = "knowledge/00-methodology/私域公理与消解案例库.md"
+
+# 增长分层文档与原子库（与 growth_layers 共享语义；此处为权威路径常量）
+L0_DOC = "knowledge/00-methodology/L0-通用用户增长原则.md"
+L1_CATERING_DOC = "knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md"
+GROWTH_INDEX_DOC = "knowledge/00-methodology/用户增长分层索引.md"
+GROWTH_ATOMS_APPROVED = "04-atoms/growth-layers.approved.jsonl"
+GROWTH_ATOMS_DRAFT = "04-atoms/growth-layers.draft.jsonl"
+
+
 @dataclass(frozen=True)
 class KnowledgePathResolver:
     repository_root: Path | None = None

@@ -39,5 +39,20 @@ class ComplianceGateTests(unittest.TestCase):
                 self.assertNotIn(flag, result["flags"], f"{text} 误命中 {flag}")
 
 
+    def test_weighted_penalty_high_severity_single_flag(self) -> None:
+        """单个高危 flag 的惩罚应不轻于低危绝对化表述。"""
+        result_high = scan("100% 稳赚不赔")
+        result_low = scan("绝对领先的唯一首选")
+        self.assertTrue(result_high["hard_fail"])
+        self.assertLessEqual(result_high["penalty"], result_low["penalty"])
+        self.assertLess(result_high["penalty"], 1.0)
+
+    def test_penalty_uses_severity_not_count(self) -> None:
+        """penalty 应等于 1 - sum(severity)，并下限夹到 0.5。"""
+        result = scan("100% 稳赚 最好 最佳")
+        expected = max(0.5, 1.0 - sum(d["severity"] for d in result["details"]))
+        self.assertAlmostEqual(result["penalty"], expected)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,11 +1,23 @@
-"""主持人（团长）收口。结构照搬 qiaomu heavy.py:196-245。
-核心：不投票不平均、评推理质量、保留少数意见；合规官红线一票否决。
+"""主持人（团长）收口：对四官盲审意见做综合拍板。
+
+提示词默认从 ``plugins/siyu-core/prompts/host-v1.md`` 读取，支持热更新；
+文件缺失时回退到内置 ``HOST_PROMPT``。
 """
 from __future__ import annotations
-import hashlib
-from typing import List, Dict
 
-HOST_PROMPT = """<task>
+import hashlib
+from functools import lru_cache
+from pathlib import Path
+from typing import Dict, List
+
+
+_PROMPT_CANDIDATES = (
+    Path(__file__).resolve().parents[2] / "plugins/siyu-core/prompts/host-v1.md",
+    Path(__file__).resolve().parent / "prompts" / "host-v1.md",
+)
+
+HOST_PROMPT = """\
+<task>
 你是「私域专家团」的团长，私域操盘手画像，负责对四官的独立评审拍板。
 议题：{question}
 方案成功标准：{success_criteria}
@@ -49,6 +61,35 @@ HOST_PROMPT = """<task>
 </output_rules>"""
 
 
+def _strip_frontmatter(text: str) -> str:
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return text
+    for index, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            return "\n".join(lines[index + 1 :]).lstrip("\n")
+    return text
+
+
+@lru_cache(maxsize=4)
+def _load_host_prompt_from(path_str: str, mtime_ns: int) -> str:
+    del mtime_ns  # 仅参与 cache key，强制文件变更后重读
+    text = Path(path_str).read_text(encoding="utf-8")
+    return _strip_frontmatter(text).strip() + "\n"
+
+
+def load_host_prompt() -> str:
+    """运行时读取外置提示词；不存在则回退内置版本。"""
+    for path in _PROMPT_CANDIDATES:
+        if path.is_file():
+            try:
+                stat = path.stat()
+                return _load_host_prompt_from(str(path), stat.st_mtime_ns)
+            except OSError:
+                continue
+    return HOST_PROMPT
+
+
 def stable_shuffle_traces(question: str, traces: List[Dict]) -> List[Dict]:
     """去位置偏差：用 question 做种子稳定洗牌（同输入同顺序，可复现）。仿 heavy.py:474+。"""
     seed = int(hashlib.sha256(question.encode("utf-8")).hexdigest(), 16)
@@ -61,14 +102,25 @@ def stable_shuffle_traces(question: str, traces: List[Dict]) -> List[Dict]:
     return [traces[i] for i in idx]
 
 
-def build_host_prompt(question: str, officer_outputs: List[Dict],
-                      success_criteria: str = "", constraints: str = "") -> str:
+def build_host_prompt(
+    question: str,
+    officer_outputs: List[Dict],
+    success_criteria: str = "",
+    constraints: str = "",
+) -> str:
+    if len(officer_outputs) < 2:
+        raise ValueError("主持人收口至少需要 2 位官的独立意见")
+    template = load_host_prompt()
     shuffled = stable_shuffle_traces(question, officer_outputs)
     blocks = []
     for i, o in enumerate(shuffled, 1):
-        blocks.append("<officer>\n[%d] %s（引擎：%s）\n%s\n</officer>"
-                      % (i, o.get("name", "官"), o.get("engine", ""), o.get("content", "")))
-    return HOST_PROMPT.format(
-        question=question, success_criteria=success_criteria or "（未指定）",
-        constraints=constraints or "（无）", officers="\n\n".join(blocks),
+        blocks.append(
+            "<officer>\n[%d] %s（引擎：%s）\n%s\n</officer>"
+            % (i, o.get("name", "官"), o.get("engine", ""), o.get("content", ""))
+        )
+    return template.format(
+        question=question,
+        success_criteria=success_criteria or "（未指定）",
+        constraints=constraints or "（无）",
+        officers="\n\n".join(blocks),
     )

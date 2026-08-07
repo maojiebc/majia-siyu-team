@@ -15,7 +15,7 @@ from siyu_team.task import (
     TaskValidationError,
     parse_task,
 )
-from siyu_team.tracing import TraceRecorder, redact
+from siyu_team.tracing import TraceRecorder, cleanup_old_traces, redact
 
 
 class TaskParsingTests(unittest.TestCase):
@@ -220,6 +220,27 @@ class RedactionHardeningTests(unittest.TestCase):
     def test_set_values_are_masked(self) -> None:
         out = redact({"s": {"13812345678"}})
         self.assertNotIn("13812345678", str(out))
+
+    def test_set_redaction_is_stably_sorted(self) -> None:
+        out = redact({"s": {"b", "a", "c"}})
+        self.assertEqual(out["s"], ["a", "b", "c"])
+
+    def test_cleanup_old_traces_removes_stale_files(self) -> None:
+        import os
+        import time
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stale = root / "trace_old.jsonl"
+            fresh = root / "trace_new.jsonl"
+            stale.write_text("{}", encoding="utf-8")
+            fresh.write_text("{}", encoding="utf-8")
+            old_ts = time.time() - 40 * 24 * 3600
+            os.utime(stale, (old_ts, old_ts))
+            deleted, _size = cleanup_old_traces(root, days=30)
+            self.assertEqual(deleted, 1)
+            self.assertFalse(stale.exists())
+            self.assertTrue(fresh.exists())
 
     def test_does_not_over_redact_normal_content(self) -> None:
         # 含 sk 的普通词、短数字、正常整数、布尔都不应被改。

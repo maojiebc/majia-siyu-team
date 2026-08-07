@@ -18,13 +18,18 @@ from pathlib import Path
 from typing import Iterable
 
 from .models import KnowledgeAtomV2, generate_atom_id, generate_source_id
-from .paths import KnowledgePathResolver
+from .paths import (
+    GROWTH_ATOMS_APPROVED,
+    GROWTH_ATOMS_DRAFT,
+    GROWTH_INDEX_DOC,
+    KnowledgePathResolver,
+    L0_DOC,
+    L1_CATERING_DOC,
+)
 
-L0_DOC = "knowledge/00-methodology/L0-通用用户增长原则.md"
-L1_CATERING_DOC = "knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md"
-GROWTH_INDEX_DOC = "knowledge/00-methodology/用户增长分层索引.md"
-GROWTH_ATOMS_APPROVED = "04-atoms/growth-layers.approved.jsonl"
-GROWTH_ATOMS_DRAFT = "04-atoms/growth-layers.draft.jsonl"  # 兼容旧路径；优先 approved
+# 单次上下文注入的原子数上限：约 40 条 × ~150 token ≈ 6000 token，
+# 给任务描述与四官输出留足余量。
+MAX_ATOMS_PER_CONTEXT = 40
 
 L0_TOPIC = "growth_l0"
 L1_CATERING_TOPIC = "growth_l1_catering"
@@ -130,7 +135,7 @@ def describe_growth_load(industry: str = "") -> str:
 def format_growth_atoms_for_context(
     industry: str = "",
     *,
-    max_atoms: int = 40,
+    max_atoms: int = MAX_ATOMS_PER_CONTEXT,
     resolver: KnowledgePathResolver | None = None,
 ) -> tuple[tuple[dict, ...], str]:
     """供诊断/全盘诊断上下文使用的精简原子列表 + 人话加载说明。

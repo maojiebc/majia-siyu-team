@@ -13,3 +13,6 @@ dist/
 
 # 维护者本地过程稿（不进公开发布）
 docs/source-materials/.local/
+
+# 本机依赖锁文件（项目零运行时依赖，不随发布包走）
+uv.lock

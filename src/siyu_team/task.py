@@ -59,40 +59,78 @@ class RiskLevel(str, Enum):
     HIGH = "high"
 
 
-_KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str]], ...] = (
-    (TaskKind.SAVE_MEMORY, re.compile(r"(保存|存档|记下来|留下结论)")),
-    (TaskKind.RESTORE_MEMORY, re.compile(r"(恢复|接着上次|上次聊|之前聊到哪)")),
-    (TaskKind.REPORT, re.compile(r"(出报告|生成报告|打包给.{0,6}(老板|客户))")),
+# (kind, pattern, weight)：多规则同时命中时取最高分；同分保留先登记顺序。
+# 内容生产类权重大于存档类，避免「保存上次朋友圈文案」误判为 SAVE_MEMORY。
+_KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
     (
         TaskKind.MARKET_RESEARCH,
         re.compile(
             r"(厂商|供应商|服务商|竞品|市场格局|市场地图|产品选型|"
-            r"公司存续|客户案例|最新政策|平台规则|"
-            r"(产品|软件|平台).{0,8}(价格|报价|收费|功能|版本|接口|停服|在营)|"
-            r"(价格|报价|功能|版本|接口).{0,8}(厂商|供应商|服务商|软件|平台|产品)|"
+            r"SCRM|CRM|公司存续|客户案例|最新政策|平台规则|"
+            r"对比.{0,16}(报价|功能|价格|厂商|软件|系统|平台)|"
+            r"(产品|软件|平台|系统).{0,8}(价格|报价|收费|功能|版本|接口|停服|在营)|"
+            r"(价格|报价|功能|版本|接口).{0,8}(厂商|供应商|服务商|软件|平台|产品|系统)|"
             r"是否.{0,8}(经营|停服|注销))"
         ),
+        3.0,
     ),
     (
         TaskKind.STRATEGY_REVIEW,
-        re.compile(r"(全盘|整盘|战略评审|私域体系|怎么搭|四官)"),
+        re.compile(r"(全盘|整盘|战略评审|私域体系|全面搭建|怎么搭|四官)"),
+        2.8,
     ),
     (
         TaskKind.DIAGNOSIS,
         re.compile(
             r"(为什么|怎么办|问题出在哪|长期|一直|连续.{0,5}(低|差|没)|"
-            r"转化差|留存.{0,3}(掉|差)|没人加微|不活跃|没回复|没打开)"
+            r"转化差|留存.{0,3}(掉|差)|没人加微|不活跃|没回复|没打开|"
+            r"打开率.{0,6}(低|差|还是))"
         ),
+        2.6,
     ),
-    (TaskKind.MOMENTS_COPY, re.compile(r"(朋友圈|发圈|内容池|节日文案|导购素材)")),
+    (
+        TaskKind.MOMENTS_COPY,
+        re.compile(r"(朋友圈|发圈|内容池|节日文案|导购素材)"),
+        2.4,
+    ),
     (
         TaskKind.GROUP_CAMPAIGN,
         re.compile(r"(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本)"),
+        2.2,
     ),
     (
         TaskKind.CONVERSATION_SCRIPT,
         re.compile(r"(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本)"),
+        2.2,
     ),
+    (
+        TaskKind.REPORT,
+        re.compile(r"(出报告|生成报告|打包给.{0,6}(老板|客户))"),
+        2.0,
+    ),
+    (
+        TaskKind.RESTORE_MEMORY,
+        re.compile(r"(恢复|接着上次|上次聊|之前聊到哪)"),
+        1.5,
+    ),
+    (
+        TaskKind.SAVE_MEMORY,
+        re.compile(r"(保存|存档|记下来|留下结论)"),
+        1.0,
+    ),
+)
+
+# 存档/恢复类与内容生产类同时命中时，压低存档分，优先内容任务。
+_CONTENT_KINDS = frozenset(
+    {
+        TaskKind.MOMENTS_COPY,
+        TaskKind.GROUP_CAMPAIGN,
+        TaskKind.CONVERSATION_SCRIPT,
+        TaskKind.MARKET_RESEARCH,
+        TaskKind.DIAGNOSIS,
+        TaskKind.STRATEGY_REVIEW,
+        TaskKind.REPORT,
+    }
 )
 
 _GOAL_RULES: tuple[tuple[Goal, re.Pattern[str]], ...] = (
@@ -229,10 +267,50 @@ class Task:
 
 
 def _infer_kind(text: str) -> TaskKind:
-    for kind, pattern in _KIND_RULES:
+    """多规则积分；低置信度内容任务优先于存档类，避免顺序依赖误判。"""
+    scores: dict[TaskKind, float] = {}
+    order: list[TaskKind] = []
+    for kind, pattern, weight in _KIND_RULES:
         if pattern.search(text):
+            if kind not in scores:
+                order.append(kind)
+            scores[kind] = scores.get(kind, 0.0) + weight
+
+    if not scores:
+        return TaskKind.UNKNOWN
+
+    # 「保存上次朋友圈文案」会同时命中 SAVE_MEMORY 与 MOMENTS_COPY。
+    if scores.keys() & _CONTENT_KINDS:
+        for memory_kind in (TaskKind.SAVE_MEMORY, TaskKind.RESTORE_MEMORY):
+            if memory_kind in scores:
+                scores[memory_kind] *= 0.25
+
+    best_score = max(scores.values())
+    for kind in order:
+        if scores[kind] == best_score:
             return kind
     return TaskKind.UNKNOWN
+
+
+def infer_kind_with_confidence(text: str) -> tuple[TaskKind, float]:
+    """对外暴露 kind + 置信度，便于路由层在低分时改问用户。"""
+    kind = _infer_kind(text)
+    if kind is TaskKind.UNKNOWN:
+        return kind, 0.0
+    # 归一到 0-1：权重表最高约 3.0
+    raw = 0.0
+    for candidate, pattern, weight in _KIND_RULES:
+        if candidate is kind and pattern.search(text):
+            raw = weight
+            break
+    if kind in _CONTENT_KINDS and (
+        re.search(r"(保存|存档|记下来|留下结论|恢复|接着上次)", text)
+    ):
+        # 内容优先场景仍保持较高置信度
+        confidence = min(1.0, raw / 3.0 + 0.15)
+    else:
+        confidence = min(1.0, raw / 3.0)
+    return kind, round(confidence, 3)
 
 
 def _infer_channel(kind: TaskKind, text: str) -> Channel:

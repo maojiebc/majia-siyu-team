@@ -11,7 +11,6 @@ from siyu_team.knowledge.growth_layers import (
     select_growth_doc_refs,
     select_growth_topics,
 )
-from siyu_team.context import build_agent_context
 from siyu_team.perspectives import build_isolated_officer_prompt
 from siyu_team.routing import route_task
 from siyu_team.runtime import SiyuRuntime

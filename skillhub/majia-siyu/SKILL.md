@@ -5,7 +5,7 @@ description: |
   边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.2.8"
+  version: "1.2.9"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-siyu-team
 ---
@@ -115,11 +115,7 @@ metadata:
 
 ## 📋 版本记录
 
-- **v1.2.8** — SkillHub 对齐用增映射；不接后台。
-- **v1.2.3** — SkillHub 展示名发布对齐。
-- **v1.2.1** — 离线 Pilot 与审核报表；不接后台。
-- **v1.2.0** — 知识契约与贡献安全层；仅人工审核。
-- **v1.1.0** — 新增动态外部事实三道硬门与 `siyu-market-research`：厂商、产品、报价和市场事实必须实时检索、逐项留证后才能进入推荐与专家分析。
+- **v1.2.9** — Runtime 硬化（积分路由 / 合规加权 / 追踪清理 / 提示词外置）；不接后台。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

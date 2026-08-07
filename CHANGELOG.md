@@ -2,6 +2,25 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.2.9] - 2026-08-07
+### 新增
+- `infer_kind_with_confidence()`：任务 kind 改为积分路由，内容生产类优先于存档类，暴露置信度。
+- `cleanup_old_traces(days=30)`：本地追踪目录生命周期清理；`siyu-plan --cleanup-traces` 可调用。
+- Host 提示词外置到 `plugins/siyu-core/prompts/host-v1.md`，运行时加载并保留内置回退。
+- 回归测试：`tests/test_task.py`、`tests/test_routing.py`、`tests/test_host.py`。
+
+### 变更
+- 合规 `scan()` 惩罚改为按 severity 加权（`1 - sum(penalty)`，下限 0.5）。
+- `routing.py` 知识路径改为引用 `knowledge/paths.py` 常量；`elif not MARKET_RESEARCH` 简化为 `else`。
+- `growth_layers` 引入 `MAX_ATOMS_PER_CONTEXT`；路径常量上收到 `paths.py`。
+- `redact()` 对 set/frozenset 输出稳定排序。
+- CLI 对超长 `source_text` 给出中文友好提示。
+- `pyproject.toml` 版本与 `VERSION`/marketplace/SKILL 对齐。
+
+### 修复
+- 「保存上次朋友圈文案」不再误判为 `SAVE_MEMORY`。
+- 「对比两家 SCRM 系统的报价和功能」可正确识别为 `MARKET_RESEARCH`。
+
 ## [1.2.8] - 2026-08-06
 ### 新增
 - 增长原子正式集：`knowledge/04-atoms/growth-layers.approved.jsonl`（35 条，`review_status=approved`）。
