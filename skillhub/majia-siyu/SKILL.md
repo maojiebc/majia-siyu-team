@@ -2,10 +2,10 @@
 name: majia-siyu
 description: |
   私域专家团 · 马甲实战版（majia-siyu）。处理朋友圈、群发、欢迎语、企微引流、私域诊断、整盘搭建、厂商选型/竞品/报价/市场地图、客户档案与任务后导航。涉及厂商、产品、价格、功能、案例、政策、平台规则或公司存续时，必须实时联网核验并附证据；不能联网时不得输出具体动态事实。
-  边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
+  边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan；召回/提频/防流失的数据依据也在那边。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.4.1"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-siyu-team
 ---
@@ -71,6 +71,7 @@ metadata:
 | 上次、接着、之前聊到哪 | `/siyu-restore` | 拉出最近的客户档案接着干 |
 | 出报告、打包给老板或客户看 | `/siyu-report` | 合并同一客户的多份存档并做合规扫描 |
 | 更新私域专家团 | `/siyu-update` | 同步官方项目，不碰本地客户档案 |
+| 圈谁、流失阈值、券力度、效果算账 | 外部 `majia-huiyuan` | 会员动作的数据依据在姊妹篇 |
 | 海报、活动主视觉、配图 | 外部出图 skill | 文案完成后路由 `guizang-social-card` 或 `baoyu-cover-image` |
 
 ### 工作流程
@@ -115,9 +116,8 @@ metadata:
 
 ## 📋 版本记录
 
+- **v1.4.1** — 会员动作的数据依据互指姊妹篇 majia-huiyuan。
 - **v1.4.0** — 原子工具链双轨（v2 检索/校验 + `make atoms` 闸门）；skills 绑定接线；roster 官名单可配置；发布包随包分发公开知识层与查询工具；CLI 冒烟测试补齐。
-- **v1.3.0** — 错误码体系 / 干货判断（知识原子）缓存 / 低置信度主动追问；不接后台。
-- **v1.2.9** — 后台运行层（Runtime）硬化（积分路由 / 合规加权 / 追踪清理 / 提示词外置）；不接后台。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

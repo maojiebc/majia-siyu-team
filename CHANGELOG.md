@@ -2,6 +2,10 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.4.1] - 2026-08-07
+### 变更
+- 与姊妹篇 majia-huiyuan（v1.4.0）双向互指：主入口 SKILL.md 边界描述改为「同一动作两半」——本团管执行内容（话术/素材/SOP），动作背后的数据依据（圈谁/何时/力度/派给谁/怎么回收）路由到 majia-huiyuan；模式 A 路由表与模式 B 导航地图各加一行对应出口。文档级变更，代码零改动。
+
 ## [1.4.0] - 2026-08-08
 ### 新增
 - 原子工具链双轨：`atoms_query` 关键词检索兼容 v2（statement/适用性字段，此前对正式集静默 0 命中）；`atoms_validate` 按行嗅探版本，v2 走 `KnowledgeAtomV2` 契约校验 + skills 存在性；新增 `make atoms` 闸门（v1 示例 + v2 正式集本体 + 本体与 Pilot 夹具零漂移）并入 `make check`。

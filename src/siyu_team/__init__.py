@@ -4,4 +4,4 @@ from .runtime import ExecutionPlan, SiyuRuntime
 from .task import Task, TaskKind, parse_task
 
 __all__ = ["ExecutionPlan", "SiyuRuntime", "Task", "TaskKind", "parse_task"]
-__version__ = "1.4.0"
+__version__ = "1.4.1"
