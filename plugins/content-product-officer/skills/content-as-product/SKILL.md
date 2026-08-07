@@ -32,6 +32,18 @@ metadata:
 ## 合规约束（合规官会查）
 - 不诱导分享 / 不绝对化用词 / 不未授权收集个人信息 / 裂变走企微官方路径
 
+## 绑定的增长干货原子
+
+增长正式集（`knowledge/04-atoms/growth-layers.approved.jsonl`）里有若干条
+原子把本 skill 写进了 `skills` 绑定。需要按条引用时，在仓库根执行：
+
+```bash
+python3 tools/atoms_query.py --file knowledge/04-atoms/growth-layers.approved.jsonl --skills content-as-product
+```
+
+诊断 / 全盘诊断计划注入的 `growth_atoms` 每行也带 `skills` 字段，
+可直接按归属取本 skill 相关的干货，不用整包背诵。
+
 ---
 
 ## 不知道下一步用哪个 skill？

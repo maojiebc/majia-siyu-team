@@ -8,7 +8,19 @@
 2. 深度方法论放在 skill 的 `references/` 或 `knowledge/00-methodology/`。
 3. 全量真实语料原子化后放入私有 `atoms.jsonl`，只通过指针查询，不复制到公开层。
 
-## Schema
+## 双轨 Schema：v1 私有库 / v2 正式集
+
+本目录同时存在两套合法格式，**不要混淆**：
+
+| 轨道 | 文件 | ID 形态 | 校验真源 |
+|---|---|---|---|
+| v1（私有语料轨） | `knowledge/03-majia-sop/atoms.jsonl`、本目录 `atoms.example.jsonl` | `{季度}_{序号}`，如 `2026Q3_001` | `tools/atoms_validate.py` 内置规则（见下表） |
+| v2（公开正式集轨） | 本目录 `growth-layers.approved.jsonl` | `ka_` + 16 位十六进制（内容寻址，代码生成） | `schema/atom-v2.schema.json` + `src/siyu_team/knowledge/models.py` |
+
+`tools/atoms_validate.py` 与 `tools/atoms_query.py` 已双轨兼容（按行嗅探 `schema_version`），
+两轨都做 id 唯一性与 skills 存在性校验；`make atoms` 把两个公开文件与 Pilot 夹具同步一起卡进 `make check`。
+
+## v1 Schema（私有语料轨）
 
 | 字段 | 类型 | 规则 |
 |---|---|---|

@@ -48,6 +48,18 @@ metadata:
 
 > 注：本 skill 的方法论框架可公开；具体话术/分层阈值/节奏配比是马甲护城河，标【待马甲填真实SOP】处由马甲注入。
 
+## 绑定的增长干货原子
+
+增长正式集（`knowledge/04-atoms/growth-layers.approved.jsonl`）里有若干条
+原子把本 skill 写进了 `skills` 绑定。需要按条引用时，在仓库根执行：
+
+```bash
+python3 tools/atoms_query.py --file knowledge/04-atoms/growth-layers.approved.jsonl --skills reactivation-playbook
+```
+
+诊断 / 全盘诊断计划注入的 `growth_atoms` 每行也带 `skills` 字段，
+可直接按归属取本 skill 相关的干货，不用整包背诵。
+
 ---
 
 ## 不知道下一步用哪个 skill？

@@ -57,13 +57,25 @@ def build_agent_context(
     officer: str,
     *,
     shared_fields: Mapping[str, Any] | None = None,
+    allowed_context: frozenset[str] | None = None,
 ) -> AgentContext:
-    if officer not in OFFICER_ALLOWED_CONTEXT:
-        raise ValueError(f"未知角色：{officer}")
+    """构建单官上下文。
+
+    ``allowed_context`` 供 roster 自定义官传入专属字段白名单；
+    不传时回落内置四官白名单。既非内置官又没给白名单 → 拒绝
+    （fail-closed：自定义官必须显式声明能看什么，不默认放行）。
+    """
+    if allowed_context is None:
+        builtin = OFFICER_ALLOWED_CONTEXT.get(officer)
+        if builtin is None:
+            raise ValueError(
+                f"未知角色：{officer}（自定义官请在 roster 条目里提供 allowed_context 白名单）"
+            )
+        allowed_context = builtin
 
     base = task.to_dict()
     fields = {key: redact(base[key], key) for key in _COMMON_FIELDS}
-    for key in OFFICER_ALLOWED_CONTEXT[officer]:
+    for key in allowed_context:
         if key in task.context:
             fields[key] = redact(task.context[key], key)
 

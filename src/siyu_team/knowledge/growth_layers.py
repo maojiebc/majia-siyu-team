@@ -84,6 +84,32 @@ def filter_atoms_by_growth_layer(
     return tuple(out)
 
 
+def filter_atoms_by_skills(
+    atoms: Iterable[KnowledgeAtomV2],
+    skills: Iterable[str],
+) -> tuple[KnowledgeAtomV2, ...]:
+    """按 skill 绑定过滤原子（skills 字段的运行时消费方之一）。"""
+    wanted = {skill.strip() for skill in skills if skill and skill.strip()}
+    if not wanted:
+        return tuple(atoms)
+    return tuple(atom for atom in atoms if wanted.intersection(atom.skills))
+
+
+def select_atoms_for_skill(
+    skill: str,
+    industry: str = "",
+    *,
+    resolver: KnowledgePathResolver | None = None,
+    cache: dict[str, tuple[KnowledgeAtomV2, ...]] | None = None,
+) -> tuple[KnowledgeAtomV2, ...]:
+    """给单个 skill 取它绑定的增长正式集原子（按业态先过滤分层）。
+
+    供 skill 侧消费：SKILL.md 引导宿主查询「本 skill 绑定了哪些干货」。
+    """
+    atoms = load_growth_atoms(industry, resolver=resolver, cache=cache)
+    return filter_atoms_by_skills(atoms, (skill,))
+
+
 def _find_growth_atoms_file(resolver: KnowledgePathResolver) -> Path | None:
     """优先正式 approved，其次 draft（兼容）。"""
     names = (GROWTH_ATOMS_APPROVED, GROWTH_ATOMS_DRAFT)
@@ -186,6 +212,8 @@ def format_growth_atoms_for_context(
                 "layer": layer,
                 "type": atom.type,
                 "statement": atom.statement,
+                # 绑定的 skill 名单随行注入：宿主/四官可按 skill 归属引用干货。
+                "skills": list(atom.skills),
             }
         )
     if len(atoms) > max_atoms:

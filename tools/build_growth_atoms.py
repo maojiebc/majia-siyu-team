@@ -217,6 +217,22 @@ def build_atom(
     )
 
 
+def _known_skills() -> set[str]:
+    return {p.parent.name for p in (ROOT / "plugins").rglob("SKILL.md")}
+
+
+def _assert_skill_bindings(atoms: list[KnowledgeAtomV2]) -> None:
+    """skills 绑定是启发式生成的，必须对照 plugins 目录硬校验，防悬空指针。"""
+    known = _known_skills()
+    problems = []
+    for atom in atoms:
+        unknown = [skill for skill in atom.skills if skill not in known]
+        if unknown:
+            problems.append(f"{atom.source.locator} 绑定了不存在的 skill：{unknown}")
+    if problems:
+        raise SystemExit("skills 绑定校验失败：\n" + "\n".join(problems))
+
+
 def _write_jsonl(path: Path, atoms: list[KnowledgeAtomV2]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
@@ -291,6 +307,7 @@ def main() -> int:
         )
 
     approved_path = ROOT / "knowledge" / "04-atoms" / "growth-layers.approved.jsonl"
+    _assert_skill_bindings(approved)
     _write_jsonl(approved_path, approved)
 
     if args.keep_draft:

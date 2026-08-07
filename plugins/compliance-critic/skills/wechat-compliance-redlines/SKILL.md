@@ -21,6 +21,18 @@ metadata:
 对每个被否决项给：命中条款（指向 redlines.md）+ 整改建议（合规替代动作）。
 > 红线维护：先核对 `knowledge/01-wechat-official/compliance/redlines.md`，再只改 `eval/compliance_lexicon.py`；其他 Python 文件只 import。
 
+## 绑定的增长干货原子
+
+增长正式集（`knowledge/04-atoms/growth-layers.approved.jsonl`）里有若干条
+原子把本 skill 写进了 `skills` 绑定。需要按条引用时，在仓库根执行：
+
+```bash
+python3 tools/atoms_query.py --file knowledge/04-atoms/growth-layers.approved.jsonl --skills wechat-compliance-redlines
+```
+
+诊断 / 全盘诊断计划注入的 `growth_atoms` 每行也带 `skills` 字段，
+可直接按归属取本 skill 相关的干货，不用整包背诵。
+
 ---
 
 ## 不知道下一步用哪个 skill？

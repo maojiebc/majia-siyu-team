@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""对本地 JSONL 原子库做轻量过滤与关键词检索。"""
+"""对本地 JSONL 原子库做轻量过滤与关键词检索（v1 私有库与 v2 正式集双轨兼容）。"""
 from __future__ import annotations
 
 import argparse
@@ -13,6 +13,35 @@ DEFAULT_FILE = Path(__file__).resolve().parents[1] / "knowledge/03-majia-sop/ato
 
 def split_values(values: list[str] | None) -> set[str]:
     return {item.strip() for value in values or [] for item in value.split(",") if item.strip()}
+
+
+def _join(items: object) -> str:
+    if isinstance(items, list):
+        return " ".join(str(item) for item in items)
+    return ""
+
+
+def haystack_of(atom: dict) -> str:
+    """按 schema 版本拼关键词检索文本：v1 搜 knowledge/original，v2 搜 statement 与适用性。"""
+    parts: list[str] = []
+    if atom.get("schema_version") == "2.0" or "statement" in atom:
+        parts.append(str(atom.get("statement", "")))
+        applicability = atom.get("applicability") or {}
+        if isinstance(applicability, dict):
+            for field in ("preconditions", "recommended_action", "failure_modes", "counterexamples"):
+                parts.append(_join(applicability.get(field)))
+            for metric in applicability.get("metrics") or []:
+                if isinstance(metric, dict):
+                    parts.append(f"{metric.get('name', '')} {metric.get('definition', '')}")
+        source = atom.get("source") or {}
+        if isinstance(source, dict):
+            parts.append(f"{source.get('label', '')} {source.get('locator', '')}")
+    else:
+        parts.append(str(atom.get("knowledge", "")))
+        parts.append(str(atom.get("original", "")))
+    parts.append(_join(atom.get("topics")))
+    parts.append(_join(atom.get("skills")))
+    return " ".join(parts).casefold()
 
 
 def main() -> int:
@@ -46,10 +75,7 @@ def main() -> int:
             continue
         if wanted_types and atom.get("type") not in wanted_types:
             continue
-        haystack = " ".join([
-            str(atom.get("knowledge", "")), str(atom.get("original", "")),
-            " ".join(atom.get("topics", [])), " ".join(atom.get("skills", [])),
-        ]).casefold()
+        haystack = haystack_of(atom)
         if any(keyword not in haystack for keyword in keywords):
             continue
         print(json.dumps(atom, ensure_ascii=False))

@@ -6,8 +6,11 @@ from siyu_team.knowledge.growth_layers import (
     L0_DOC,
     L1_CATERING_DOC,
     describe_growth_load,
+    filter_atoms_by_skills,
+    format_growth_atoms_for_context,
     growth_atom_id,
     load_growth_atoms,
+    select_atoms_for_skill,
     select_growth_doc_refs,
     select_growth_topics,
 )
@@ -109,6 +112,47 @@ class GrowthLayerTests(unittest.TestCase):
         self.assertIn("增长参考", prompt)
         self.assertIn("L0-01", prompt)
 
+
+
+class SkillBindingTests(unittest.TestCase):
+    """skills 字段的消费链：过滤 API、上下文行注入、绑定双向对账。"""
+
+    def test_filter_atoms_by_skills(self) -> None:
+        atoms = load_growth_atoms("catering")
+        funnel = filter_atoms_by_skills(atoms, ("ops-as-ad-funnel",))
+        self.assertGreater(len(funnel), 0)
+        self.assertLess(len(funnel), len(atoms))
+        for atom in funnel:
+            self.assertIn("ops-as-ad-funnel", atom.skills)
+
+    def test_empty_skill_filter_returns_all(self) -> None:
+        atoms = load_growth_atoms("")
+        self.assertEqual(filter_atoms_by_skills(atoms, ()), atoms)
+
+    def test_select_atoms_for_skill(self) -> None:
+        atoms = select_atoms_for_skill("conversion-caliber", "catering")
+        self.assertGreater(len(atoms), 0)
+        for atom in atoms:
+            self.assertIn("conversion-caliber", atom.skills)
+
+    def test_context_rows_carry_skills(self) -> None:
+        rows, _ = format_growth_atoms_for_context("catering")
+        self.assertGreater(len(rows), 0)
+        for row in rows:
+            self.assertIsInstance(row.get("skills"), list)
+            self.assertTrue(row["skills"], f"{row['locator']} 没有 skills 绑定")
+
+    def test_all_bound_skills_exist_in_plugins(self) -> None:
+        # 双向对账：正式集绑定的 skill 目录必须真实存在，防 skill 改名后悬空。
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parents[1]
+        known = {p.parent.name for p in (root / "plugins").rglob("SKILL.md")}
+        for atom in load_growth_atoms("catering"):
+            for skill in atom.skills:
+                self.assertIn(
+                    skill, known, f"{atom.source.locator} 绑定了不存在的 skill：{skill}"
+                )
 
 
 class AtomCacheTests(unittest.TestCase):

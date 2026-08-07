@@ -9,11 +9,13 @@ from typing import Any, Mapping
 
 from .context import AgentContext, build_agent_context
 from .knowledge.growth_layers import format_growth_atoms_for_context
+from .roster import MAX_OFFICERS, load_roster, normalize_officers
 from .routing import RouteDecision, route_task
 from .task import Task, TaskKind, parse_task
 from .tracing import TraceRecorder
 
 
+# 内置四官（roster 缺失/损坏时的回退名单；正常路径从 roster 读取）。
 PANEL_OFFICERS = ("公关官", "产品官", "广告官", "合规官")
 
 # 诊断与全盘诊断注入增长 draft 原子
@@ -47,9 +49,39 @@ class ExecutionPlan:
         }
 
 
+def _panel_from_roster(roster: Mapping[str, Any]) -> tuple[tuple[str, frozenset[str] | None], ...]:
+    """从 roster 提取 (官名, 自定义白名单) 面板；名单为空回落内置四官。
+
+    这是「换角色不碰代码」的接线点：往 roster.json 加官即生效，
+    自定义官需带 allowed_context（context.build_agent_context fail-closed）。
+    """
+    panel: list[tuple[str, frozenset[str] | None]] = []
+    seen: set[str] = set()
+    for officer in normalize_officers(roster.get("officers"), k=MAX_OFFICERS):
+        if not isinstance(officer, Mapping):
+            continue
+        name = str(officer.get("name", "")).strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        allowed = officer.get("allowed_context")
+        panel.append(
+            (name, frozenset(str(key) for key in allowed) if allowed is not None else None)
+        )
+    if not panel:
+        panel = [(name, None) for name in PANEL_OFFICERS]
+    return tuple(panel)
+
+
 class SiyuRuntime:
-    def __init__(self, trace_recorder: TraceRecorder | None = None) -> None:
+    def __init__(
+        self,
+        trace_recorder: TraceRecorder | None = None,
+        roster: Mapping[str, Any] | None = None,
+    ) -> None:
         self.trace_recorder = trace_recorder or TraceRecorder()
+        # 官名单来自 roster（默认 examples/roster.example.json 或内置四官）。
+        self._panel = _panel_from_roster(roster if roster is not None else load_roster())
         # 增长原子内存缓存：key=归一化业态，生命周期与实例绑定，跨 plan 复用。
         self._atom_cache: dict[str, tuple[Any, ...]] = {}
 
@@ -85,8 +117,10 @@ class SiyuRuntime:
             and not decision.needs_clarification
         ):
             contexts = tuple(
-                build_agent_context(task, officer, shared_fields=shared)
-                for officer in PANEL_OFFICERS
+                build_agent_context(
+                    task, name, shared_fields=shared, allowed_context=allowed
+                )
+                for name, allowed in self._panel
             )
 
         plan = ExecutionPlan(

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""校验知识原子 JSONL 的 schema、枚举、唯一性与 skill 引用。"""
+"""校验知识原子 JSONL：v1 私有库走内置规则，v2 正式集走 KnowledgeAtomV2 契约。
+
+两轨都做 id 唯一性与 skills 存在性校验；一份文件里允许混行（按行嗅探版本）。
+"""
 from __future__ import annotations
 
 import argparse
@@ -7,6 +10,18 @@ from datetime import date
 import json
 from pathlib import Path
 import re
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+try:
+    from siyu_team.knowledge.models import (  # noqa: E402
+        KnowledgeAtomV2,
+        KnowledgeValidationError,
+    )
+except ImportError:  # SkillHub 分发态没有 src/：v2 校验降级为明确报错，v1 照常
+    KnowledgeAtomV2 = None  # type: ignore[assignment, misc]
+    KnowledgeValidationError = None  # type: ignore[assignment, misc]
 
 
 REQUIRED = {"id", "knowledge", "original", "source", "date", "topics", "skills", "type", "confidence"}
@@ -20,7 +35,31 @@ def repo_root() -> Path:
 
 
 def known_skills(root: Path) -> set[str]:
-    return {p.parent.name for p in (root / "plugins").rglob("SKILL.md")}
+    # 完整仓库扫 plugins/；SkillHub 单包布局扫 modules/。都没有则返回空集，
+    # main 会给出警告并跳过 skills 存在性检查（其余校验照跑）。
+    for base in ("plugins", "modules"):
+        found = {p.parent.name for p in (root / base).rglob("SKILL.md")}
+        if found:
+            return found
+    return set()
+
+
+def is_v2(atom: dict) -> bool:
+    return atom.get("schema_version") == "2.0" or "statement" in atom
+
+
+def validate_atom_v2(atom: dict, line: int, skills: set[str]) -> list[str]:
+    prefix = f"第 {line} 行"
+    if KnowledgeAtomV2 is None:
+        return [f"{prefix}: v2 校验需要完整仓库（src/siyu_team 不可导入）"]
+    try:
+        parsed = KnowledgeAtomV2.from_dict(atom)
+    except KnowledgeValidationError as exc:
+        return [f"{prefix}: v2 契约违规：{exc}"]
+    unknown = [s for s in parsed.skills if s not in skills]
+    if skills and unknown:
+        return [f"{prefix}: skills 引用了不存在的目录 {unknown!r}"]
+    return []
 
 
 def validate_atom(atom: object, line: int, skills: set[str]) -> list[str]:
@@ -50,7 +89,7 @@ def validate_atom(atom: object, line: int, skills: set[str]) -> list[str]:
         errors.append(f"{prefix}: topics 含未定义主题 {atom['topics']!r}")
     if not isinstance(atom["skills"], list) or not atom["skills"]:
         errors.append(f"{prefix}: skills 必须至少绑定一个 skill")
-    elif any(not isinstance(x, str) or x not in skills for x in atom["skills"]):
+    elif skills and any(not isinstance(x, str) or x not in skills for x in atom["skills"]):
         errors.append(f"{prefix}: skills 引用了不存在的目录 {atom['skills']!r}")
     if not isinstance(atom["type"], str) or atom["type"] not in TYPES:
         errors.append(f"{prefix}: type 枚举错误 {atom['type']!r}")
@@ -68,7 +107,10 @@ def main() -> int:
         parser.error(f"文件不存在：{args.file}")
 
     errors, seen, count = [], {}, 0
+    v2_count = 0
     skills = known_skills(args.repo.resolve())
+    if not skills:
+        print("⚠️ 找不到 plugins/ 或 modules/ 下的 SKILL.md，跳过 skills 存在性检查", file=sys.stderr)
     for line_no, raw in enumerate(args.file.read_text(encoding="utf-8").splitlines(), 1):
         if not raw.strip():
             continue
@@ -78,7 +120,11 @@ def main() -> int:
         except json.JSONDecodeError as exc:
             errors.append(f"第 {line_no} 行: JSON 错误：{exc.msg}")
             continue
-        errors.extend(validate_atom(atom, line_no, skills))
+        if isinstance(atom, dict) and is_v2(atom):
+            v2_count += 1
+            errors.extend(validate_atom_v2(atom, line_no, skills))
+        else:
+            errors.extend(validate_atom(atom, line_no, skills))
         if isinstance(atom, dict) and isinstance(atom.get("id"), str):
             if atom["id"] in seen:
                 errors.append(f"第 {line_no} 行: id {atom['id']!r} 与第 {seen[atom['id']]} 行重复")
@@ -91,7 +137,10 @@ def main() -> int:
             print("❌", error)
         print(f"校验失败：{count} 条，{len(errors)} 个问题")
         return 1
-    print(f"校验通过：{count} 条原子，{len(skills)} 个可引用 skill")
+    print(
+        f"校验通过：{count} 条原子（v1={count - v2_count}，v2={v2_count}），"
+        f"{len(skills)} 个可引用 skill"
+    )
     return 0
 
 
