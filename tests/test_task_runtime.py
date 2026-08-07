@@ -250,5 +250,43 @@ class RedactionHardeningTests(unittest.TestCase):
         self.assertIs(redact({"flag": True})["flag"], True)
 
 
+
+class RuntimeCacheAndConfidenceTests(unittest.TestCase):
+    def test_runtime_reuses_atom_cache_across_plans(self) -> None:
+        runtime = SiyuRuntime()
+        first = runtime.plan(
+            "帮我做整盘私域战略评审",
+            hints={"industry": "catering", "stage": "growth"},
+            trace=False,
+        )
+        self.assertGreater(len(first.growth_atoms), 0)
+        self.assertIn("catering", runtime._atom_cache)
+        cached = runtime._atom_cache["catering"]
+        second = runtime.plan(
+            "帮我做整盘私域战略评审",
+            hints={"industry": "catering", "stage": "growth"},
+            trace=False,
+        )
+        self.assertIs(runtime._atom_cache["catering"], cached)
+        self.assertEqual(len(second.growth_atoms), len(cached))
+
+    def test_low_confidence_plan_asks_for_kind(self) -> None:
+        plan = SiyuRuntime().plan("写朋友圈和群发通知", trace=False)
+        self.assertTrue(plan.decision.needs_clarification)
+        self.assertIn("kind", plan.decision.required_fields)
+        self.assertLess(plan.decision.confidence, 0.6)
+        payload = plan.to_dict()
+        self.assertIn("confidence", payload["decision"])
+
+    def test_runtime_cache_not_shared_between_instances(self) -> None:
+        first = SiyuRuntime()
+        second = SiyuRuntime()
+        first.plan(
+            "群转化差怎么办",
+            trace=False,
+        )
+        self.assertIn("", first._atom_cache)
+        self.assertNotIn("", second._atom_cache)
+
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,20 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.3.0] - 2026-08-07
+### 新增
+- 统一错误码体系 `errors.py`：`SiyuBaseError` 基类 + `TaskValidationError` / `ComplianceBlockedError` / `KnowledgeLoadError` / `RouteAmbiguousError`；合规硬卡与知识解析失败改为抛带原因的业务异常。
+- `Task.confidence` + 歧义感知置信度：信号强度 × 与次高意图的差距；纯存档请求视为明确意图不误判。
+- 低置信度主动追问：`RouteDecision` 暴露 `confidence`，意图信号不足 / 命中多意图时 `required_fields` 增加 `kind` 由入口补问，不再猜测。
+- 增长原子内存缓存：`load_growth_atoms(cache=...)`；`SiyuRuntime` 按业态缓存、生命周期与实例绑定、跨 plan 复用。
+
+### 变更
+- 合规 `ABSOLUTE_CLAIM` 增加软化语境窗口（「自称 / 报道称 / 对方称」等转述不误伤）。
+- `siyu-plan` CLI 对低置信度任务输出中文提示。
+
+### 说明
+- API 兼容：`parse_task` / `route_task` / `scan` 签名不变（新增参数均为可选）；`TaskValidationError` 从 `siyu_team.task` 与 `siyu_team.errors` 均可导入。
+
 ## [1.2.9] - 2026-08-07
 ### 新增
 - `infer_kind_with_confidence()`：任务 kind 改为积分路由，内容生产类优先于存档类，暴露置信度。

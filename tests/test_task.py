@@ -82,5 +82,40 @@ class TestParseTask(unittest.TestCase):
         self.assertLessEqual(confidence, 1.0)
 
 
+
+class TestConfidenceTests(unittest.TestCase):
+    def test_clear_request_high_confidence(self) -> None:
+        task = parse_task("写本周朋友圈")
+        self.assertGreaterEqual(task.confidence, 0.7)
+        self.assertLessEqual(task.confidence, 1.0)
+
+    def test_pure_save_memory_is_not_low_confidence(self) -> None:
+        """纯存档是明确意图，不应因权重低被误判为低置信度。"""
+        task = parse_task("把这次结论保存下来")
+        self.assertEqual(task.kind, TaskKind.SAVE_MEMORY)
+        self.assertGreaterEqual(task.confidence, 0.8)
+
+    def test_multi_intent_is_low_confidence(self) -> None:
+        """同句多个意图 → 低置信度，路由层应追问而不是猜。"""
+        task = parse_task("写朋友圈和群发通知")
+        self.assertLess(task.confidence, 0.6)
+
+    def test_explicit_hint_kind_is_certain(self) -> None:
+        task = parse_task("看看这个", {"kind": "diagnosis"})
+        self.assertEqual(task.confidence, 1.0)
+
+    def test_invalid_confidence_fails_closed(self) -> None:
+        from siyu_team.task import TaskValidationError
+
+        with self.assertRaises(TaskValidationError):
+            parse_task("写朋友圈", {"confidence": "high"})
+        with self.assertRaises(TaskValidationError):
+            parse_task("写朋友圈", {"confidence": 1.5})
+
+    def test_confidence_round_trips_through_to_dict(self) -> None:
+        task = parse_task("写本周朋友圈")
+        restored = task.from_dict(task.to_dict())
+        self.assertEqual(restored.confidence, task.confidence)
+
 if __name__ == "__main__":
     unittest.main()

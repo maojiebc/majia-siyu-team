@@ -73,6 +73,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 file=sys.stderr,
             )
         return 2
+    if (
+        plan.decision.needs_clarification
+        and "kind" in plan.decision.required_fields
+    ):
+        print(
+            "提示：意图信号不足或命中多个意图，建议先向用户确认要解决哪一个。",
+            file=sys.stderr,
+        )
     print(json.dumps(plan.to_dict(), ensure_ascii=False, indent=2))
     return 0
 

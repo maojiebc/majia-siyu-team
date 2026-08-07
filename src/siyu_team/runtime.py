@@ -50,6 +50,8 @@ class ExecutionPlan:
 class SiyuRuntime:
     def __init__(self, trace_recorder: TraceRecorder | None = None) -> None:
         self.trace_recorder = trace_recorder or TraceRecorder()
+        # 增长原子内存缓存：key=归一化业态，生命周期与实例绑定，跨 plan 复用。
+        self._atom_cache: dict[str, tuple[Any, ...]] = {}
 
     def plan(
         self,
@@ -66,7 +68,7 @@ class SiyuRuntime:
         growth_note = ""
         if task.kind in _GROWTH_CONTEXT_KINDS:
             growth_atoms, growth_note = format_growth_atoms_for_context(
-                task.industry
+                task.industry, cache=self._atom_cache
             )
 
         shared: dict[str, Any] | None = None

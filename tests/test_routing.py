@@ -65,5 +65,36 @@ class TestRouteTask(unittest.TestCase):
         self.assertIn(L0_DOC, decision.knowledge_refs)
 
 
+
+class TestLowConfidenceRouting(unittest.TestCase):
+    def test_low_confidence_requires_kind_confirmation(self) -> None:
+        task = Task(
+            kind=TaskKind.MOMENTS_COPY,
+            source_text="写朋友圈和群发通知",
+            confidence=0.56,
+        )
+        decision = route_task(task)
+        self.assertTrue(decision.needs_clarification)
+        self.assertIn("kind", decision.required_fields)
+        self.assertIn("先确认", decision.reason)
+        self.assertEqual(decision.confidence, 0.56)
+
+    def test_high_confidence_does_not_clarify(self) -> None:
+        task = Task(
+            kind=TaskKind.MOMENTS_COPY,
+            source_text="写本周朋友圈",
+            confidence=0.8,
+        )
+        decision = route_task(task)
+        self.assertFalse(decision.needs_clarification)
+        self.assertEqual(decision.required_fields, ())
+
+    def test_uncomputed_confidence_does_not_clarify(self) -> None:
+        """直接构造的 Task（confidence=None）不触发置信度追问。"""
+        task = Task(kind=TaskKind.MOMENTS_COPY, source_text="写朋友圈")
+        decision = route_task(task)
+        self.assertFalse(decision.needs_clarification)
+        self.assertIsNone(decision.confidence)
+
 if __name__ == "__main__":
     unittest.main()

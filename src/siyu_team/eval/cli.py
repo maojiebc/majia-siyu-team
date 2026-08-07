@@ -12,6 +12,7 @@ import os
 import re
 import sys
 
+from ..errors import ComplianceBlockedError
 from . import static as static_mod
 
 
@@ -20,13 +21,16 @@ def cmd_score(args) -> int:
         print("找不到文件:", args.file)
         return 2
     text = open(args.file, encoding="utf-8").read()
-    st = static_mod.scan(text)
+    try:
+        st = static_mod.assert_compliant(text)
+    except ComplianceBlockedError as exc:
+        print("❌ COMPLIANCE_RED：命中合规红线，方案不得交付。")
+        for detail in exc.details:
+            print("-", detail["flag"], detail["desc"])
+        return 1
     print("== 静态层 ==")
     print("flags:", st["flags"] or "无")
     print("反模式惩罚系数:", st["penalty"])
-    if st["hard_fail"]:
-        print("❌ COMPLIANCE_RED：命中合规红线，方案不得交付。")
-        return 1
     # judge/蒙卡未实装，静态层不产出质量分，只做合规红线 + 反模式惩罚。
     print("（judge/蒙卡层未实装；当前仅静态合规检查，不产出质量分。设计见 docs/blueprint.md §3d）")
     # penalty 越低表示软性反模式越多；这不是质量分，仅用来把明显粗糙的稿子挡在阈值外。
@@ -51,9 +55,12 @@ def cmd_judge(args) -> int:
         print("找不到文件:", args.file)
         return 2
     text = open(args.file, encoding="utf-8").read()
-    st = static_mod.scan(text)
-    if st["hard_fail"]:
+    try:
+        st = static_mod.assert_compliant(text)
+    except ComplianceBlockedError as exc:
         print("❌ COMPLIANCE_RED：命中合规红线，判官层不评分，方案不得交付。")
+        for detail in exc.details:
+            print("-", detail["flag"], detail["desc"])
         return 1
 
     if args.emit_prompts:

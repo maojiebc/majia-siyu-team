@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from .task import Task, TaskKind
+from .task import CONFIDENCE_CLARIFY_THRESHOLD, Task, TaskKind
 from .knowledge.growth_layers import describe_growth_load, select_growth_doc_refs
 from .knowledge.paths import COMPLIANCE_REDLINES_DOC, METHODOLOGY_AXIOMS_DOC
 
@@ -79,6 +79,7 @@ class RouteDecision:
     industry_book: str | None
     focus: str
     knowledge_refs: tuple[str, ...]
+    confidence: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -89,6 +90,7 @@ class RouteDecision:
             "industry_book": self.industry_book,
             "focus": self.focus,
             "knowledge_refs": list(self.knowledge_refs),
+            "confidence": self.confidence,
         }
 
 
@@ -126,6 +128,15 @@ def route_task(task: Task) -> RouteDecision:
             required.append("industry")
         if not industry_route["stage"]:
             required.append("stage")
+    if (
+        task.kind is not TaskKind.UNKNOWN
+        and task.confidence is not None
+        and task.confidence < CONFIDENCE_CLARIFY_THRESHOLD
+    ):
+        # 意图信号不足或多意图：不猜，先确认要解决哪一个。
+        if "kind" not in required:
+            required.append("kind")
+        reason = f"{reason}（意图信号不足/命中多个意图，先确认要解决哪一个）"
 
     knowledge_refs: list[str] = []
     if task.kind is not TaskKind.MARKET_RESEARCH:
@@ -165,4 +176,5 @@ def route_task(task: Task) -> RouteDecision:
         industry_book=industry_book,
         focus=focus,
         knowledge_refs=tuple(knowledge_refs),
+        confidence=task.confidence,
     )

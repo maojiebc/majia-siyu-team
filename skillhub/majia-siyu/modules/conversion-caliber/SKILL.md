@@ -2,7 +2,7 @@
 name: conversion-caliber
 description: 转化口径定义库（UV→加微→首单→复购）。Use this skill when 定义/核对转化漏斗每一跳的分子分母与时间窗时。
 metadata:
-  version: "1.2.9"
+  version: "1.3.0"
 ---
 
 # 转化口径定义库（UV→加微→首单→复购）

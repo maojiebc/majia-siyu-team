@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.9-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.3.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.2.9 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.3.0 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
 </p>
 
 > **一张图看懂**：说真实处境 → `/siyu` 只选当前最该做的一步 → 高频任务直接写朋友圈 / 群发 / 话术（边写边合规）→ 真结构问题才升级全盘诊断评审 → 结论可存档、可续聊、可出报告。经营动作归本仓；会员指标 / SQL / 数仓请用 [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan)。
@@ -230,6 +230,7 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v1.3.0** — 统一错误码体系、知识原子缓存、低置信度主动追问；合规绝对化软化语境窗口。
 - **v1.2.9** — Runtime 硬化：kind 积分路由、合规加权惩罚、路径常量化、host 提示词外置、追踪清理与回归测试补齐。
 - **v1.2.8** — 增长原子正式集 approved 并进入 Pilot；诊断继续按业态注入。
 - **v1.2.7** — 诊断/全盘诊断上下文注入增长 draft 原子（按业态 L0/L1）。

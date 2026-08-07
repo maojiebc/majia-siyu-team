@@ -17,6 +17,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable
 
+from ..errors import KnowledgeLoadError
 from .models import KnowledgeAtomV2, generate_atom_id, generate_source_id
 from .paths import (
     GROWTH_ATOMS_APPROVED,
@@ -98,27 +99,52 @@ def load_growth_draft_atoms(
     industry: str = "",
     *,
     resolver: KnowledgePathResolver | None = None,
+    cache: dict[str, tuple[KnowledgeAtomV2, ...]] | None = None,
 ) -> tuple[KnowledgeAtomV2, ...]:
     """读取增长原子并按业态过滤（函数名保留兼容；优先 approved 正式集）。"""
-    return load_growth_atoms(industry, resolver=resolver)
+    return load_growth_atoms(industry, resolver=resolver, cache=cache)
 
 
 def load_growth_atoms(
     industry: str = "",
     *,
     resolver: KnowledgePathResolver | None = None,
+    cache: dict[str, tuple[KnowledgeAtomV2, ...]] | None = None,
 ) -> tuple[KnowledgeAtomV2, ...]:
-    """读取增长正式集（approved）并按业态过滤；无文件则空。"""
+    """读取增长正式集（approved）并按业态过滤；无文件则空。
+
+    ``cache`` 传进程内内存缓存（key=归一化业态），命中即短路，
+    避免同一 Runtime 重复读盘；不传则每次读取（向后兼容）。
+    """
+    normalized = (industry or "").strip().lower()
+    if cache is not None and normalized in cache:
+        return cache[normalized]
+    atoms = _read_growth_atoms(normalized, resolver=resolver)
+    if cache is not None:
+        cache[normalized] = atoms
+    return atoms
+
+
+def _read_growth_atoms(
+    industry: str,
+    *,
+    resolver: KnowledgePathResolver | None,
+) -> tuple[KnowledgeAtomV2, ...]:
     resolver = resolver or KnowledgePathResolver()
     path = _find_growth_atoms_file(resolver)
     if path is None:
         return ()
     atoms: list[KnowledgeAtomV2] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         line = line.strip()
         if not line:
             continue
-        atoms.append(KnowledgeAtomV2.from_json(line))
+        try:
+            atoms.append(KnowledgeAtomV2.from_json(line))
+        except Exception as exc:
+            raise KnowledgeLoadError(
+                f"增长原子解析失败：{path}:{line_no}（{exc}）"
+            ) from exc
     return filter_atoms_by_growth_layer(atoms, industry)
 
 
@@ -137,13 +163,14 @@ def format_growth_atoms_for_context(
     *,
     max_atoms: int = MAX_ATOMS_PER_CONTEXT,
     resolver: KnowledgePathResolver | None = None,
+    cache: dict[str, tuple[KnowledgeAtomV2, ...]] | None = None,
 ) -> tuple[tuple[dict, ...], str]:
     """供诊断/全盘诊断上下文使用的精简原子列表 + 人话加载说明。
 
     只输出 locator/statement/type/layer，控制体积；正式集进入诊断上下文
     （仍不是 Pilot approved 检索真源）。
     """
-    atoms = load_growth_atoms(industry, resolver=resolver)
+    atoms = load_growth_atoms(industry, resolver=resolver, cache=cache)
     note = describe_growth_load(industry)
     rows: list[dict] = []
     for atom in atoms[: max(0, max_atoms)]:

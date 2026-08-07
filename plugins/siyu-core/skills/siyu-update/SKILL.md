@@ -4,7 +4,7 @@ description: |
   更新私域专家团。用户说「更新私域专家团」「升级 siyu」「检查并安装最新版」或输入 /siyu-update 时使用。
   只同步 maojiebc/majia-siyu-team，不修改 ~/.siyu/ 客户档案，不更新其他 skill。
 metadata:
-  version: "1.2.9"
+  version: "1.3.0"
 ---
 
 # siyu-update：更新私域专家团

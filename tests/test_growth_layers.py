@@ -110,6 +110,40 @@ class GrowthLayerTests(unittest.TestCase):
         self.assertIn("L0-01", prompt)
 
 
+
+class AtomCacheTests(unittest.TestCase):
+    def test_cache_short_circuits_file_read(self) -> None:
+        cache: dict[str, tuple] = {"catering": ()}
+        atoms = load_growth_atoms("catering", cache=cache)
+        self.assertEqual(atoms, ())
+        self.assertEqual(cache["catering"], ())
+
+    def test_cache_miss_populates(self) -> None:
+        cache: dict[str, tuple] = {}
+        atoms = load_growth_atoms("catering", cache=cache)
+        self.assertIn("catering", cache)
+        self.assertEqual(cache["catering"], atoms)
+
+    def test_parse_failure_raises_knowledge_load_error(self) -> None:
+        import tempfile
+        from pathlib import Path as P
+
+        from siyu_team.errors import KnowledgeLoadError
+        from siyu_team.knowledge.paths import KnowledgePathResolver, GROWTH_ATOMS_APPROVED
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = P(directory)
+            atoms_file = root / GROWTH_ATOMS_APPROVED
+            atoms_file.parent.mkdir(parents=True)
+            atoms_file.write_text(
+                "{broken-json-line}\n", encoding="utf-8"
+            )
+            resolver = KnowledgePathResolver(
+                repository_root=root, package_root=root, home=root
+            )
+            with self.assertRaises(KnowledgeLoadError):
+                load_growth_atoms("catering", resolver=resolver)
+
 if __name__ == "__main__":
     unittest.main()
 

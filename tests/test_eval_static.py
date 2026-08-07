@@ -54,5 +54,41 @@ class ComplianceGateTests(unittest.TestCase):
         self.assertAlmostEqual(result["penalty"], expected)
 
 
+
+class ComplianceBlockedErrorTests(unittest.TestCase):
+    def test_assert_compliant_raises_with_reasons(self) -> None:
+        from siyu_team.errors import ComplianceBlockedError
+        from siyu_team.eval.static import assert_compliant
+
+        with self.assertRaises(ComplianceBlockedError) as ctx:
+            assert_compliant("集赞转发拉人，100% 稳赚")
+        self.assertIn("INDUCE_SHARE", ctx.exception.flags)
+        self.assertGreater(len(ctx.exception.details), 0)
+        self.assertTrue(all("desc" in d for d in ctx.exception.details))
+
+    def test_assert_compliant_returns_scan_result_when_clean(self) -> None:
+        from siyu_team.eval.static import assert_compliant
+
+        result = assert_compliant("本周会员日到店 8 折")
+        self.assertFalse(result["hard_fail"])
+        self.assertGreater(result["penalty"], 0.5)
+
+    def test_absolute_claim_softened_by_attribution(self) -> None:
+        from siyu_team.eval.static import scan
+
+        for text in (
+            "对方自称领先品牌，实际效果待验证",
+            "据报道称该品牌是唯一供应商",
+            "厂商对外宣称最佳方案，需要尽调",
+        ):
+            result = scan(text)
+            self.assertNotIn("ABSOLUTE_CLAIM", result["flags"], text)
+
+    def test_absolute_claim_still_fires_without_attribution(self) -> None:
+        from siyu_team.eval.static import scan
+
+        result = scan("本店是本地领先品牌，服务最好")
+        self.assertIn("ABSOLUTE_CLAIM", result["flags"])
+
 if __name__ == "__main__":
     unittest.main()

@@ -12,13 +12,13 @@ import re
 from typing import Any, Mapping, TypeVar
 from uuid import uuid4
 
+from .errors import TaskValidationError as TaskValidationError
+
 
 SCHEMA_VERSION = "1.0"
 MAX_SOURCE_TEXT_LENGTH = 20_000
-
-
-class TaskValidationError(ValueError):
-    """任务字段不符合 schema。"""
+# 路由层澄清阈值：低于该置信度时先问意图，不猜。
+CONFIDENCE_CLARIFY_THRESHOLD = 0.6
 
 
 class TaskKind(str, Enum):
@@ -181,6 +181,18 @@ def _boolean_value(value: Any, field_name: str) -> bool:
     return value
 
 
+def _optional_confidence(value: Any) -> float | None:
+    """None 表示未计算（显式构造）；数字校验后返回，非法值 fail-closed。"""
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TaskValidationError("confidence 必须是 0-1 的数字")
+    number = float(value)
+    if not 0.0 <= number <= 1.0:
+        raise TaskValidationError("confidence 必须在 0-1 之间")
+    return number
+
+
 @dataclass(frozen=True)
 class Task:
     kind: TaskKind
@@ -195,6 +207,7 @@ class Task:
     constraints: tuple[str, ...] = ()
     context: Mapping[str, Any] = field(default_factory=dict)
     need_compliance_check: bool = True
+    confidence: float | None = None
     task_id: str = field(default_factory=lambda: f"task_{uuid4().hex}")
     schema_version: str = SCHEMA_VERSION
 
@@ -217,6 +230,15 @@ class Task:
         object.__setattr__(self, "audience", self.audience.strip())
         object.__setattr__(self, "constraints", tuple(self.constraints))
         object.__setattr__(self, "context", _clean_mapping(self.context))
+        if self.confidence is not None:
+            if not isinstance(self.confidence, (int, float)) or isinstance(
+                self.confidence, bool
+            ):
+                raise TaskValidationError("confidence 必须是 0-1 的数字")
+            value = float(self.confidence)
+            if not 0.0 <= value <= 1.0:
+                raise TaskValidationError("confidence 必须在 0-1 之间")
+            object.__setattr__(self, "confidence", value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -234,6 +256,7 @@ class Task:
             "constraints": list(self.constraints),
             "context": dict(self.context),
             "need_compliance_check": self.need_compliance_check,
+            "confidence": self.confidence,
         }
 
     @classmethod
@@ -263,53 +286,76 @@ class Task:
                 data.get("need_compliance_check", True),
                 "need_compliance_check",
             ),
+            confidence=_optional_confidence(data.get("confidence")),
         )
 
 
-def _infer_kind(text: str) -> TaskKind:
-    """多规则积分；低置信度内容任务优先于存档类，避免顺序依赖误判。"""
+def _score_kinds(text: str) -> dict[TaskKind, float]:
+    """多规则积分；内容生产类命中时压低存档/恢复分，避免顺序依赖误判。"""
     scores: dict[TaskKind, float] = {}
-    order: list[TaskKind] = []
     for kind, pattern, weight in _KIND_RULES:
         if pattern.search(text):
-            if kind not in scores:
-                order.append(kind)
             scores[kind] = scores.get(kind, 0.0) + weight
-
-    if not scores:
-        return TaskKind.UNKNOWN
-
     # 「保存上次朋友圈文案」会同时命中 SAVE_MEMORY 与 MOMENTS_COPY。
     if scores.keys() & _CONTENT_KINDS:
         for memory_kind in (TaskKind.SAVE_MEMORY, TaskKind.RESTORE_MEMORY):
             if memory_kind in scores:
                 scores[memory_kind] *= 0.25
+    return scores
 
+
+def _infer_kind(text: str) -> TaskKind:
+    """多规则积分取最高分；同分保留先登记顺序。"""
+    scores = _score_kinds(text)
+    if not scores:
+        return TaskKind.UNKNOWN
     best_score = max(scores.values())
-    for kind in order:
-        if scores[kind] == best_score:
+    for kind, _pattern, _weight in _KIND_RULES:
+        if kind in scores and scores[kind] == best_score:
             return kind
     return TaskKind.UNKNOWN
 
 
+# 置信度语义：信号强度（权重归一）乘歧义系数（与次高分的差距）。
+# 差距小于该阈值视为歧义（同句命中多个意图），应触发澄清而不是猜。
+_AMBIGUITY_GAP = 0.5
+_MAX_RULE_WEIGHT = 3.0
+# 存档/恢复类信号（纯存档请求是明确意图，不是低置信度）。
+_ARCHIVE_KINDS = frozenset({TaskKind.SAVE_MEMORY, TaskKind.RESTORE_MEMORY})
+_ARCHIVE_SIGNALS = re.compile(
+    r"(保存|存档|记下来|留下结论|恢复|接着上次|上次聊|之前聊到哪)"
+)
+
+
 def infer_kind_with_confidence(text: str) -> tuple[TaskKind, float]:
-    """对外暴露 kind + 置信度，便于路由层在低分时改问用户。"""
+    """对外暴露 kind + 置信度（0-1），便于路由层在低分时改问用户。
+
+    confidence 综合信号强度与歧义：权重越高越强；与次高分差距越小越不确定。
+    """
+    scores = _score_kinds(text)
+    if not scores:
+        return TaskKind.UNKNOWN, 0.0
     kind = _infer_kind(text)
-    if kind is TaskKind.UNKNOWN:
-        return kind, 0.0
-    # 归一到 0-1：权重表最高约 3.0
-    raw = 0.0
-    for candidate, pattern, weight in _KIND_RULES:
-        if candidate is kind and pattern.search(text):
-            raw = weight
-            break
-    if kind in _CONTENT_KINDS and (
-        re.search(r"(保存|存档|记下来|留下结论|恢复|接着上次)", text)
-    ):
-        # 内容优先场景仍保持较高置信度
-        confidence = min(1.0, raw / 3.0 + 0.15)
+    best = scores[kind]
+    second = max(
+        (score for cand, score in scores.items() if cand is not kind),
+        default=0.0,
+    )
+    gap = best - second
+
+    strength = min(1.0, best / _MAX_RULE_WEIGHT)
+    if gap < _AMBIGUITY_GAP:
+        ambiguity = 0.5 + 0.5 * (gap / _AMBIGUITY_GAP)
     else:
-        confidence = min(1.0, raw / 3.0)
+        ambiguity = 1.0
+    confidence = strength * ambiguity
+
+    # 纯存档请求只命中存档类，是明确意图，直接抬高置信度。
+    if kind in _ARCHIVE_KINDS and not (scores.keys() - _ARCHIVE_KINDS):
+        confidence = 0.9
+    # 内容优先的混合场景（保存+朋友圈）本身已明确，轻微上调。
+    if kind in _CONTENT_KINDS and _ARCHIVE_SIGNALS.search(text):
+        confidence = min(1.0, confidence + 0.15)
     return kind, round(confidence, 3)
 
 
@@ -377,4 +423,12 @@ def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
     }
     payload.update(supplied)
     payload["source_text"] = clean_text
+    if "confidence" in supplied:
+        # confidence 是只读派生信号，不允许外部注入；非法值 fail-closed。
+        _optional_confidence(supplied["confidence"])
+    if "kind" in supplied:
+        payload["confidence"] = 1.0
+    else:
+        _kind, confidence = infer_kind_with_confidence(clean_text)
+        payload["confidence"] = confidence
     return Task.from_dict(payload)
