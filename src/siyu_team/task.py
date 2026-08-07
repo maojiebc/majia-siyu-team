@@ -400,10 +400,27 @@ def _infer_risk(text: str) -> RiskLevel:
     return RiskLevel.LOW
 
 
+# hints 合法键白名单：上游编排器拼错字段名（如 industy/chanel）必须报错，
+# 否则静默落默认值等于静默错路由。
+_HINT_KEYS = frozenset(
+    {
+        "kind", "source_text", "channel", "goal", "risk", "industry", "stage",
+        "client", "audience", "constraints", "context", "need_compliance_check",
+        "confidence", "task_id", "schema_version",
+    }
+)
+
+
 def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
     """把自然语言转成 Task；显式 hints 始终覆盖规则推断。"""
     clean_text = str(text).strip()
     supplied = dict(hints or {})
+    unknown_hints = set(supplied) - _HINT_KEYS
+    if unknown_hints:
+        raise TaskValidationError(
+            f"未知 hint 字段：{', '.join(sorted(unknown_hints))}；"
+            f"合法字段：{', '.join(sorted(_HINT_KEYS))}"
+        )
     inferred_kind = _infer_kind(clean_text)
     effective_kind = _enum_value(
         TaskKind,

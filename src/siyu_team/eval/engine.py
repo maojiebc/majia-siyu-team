@@ -18,7 +18,12 @@ def badge(score: float) -> str:
 
 
 def composite(dim_scores: dict, static_penalty: float = 1.0) -> dict:
-    """dim_scores: {维度: 0.0–1.0}。缺的维度按 0 计并提示。"""
+    """dim_scores: {维度: 0.0–1.0}。缺的维度按 0 计并提示。
+
+    static_penalty 是乘法惩罚系数，钳制到 [0.0, 1.0]——惩罚只能扣分，
+    不允许把总分抬到满分之上。
+    """
+    static_penalty = min(1.0, max(0.0, static_penalty))
     total = 0.0
     missing = []
     for dim, (w, _) in DIMENSION_WEIGHTS.items():

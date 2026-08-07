@@ -118,9 +118,15 @@ def build_host_prompt(
             "<officer>\n[%d] %s（引擎：%s）\n%s\n</officer>"
             % (i, o.get("name", "官"), o.get("engine", ""), o.get("content", ""))
         )
-    return template.format(
-        question=question,
-        success_criteria=success_criteria or "（未指定）",
-        constraints=constraints or "（无）",
-        officers="\n\n".join(blocks),
-    )
+    # 逐个替换已知占位符（不用 str.format：热更模板里出现示例花括号
+    # 如 {分母} 时 format 会 KeyError 崩掉整条收口链，replace 原样保留）。
+    fields = {
+        "question": question,
+        "success_criteria": success_criteria or "（未指定）",
+        "constraints": constraints or "（无）",
+        "officers": "\n\n".join(blocks),
+    }
+    prompt = template
+    for key, value in fields.items():
+        prompt = prompt.replace("{" + key + "}", value)
+    return prompt

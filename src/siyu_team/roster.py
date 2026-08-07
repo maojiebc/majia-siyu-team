@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 
 from typing import Optional
 
@@ -33,12 +34,14 @@ def load_roster(path: Optional[str] = None) -> dict:
         try:
             with open(path, encoding="utf-8") as handle:
                 return json.load(handle)
-        except (OSError, json.JSONDecodeError):
-            pass  # 损坏或不可读时回落到内置默认，不让整条团长链崩。
+        except (OSError, json.JSONDecodeError) as exc:
+            # 损坏或不可读时回落到内置默认，不让整条团长链崩；但要出声。
+            print(f"⚠️ roster 加载失败（{path}）：{exc}；回落内置四官。", file=sys.stderr)
     return {"version": "1.0.0", "officers": DEFAULT_OFFICERS, "host": {"mode": "codex", "rounds_max": 2}}
 
 
 def normalize_officers(supplied=None, k: int = 4):
     """用户传了用用户的、否则用默认。仿 heavy.normalize_perspectives。"""
     officers = supplied or DEFAULT_OFFICERS
-    return officers[:min(k, MAX_OFFICERS)]
+    limit = min(max(0, k), MAX_OFFICERS)  # 负数 k 不允许走负切片
+    return officers[:limit]

@@ -6,9 +6,10 @@ import json
 import sys
 from typing import Sequence
 
+from .errors import KnowledgeLoadError, SiyuBaseError
 from .runtime import SiyuRuntime
 from .task import TaskValidationError
-from .tracing import cleanup_old_traces
+from .tracing import TraceRecorder, cleanup_old_traces
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -61,7 +62,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         if value
     }
     try:
-        plan = SiyuRuntime().plan(
+        runtime = SiyuRuntime(trace_recorder=TraceRecorder(args.trace_dir))
+        plan = runtime.plan(
             args.request, hints=hints, trace=not args.no_trace
         )
     except TaskValidationError as exc:
@@ -72,6 +74,17 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "提示：请把请求缩短到 20000 字以内后再试。",
                 file=sys.stderr,
             )
+        return 2
+    except KnowledgeLoadError as exc:
+        print(f"知识文件损坏：{exc}", file=sys.stderr)
+        print(
+            "提示：检查报错里指出的 JSONL 行并修复，或删除该私有副本后重跑"
+            "（正式集可用 tools/build_growth_atoms.py 重建）。",
+            file=sys.stderr,
+        )
+        return 2
+    except SiyuBaseError as exc:
+        print(f"执行失败：{exc}", file=sys.stderr)
         return 2
     if (
         plan.decision.needs_clarification

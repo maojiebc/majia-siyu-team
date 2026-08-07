@@ -24,6 +24,18 @@ def wilson_interval(hits: int, n: int, z: float = 1.96) -> tuple[float, float]:
     return (max(0.0, center - margin), min(1.0, center + margin))
 
 
+def _sample_number(value: Any, field: str) -> float:
+    """缺省安全：None/缺失按 0；非数字抛 ValueError（而不是原生 TypeError）。"""
+    if value is None:
+        return 0.0
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        raise ValueError(f"样本 {field} 不是数字：{value!r}")
+    try:
+        return float(value)
+    except ValueError as exc:
+        raise ValueError(f"样本 {field} 不是数字：{value!r}") from exc
+
+
 def reliability(samples: Sequence[Mapping[str, Any]]) -> dict:
     """吃 N 份样本的度量，出可靠性分 + 命中率置信区间。
 
@@ -37,10 +49,14 @@ def reliability(samples: Sequence[Mapping[str, Any]]) -> dict:
     if n == 0:
         raise ValueError("蒙卡层至少需要 1 份样本")
 
-    scores = [float(s.get("score", 0.0)) for s in samples]
+    scores = [_sample_number(s.get("score"), "score") for s in samples]
     hits = sum(1 for s in samples if s.get("hit"))
     crashes = sum(1 for s in samples if s.get("crashed"))
-    lengths = [int(s["length"]) for s in samples if s.get("length")]
+    lengths = [
+        int(_sample_number(s.get("length"), "length"))
+        for s in samples
+        if s.get("length")
+    ]
 
     hit_rate = hits / n
     crash_rate = crashes / n

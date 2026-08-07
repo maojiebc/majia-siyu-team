@@ -32,6 +32,21 @@ for plugin_json in sorted(ROOT.glob("plugins/*/.claude-plugin/plugin.json")):
             f"{data.get('version')!r} 与 VERSION 不一致"
         )
 
+# Python 包 __version__ 同样是漂移盲区（曾停在 0.4.0 直到 1.3.0 才发现）。
+init_text = (ROOT / "src/siyu_team/__init__.py").read_text(encoding="utf-8")
+init_match = re.search(r'__version__\s*=\s*"([^"]+)"', init_text)
+if not init_match:
+    errors.append("src/siyu_team/__init__.py 未找到 __version__")
+elif init_match.group(1) != version:
+    errors.append(f"__init__.py __version__ {init_match.group(1)!r} 与 VERSION 不一致")
+
+pyproject_text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+pyproject_match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject_text, re.M)
+if not pyproject_match:
+    errors.append("pyproject.toml 未找到 version")
+elif pyproject_match.group(1) != version:
+    errors.append(f"pyproject.toml version {pyproject_match.group(1)!r} 与 VERSION 不一致")
+
 badge = re.search(
     r"img\.shields\.io/badge/(?:skill-)?v?([0-9.]+)-[A-Fa-f0-9]+\.svg",
     readme,

@@ -31,7 +31,7 @@ FIXTURE_ROOT = REPOSITORY_ROOT / "tests" / "fixtures" / "pilot"
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="siyu-pilot",
-        description="v1.2.1 离线知识共建验证工具（不调用模型或飞书 API）",
+        description="离线知识共建验证工具（不调用模型或飞书 API）",
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
