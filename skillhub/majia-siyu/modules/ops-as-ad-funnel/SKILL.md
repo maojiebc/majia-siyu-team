@@ -10,7 +10,7 @@ metadata:
 ## Overview
 
 
-> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.8）。
+> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `modules/_knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.8）。
 对齐方法论引擎「运营即广告」。本 skill 给方法论框架；具体话术/阈值/配比是马甲护城河，标【待马甲填真实SOP】。
 
 ## 方法框架（行业通行版，真实节奏见护城河注入点）
@@ -34,6 +34,18 @@ metadata:
 
 ## 合规约束（合规官会查）
 - 不诱导分享 / 不绝对化用词 / 不未授权收集个人信息 / 裂变走企微官方路径
+
+## 绑定的增长干货原子
+
+增长正式集（`modules/_knowledge/04-atoms/growth-layers.approved.jsonl`）里有若干条
+原子把本 skill 写进了 `skills` 绑定。需要按条引用时，在仓库根执行：
+
+```bash
+python3 tools/atoms_query.py --file modules/_knowledge/04-atoms/growth-layers.approved.jsonl --skills ops-as-ad-funnel
+```
+
+诊断 / 全盘诊断计划注入的 `growth_atoms` 每行也带 `skills` 字段，
+可直接按归属取本 skill 相关的干货，不用整包背诵。
 
 ---
 

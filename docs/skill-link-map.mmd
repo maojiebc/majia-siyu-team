@@ -1,14 +1,48 @@
 flowchart TD
     U["用户"] --> S["/siyu 主入口"]
-    S --> P["/siyu-pyq 朋友圈"]
-    S --> Q["/siyu-qunfa 群发"]
-    S --> H["/siyu-huashu 话术"]
-    S --> W["siyu-wenzhen 轻问诊"]
-    S --> O["siyu-onboard 全盘诊断"]
-    S --> SV["/siyu-save 存档"]
-    S --> RS["/siyu-restore 接续"]
-    S --> RP["/siyu-report 报告"]
-    S --> UP["/siyu-update 更新"]
+
+    subgraph EXEC["执行层"]
+        P["/siyu-pyq 朋友圈"]
+        Q["/siyu-qunfa 群发"]
+        H["/siyu-huashu 话术"]
+    end
+
+    subgraph DIAG["诊断层"]
+        W["siyu-wenzhen 轻问诊"]
+        O["siyu-onboard 全盘诊断"]
+        MR["siyu-market-research 市场调研"]
+    end
+
+    subgraph MEM["记忆层"]
+        SV["/siyu-save 存档"]
+        RS["/siyu-restore 接续"]
+        RP["/siyu-report 报告"]
+        UP["/siyu-update 更新"]
+    end
+
+    subgraph OFFICERS["四官能力层（全盘诊断引用）"]
+        PR1["crisis-response-sop 危机响应"]
+        PR2["trust-asset-playbook 信任资产"]
+        CP1["content-as-product 内容即产品"]
+        CP2["reactivation-playbook 召回剧本"]
+        AD1["ops-as-ad-funnel 运营漏斗"]
+        AD2["conversion-caliber 转化口径"]
+        CC1["wechat-compliance-redlines 合规红线"]
+    end
+
+    KA[("增长原子正式集<br/>growth-layers.approved.jsonl")]
+
+    S --> P
+    S --> Q
+    S --> H
+    S --> W
+    S --> O
+    S --> MR
+    S --> SV
+    S --> RS
+    S --> RP
+    S --> UP
+
     P --> Q
     P --> W
     Q --> H
@@ -20,6 +54,7 @@ flowchart TD
     W --> Q
     W --> H
     W --> O
+    W --> MR
     O --> P
     O --> Q
     O --> H
@@ -30,3 +65,19 @@ flowchart TD
     RS --> H
     RS --> W
     RS --> O
+
+    O -.引用.-> PR1
+    O -.引用.-> PR2
+    O -.引用.-> CP1
+    O -.引用.-> CP2
+    O -.引用.-> AD1
+    O -.引用.-> AD2
+    O -.一票否决.-> CC1
+
+    KA -.skills 绑定.-> W
+    KA -.skills 绑定.-> AD1
+    KA -.skills 绑定.-> AD2
+    KA -.skills 绑定.-> CP1
+    KA -.skills 绑定.-> CP2
+    KA -.skills 绑定.-> CC1
+    KA -.skills 绑定.-> Q

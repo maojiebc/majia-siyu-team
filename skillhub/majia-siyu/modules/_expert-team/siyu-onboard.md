@@ -62,7 +62,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 → 写 `.siyu-team/00-intake.md` → `state.update(step=1, add_file="00-intake.md", add_completed=0)`
 
 ## Step 1 · 按行业×阶段路由（规则路由，不花 token）
-读 `00-intake.md`，把调研字段映射进 `Task.context`，重新调 `SiyuRuntime.plan()`。只有 RouteDecision 不再缺字段时才更新 `.siyu-team/task.json`，并加载 `knowledge/02-industry/<industry>/` 行业册。
+读 `00-intake.md`，把调研字段映射进 `Task.context`，重新调 `SiyuRuntime.plan()`。只有 RouteDecision 不再缺字段时才更新 `.siyu-team/task.json`，并加载 `modules/_knowledge/02-industry/<industry>/` 行业册。
 产出：选定行业册 + 阶段重点 + **四官各自要重点回答的子问题**。
 → 写 `.siyu-team/01-routing.md` → `state.update(step="checkpoint-1")`
 

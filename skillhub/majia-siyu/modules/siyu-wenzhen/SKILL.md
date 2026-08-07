@@ -20,7 +20,7 @@ metadata:
 5. **沉默盘是机制问题，不是文案问题**：长期低于基线时先查分层、预期与承接机制。
 6. **合规是前置，不是事后**：一句违规能抵消长期运营，生成端就要拦截。
 
-所有判断都要能追溯到至少一条公理。增长类问题：优先用任务计划里的 `growth_atoms`（按业态加载的 L0/L1 精简判断句）；没有计划时读 `knowledge/00-methodology/L0-通用用户增长原则.md`，业态是餐饮/零售再读 `knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`。需要更多案例时读取 [`../../../../knowledge/00-methodology/私域公理与消解案例库.md`](../../../../knowledge/00-methodology/私域公理与消解案例库.md)。
+所有判断都要能追溯到至少一条公理。增长类问题：优先用任务计划里的 `growth_atoms`（按业态加载的 L0/L1 精简判断句）；没有计划时读 `modules/_knowledge/00-methodology/L0-通用用户增长原则.md`，业态是餐饮/零售再读 `modules/_knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`。需要更多案例时读取 [`../_knowledge/00-methodology/私域公理与消解案例库.md`](../_knowledge/00-methodology/私域公理与消解案例库.md)。
 
 ## 动态外部事实边界
 

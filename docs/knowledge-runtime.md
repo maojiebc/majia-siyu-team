@@ -1,6 +1,7 @@
 # Knowledge Runtime 数据契约
 
-当前阶段只建立 `KnowledgeAtomV2` 契约、稳定 ID 和知识路径发现，不接入 Runtime。
+本文档描述 `KnowledgeAtomV2` 契约、稳定 ID、知识路径发现，以及已接入 Runtime 的
+增长分层注入（v1.2.8 起）与 skills 绑定消费（v1.3.x 起）。
 
 ## 真源与隔离
 
@@ -32,11 +33,10 @@ ID 由代码生成。修改来源身份、来源定位或来源内序号会得�
 
 `migrate_v1_atom()` 将旧示例迁移为 `draft + exportable=false + evidence_grade=D`。迁移不会自动批准知识，也不会把旧摘录当作已验证行业事实。
 
-## 本阶段未实现
+## 尚未实现
 
 - 导入、人工审阅、隐私审计与 CLI
-- 本地检索、KnowledgeBundle 和冲突处理
-- Runtime、四官上下文和 Trace 注入
+- 本地检索、KnowledgeBundle 和冲突处理（SkillHub 包已随包分发 `modules/_knowledge/` 静态副本）
 - 正式语料、发布批次与版本升级
 
 ## 公开方法层（v1.2.4/v1.2.8）
@@ -63,3 +63,14 @@ ID 由代码生成。修改来源身份、来源定位或来源内序号会得�
 - 轻问诊 skill 优先消费计划中的原子列表
 
 增长原子自 v1.2.8 起为 **approved 正式集**，进 Pilot 夹具与诊断上下文；重建用 `tools/build_growth_atoms.py`。
+
+## skills 绑定消费（v1.3.x）
+
+- 每条 v2 原子的 `skills` 字段是「原子 → skill」的绑定声明，构建期由
+  `tools/build_growth_atoms.py` 对照 `plugins/**/SKILL.md` 目录名硬校验（悬空即失败）。
+- 运行时：`format_growth_atoms_for_context` 输出的每行带 `skills`，四官可按归属取干货；
+  `filter_atoms_by_skills` / `select_atoms_for_skill` 供按 skill 过滤。
+- skill 侧：被绑定的能力 skill 在 SKILL.md「绑定的增长干货原子」小节给出
+  `tools/atoms_query.py --skills <name>` 查询入口（双轨兼容 v1/v2）。
+- 回归：`tests/test_growth_layers.py::SkillBindingTests` 做绑定双向对账；
+  `make atoms` 卡本体校验与夹具零漂移。

@@ -197,7 +197,7 @@ flowchart LR
 4. **诊断层** —— 结构问题才进全盘诊断；四位专家彼此看不见对方意见，总协调只评推理质量，合规可一票否决  
 5. **底座** —— 本地状态、脱敏追踪、分层知识契约、连接器预留（线上提交 / 检索尚未默认打开）
 
-技术细节：[`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md) · [`docs/framework.svg`](docs/framework.svg) · [`docs/标杆移植说明.md`](docs/标杆移植说明.md)
+技术细节：[`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md) · [`docs/framework.svg`](docs/framework.svg) · [`docs/skill-link-map.mmd`](docs/skill-link-map.mmd)（17 个 skill 的路由与原子绑定关系图） · [`docs/标杆移植说明.md`](docs/标杆移植说明.md)
 
 ## 同行知识共建（邀请制）
 

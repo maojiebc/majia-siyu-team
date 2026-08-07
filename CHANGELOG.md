@@ -2,6 +2,29 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [Unreleased]
+### 新增
+- 原子工具链双轨：`atoms_query` 关键词检索兼容 v2（statement/适用性字段，此前对正式集静默 0 命中）；`atoms_validate` 按行嗅探版本，v2 走 `KnowledgeAtomV2` 契约校验 + skills 存在性；新增 `make atoms` 闸门（v1 示例 + v2 正式集本体 + 本体与 Pilot 夹具零漂移）并入 `make check`。
+- skills 绑定接线（消费方落地）：`filter_atoms_by_skills` / `select_atoms_for_skill` API；诊断上下文原子行携带 `skills` 字段；被绑定的五个能力 skill 在 SKILL.md 提供绑定原子查询入口；`build_growth_atoms` 构建期对照 plugins 目录硬校验绑定，悬空即失败。
+- roster 接线：`SiyuRuntime` 官名单改从 roster 读取（默认四官行为不变）；自定义官带 `allowed_context` 白名单即可入面板（不带则 fail-closed 拒绝）；roster 损坏时出声回退而非静默。
+- SkillHub 包分发态可达：bundle 随包生成 `modules/_knowledge/`（00/01/02/04 + manifest，护城河 03 显式排除并构建期断言）与 `tools/`（atoms_query/validate）；bundle 副本内仓库根路径自动改写为包内路径；`atoms_validate` 无 src 环境自动降级 v1-only。
+- 回归防线：`tests/test_cli_smoke.py`（三个 CLI 入口首次有测试）、`tests/test_roster.py`、`SkillBindingTests` 绑定双向对账（158 tests）。
+
+### 修复
+- `siyu-plan` 接住 `KnowledgeLoadError` / `SiyuBaseError`，知识文件损坏给中文修复提示而非裸 traceback；`--trace-dir` 真实生效（此前被静默忽略）。
+- `siyu-eval score` 支持多文件（修复 `make eval FILE=<glob>` 展开即崩）；`--samples` 坏 JSON 友好报错；同一惩罚系数重复打印去除。
+- `parse_task` hints 未知键 fail-closed：拼错字段名（如 `industy`）立即报错，不再静默落默认值错路由。
+- 判官维度分显式排除 bool 混入（`True` 不再折算 1.0）；`composite` 的 `static_penalty` 钳制 [0,1]；蒙卡样本非数字值给中文 `ValueError`。
+- 主持人提示词模板含非占位符花括号（如 `{分母}`）不再崩整条收口链。
+- `__init__.py` `__version__` 与 VERSION 对齐（此前停在 0.4.0）；`check_versions` 巡检补 `__init__.py` 与 `pyproject.toml` 两处盲区；`pilot/cli.py` 描述去除硬编码版本号。
+- 私有原子库两处 `skills=["siyu"]` 悬空绑定修正为 `majia-siyu`（本机文件，不入库）。
+
+### 文档
+- `knowledge/04-atoms/README.md` 增加 v1/v2 双轨 schema 边界说明。
+- `docs/knowledge-runtime.md` 头部旧阶段残留改为现状陈述，新增 skills 绑定消费一节。
+- `knowledge/03-majia-sop/README.md` 连接器表述改为「预留未接入」，指明当前实际取数路径。
+- `docs/skill-link-map.mmd` 重绘为当前 17 个 skill 分层拓扑（补 siyu-market-research 与四官能力层、原子绑定关系），并在 README 挂上引用。
+
 ## [1.3.0] - 2026-08-07
 ### 新增
 - 统一错误码体系 `errors.py`：`SiyuBaseError` 基类 + `TaskValidationError` / `ComplianceBlockedError` / `KnowledgeLoadError` / `RouteAmbiguousError`；合规硬卡与知识解析失败改为抛带原因的业务异常。

@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "corpus_version": "0.3.0",
+  "atom_schema": "04-atoms/schema/atom-v2.schema.json",
+  "public_corpora": [],
+  "status": "pilot-validation",
+  "notes": "增长 L0/L1 正式集 approved；route_task + 诊断注入；Pilot 双夹具校验。",
+  "methodology": [
+    "00-methodology/私域公理与消解案例库.md",
+    "00-methodology/L0-通用用户增长原则.md",
+    "00-methodology/用户增长分层索引.md",
+    "02-industry/catering/L1-餐饮零售用增Know-how.md"
+  ],
+  "growth_layers": {
+    "l0": "00-methodology/L0-通用用户增长原则.md",
+    "l1_catering": "02-industry/catering/L1-餐饮零售用增Know-how.md",
+    "approved_atoms": "04-atoms/growth-layers.approved.jsonl",
+    "pilot_atoms": "tests/fixtures/pilot/growth-approved-atoms.jsonl",
+    "pilot_mapping": "tests/fixtures/pilot/growth-task-atom-map.json",
+    "routing": "未声明业态只 L0；catering|retail 叠加 L1"
+  }
+}

@@ -10,7 +10,7 @@ metadata:
 ## Overview
 
 
-> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.8）。
+> 餐饮/零售增长口径与 16 条 Know-how 主句见仓库 `modules/_knowledge/00-methodology/用增方法映射-餐饮零售.md`（v1.2.8）。
 把促活拆成五步可执行流程：分层 → 选钩子 → 选话术 → 排节奏 → 看指标。
 对齐方法论引擎「内容即产品」：每一个促活动作都当一个小产品来做（有钩子、有承接、有复购）。
 
@@ -47,6 +47,18 @@ metadata:
 - 裂变走企微官方允许路径；信息收集有授权口径
 
 > 注：本 skill 的方法论框架可公开；具体话术/分层阈值/节奏配比是马甲护城河，标【待马甲填真实SOP】处由马甲注入。
+
+## 绑定的增长干货原子
+
+增长正式集（`modules/_knowledge/04-atoms/growth-layers.approved.jsonl`）里有若干条
+原子把本 skill 写进了 `skills` 绑定。需要按条引用时，在仓库根执行：
+
+```bash
+python3 tools/atoms_query.py --file modules/_knowledge/04-atoms/growth-layers.approved.jsonl --skills reactivation-playbook
+```
+
+诊断 / 全盘诊断计划注入的 `growth_atoms` 每行也带 `skills` 字段，
+可直接按归属取本 skill 相关的干货，不用整包背诵。
 
 ---
 

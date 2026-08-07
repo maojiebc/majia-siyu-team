@@ -21,6 +21,23 @@ ROUTER = ROOT / "plugins/siyu-core/skills/majia-siyu"
 DEFAULT_OUTPUT = ROOT / "skillhub/majia-siyu"
 RASTER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico"}
 
+# 随包分发的公开知识子集；03-majia-sop 是护城河，永不进包。
+KNOWLEDGE_PUBLIC_DIRS = (
+    "00-methodology",
+    "01-wechat-official",
+    "02-industry",
+    "04-atoms",
+)
+# 随包分发的原子工具（零依赖可跑；atoms_validate 分发态自动降级 v1-only）。
+BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
+# 包内路径重写：SKILL.md 里的仓库根相对引用改指包内 _knowledge，
+# 否则独立安装态全是死指针。顺序敏感：先收相对逃逸，再收裸路径；
+# 裸路径用负向后顾防止把已改写的 `_knowledge/...` 再匹配一次。
+RELATIVE_ESCAPE = ("../../../../knowledge/", "../_knowledge/")
+BARE_KNOWLEDGE_RE = re.compile(
+    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms)"
+)
+
 
 def skill_dirs() -> list[Path]:
     found = sorted({path.parent for path in (ROOT / "plugins").glob("**/skills/*/SKILL.md")})
@@ -86,6 +103,53 @@ def copy_modules(output: Path, modules: list[Path]) -> dict[str, str]:
     return index
 
 
+def copy_knowledge(output: Path) -> int:
+    """公开知识层随包走：modules/_knowledge/{00,01,02,04}+manifest。
+
+    resolver（knowledge/paths.py）已给这个槽位留了发现优先级；
+    03-majia-sop 显式排除——本机构建时该目录含真实 SOP。
+    """
+    target = output / "modules" / "_knowledge"
+    target.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for name in KNOWLEDGE_PUBLIC_DIRS:
+        source = ROOT / "knowledge" / name
+        if not source.is_dir():
+            raise RuntimeError(f"公开知识目录缺失：{source}")
+        shutil.copytree(source, target / name)
+        copied += sum(1 for path in (target / name).rglob("*") if path.is_file())
+    manifest = ROOT / "knowledge" / "manifest.json"
+    if manifest.exists():
+        shutil.copy2(manifest, target / "manifest.json")
+        copied += 1
+    forbidden = target / "03-majia-sop"
+    if forbidden.exists():
+        raise RuntimeError("护城河目录被拷进 bundle，立即中止")
+    return copied
+
+
+def copy_tools(output: Path) -> int:
+    """SKILL.md 引用的原子工具随包走，独立安装态命令不再是死指针。"""
+    target = output / "tools"
+    target.mkdir(parents=True, exist_ok=True)
+    for name in BUNDLED_TOOLS:
+        shutil.copy2(ROOT / "tools" / name, target / name)
+    return len(BUNDLED_TOOLS)
+
+
+def rewrite_knowledge_paths(output: Path) -> int:
+    """把 bundle 副本 markdown 里的仓库根路径改写成包内路径（源文件不动）。"""
+    rewritten = 0
+    for path in output.rglob("*.md"):
+        text = path.read_text(encoding="utf-8")
+        updated = text.replace(*RELATIVE_ESCAPE)
+        updated = BARE_KNOWLEDGE_RE.sub(r"modules/_knowledge/\1", updated)
+        if updated != text:
+            path.write_text(updated, encoding="utf-8")
+            rewritten += 1
+    return rewritten
+
+
 def sanitize(output: Path) -> list[str]:
     removed: list[str] = []
     for path in list(output.rglob("*")):
@@ -106,6 +170,9 @@ def build(output: Path) -> dict[str, object]:
     output.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(ROUTER, output)
     index = copy_modules(output, modules)
+    knowledge_files = copy_knowledge(output)
+    tool_files = copy_tools(output)
+    rewritten = rewrite_knowledge_paths(output)
     add_bundle_rules(output / "SKILL.md")
     license_file = ROOT / "LICENSE"
     if license_file.exists():
@@ -124,6 +191,9 @@ def build(output: Path) -> dict[str, object]:
         "moduleCount": len(index),
         "fileCount": len(files),
         "bytes": total,
+        "knowledgeFiles": knowledge_files,
+        "bundledTools": tool_files,
+        "pathRewrites": rewritten,
         "removed": removed,
     }
 
