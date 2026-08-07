@@ -2,7 +2,7 @@
 name: ops-as-ad-funnel
 description: 运营即广告投放（漏斗/埋点）。Use this skill when 把运营动作设计成自带传播/转化的漏斗、做埋点时。
 metadata:
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # 运营即广告投放（漏斗/埋点）
