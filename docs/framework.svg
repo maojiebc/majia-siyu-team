@@ -1,6 +1,6 @@
 <svg width="100%" viewBox="0 0 760 940" role="img" xmlns="http://www.w3.org/2000/svg">
-<title>majia-siyu v1.3.0 私域专家团架构图</title>
-<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，知识条目V2 按范围隔离，v1.3.0 公开用增方法映射；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
+<title>majia-siyu v1.4.1 私域专家团架构图</title>
+<desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，知识条目V2 按范围隔离；与姊妹篇 majia-huiyuan 双向互指——执行内容归本团，动作的数据依据归 huiyuan；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
 <defs>
   <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
     <path d="M0,0 L7,3 L0,6 Z" fill="#77766F"/>
@@ -28,9 +28,9 @@
 <text x="38" y="38" font-size="21" class="title">majia-siyu · 私域专家团</text>
 <g class="violet">
   <rect x="648" y="18" width="76" height="28" rx="14"/>
-  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.3.0</text>
+  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.4.1</text>
 </g>
-<text x="38" y="60" font-size="12" class="muted">经营动作归本入口；会员指标、SQL 与数仓交给 majia-huiyuan</text>
+<text x="38" y="60" font-size="12" class="muted">同一动作两半：话术素材归本入口；圈谁 / 阈值 / 力度 / 回收等数据依据交给 majia-huiyuan</text>
 
 <g class="gray">
   <rect x="240" y="82" width="280" height="54" rx="12"/>
@@ -111,7 +111,7 @@
 </g>
 
 <rect x="400" y="370" width="330" height="316" rx="16" fill="#F7F5FC" stroke="#AE9BC8" stroke-width="1.3"/>
-<text x="418" y="397" font-size="14" class="title">②B 问诊 / 全盘升级全盘诊断</text>
+<text x="418" y="397" font-size="14" class="title">②B 问诊 / 全盘深度诊断</text>
 <text x="712" y="397" text-anchor="end" font-size="11" class="muted">结构问题才进四位专家</text>
 
 <g class="violet">
