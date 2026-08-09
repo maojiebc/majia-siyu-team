@@ -52,9 +52,12 @@ def _load_runtime(root: Path) -> tuple[Any, Any, Any, Any, Any]:
     if source not in sys.path:
         sys.path.insert(0, source)
     from siyu_team.routing import (  # noqa: PLC0415
+        EXTERNAL_ROUTE_TARGETS,
         INDUSTRY_BOOKS,
         INDUSTRY_CAPABILITIES,
         TASK_ROUTES,
+        normalize_skill_slug,
+        route_contract_document,
         route_task,
     )
     from siyu_team.task import Task, TaskKind  # noqa: PLC0415
@@ -62,6 +65,9 @@ def _load_runtime(root: Path) -> tuple[Any, Any, Any, Any, Any]:
     return TASK_ROUTES, route_task, Task, TaskKind, (
         INDUSTRY_CAPABILITIES,
         INDUSTRY_BOOKS,
+        EXTERNAL_ROUTE_TARGETS,
+        normalize_skill_slug,
+        route_contract_document,
     )
 
 
@@ -69,17 +75,50 @@ def check_contracts(root: Path = ROOT, bundle: Path = DEFAULT_BUNDLE) -> list[st
     root = root.resolve(strict=False)
     bundle = bundle.resolve(strict=False)
     task_routes, route_task, task_type, task_kind, industry_data = _load_runtime(root)
-    industry_capabilities, industry_books = industry_data
+    (
+        industry_capabilities,
+        industry_books,
+        external_targets,
+        runtime_normalize_slug,
+        route_contract_document,
+    ) = industry_data
     repo_skills = published_repo_skills(root)
     bundle_skills = published_bundle_skills(bundle)
     errors: list[str] = []
 
     for kind, (raw_skill, _reason) in task_routes.items():
+        if raw_skill != runtime_normalize_slug(raw_skill):
+            errors.append(f"{kind.value}: 路由目标不是规范 slug：{raw_skill}")
         skill = normalize_skill_slug(raw_skill)
+        if skill in external_targets:
+            continue
         if skill not in repo_skills:
             errors.append(f"{kind.value}: 路由目标未发布：{raw_skill}")
         if skill not in bundle_skills:
-            errors.append(f"{kind.value}: SkillHub 缺少路由目标：{raw_skill}")
+                errors.append(f"{kind.value}: SkillHub 缺少路由目标：{raw_skill}")
+
+    contract_targets = (
+        root
+        / "plugins/siyu-core/skills/majia-siyu/references/route-contract.json",
+        bundle / "modules/_runtime/route-contract.json",
+    )
+    expected_contract = route_contract_document()
+    contract_bytes: list[bytes] = []
+    for target in contract_targets:
+        if not target.is_file():
+            errors.append(f"路由生成契约不存在：{target}")
+            continue
+        raw = target.read_bytes()
+        contract_bytes.append(raw)
+        try:
+            document = json.loads(raw)
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            errors.append(f"路由生成契约不是合法 UTF-8 JSON：{target}")
+            continue
+        if document != expected_contract:
+            errors.append(f"路由生成契约与 Runtime 漂移：{target}")
+    if len(contract_bytes) == 2 and contract_bytes[0] != contract_bytes[1]:
+        errors.append("插件与 SkillHub 路由生成契约字节不一致")
 
     for industry, status in industry_capabilities.items():
         if status not in ALLOWED_INDUSTRY_STATUS:

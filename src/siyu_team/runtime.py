@@ -5,6 +5,9 @@ Runtime 只制定可验证的执行计划，不直接调用模型，也不替 Sk
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
+import hashlib
+import json
 from typing import Any, Mapping
 
 from .context import AgentContext, build_agent_context
@@ -17,6 +20,13 @@ from .tracing import TraceRecorder
 
 # 内置四官（roster 缺失/损坏时的回退名单；正常路径从 roster 读取）。
 PANEL_OFFICERS = ("公关官", "产品官", "广告官", "合规官")
+PLAN_SCHEMA_VERSION = "1.0"
+LEGACY_CORPUS_VERSION = "0.3.0"
+
+
+class RuntimeMode(str, Enum):
+    PYTHON = "python"
+    PROMPT_ONLY = "prompt_only"
 
 # 诊断与全盘诊断注入增长 draft 原子
 _GROWTH_CONTEXT_KINDS = frozenset(
@@ -32,21 +42,49 @@ class ExecutionPlan:
     trace_id: str
     task: Task
     decision: RouteDecision
+    plan_schema_version: str = PLAN_SCHEMA_VERSION
+    runtime_mode: RuntimeMode = RuntimeMode.PYTHON
+    knowledge: Mapping[str, Any] | None = None
+    warnings: tuple[str, ...] = ()
     agent_contexts: tuple[AgentContext, ...] = ()
     growth_atoms: tuple[dict[str, Any], ...] = ()
     growth_load_note: str = ""
 
     def to_dict(self) -> dict[str, Any]:
+        knowledge = dict(self.knowledge or _legacy_knowledge(self.growth_atoms))
         return {
+            "plan_schema_version": self.plan_schema_version,
+            "runtime_mode": self.runtime_mode.value,
             "trace_id": self.trace_id,
             "task": self.task.to_dict(),
             "decision": self.decision.to_dict(),
+            "knowledge": knowledge,
+            "warnings": list(self.warnings),
             "agent_contexts": [
                 context.to_dict() for context in self.agent_contexts
             ],
             "growth_atoms": [dict(row) for row in self.growth_atoms],
             "growth_load_note": self.growth_load_note,
         }
+
+
+def _legacy_knowledge(
+    growth_atoms: tuple[dict[str, Any], ...],
+) -> dict[str, Any]:
+    """Expose legacy rows through the v1 envelope until PR-03 replaces loading."""
+    atoms = [dict(row) for row in growth_atoms]
+    canonical = json.dumps(
+        atoms,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return {
+        "corpus_version": LEGACY_CORPUS_VERSION,
+        "corpus_hash": "sha256:" + hashlib.sha256(canonical).hexdigest(),
+        "selection_count": len(atoms),
+        "atoms": atoms,
+    }
 
 
 def _panel_from_roster(roster: Mapping[str, Any]) -> tuple[tuple[str, frozenset[str] | None], ...]:
@@ -127,6 +165,12 @@ class SiyuRuntime:
             trace_id=trace_id,
             task=task,
             decision=decision,
+            knowledge=_legacy_knowledge(growth_atoms),
+            warnings=(
+                ("legacy_growth_selection_pending_strict_corpus",)
+                if growth_atoms
+                else ()
+            ),
             agent_contexts=contexts,
             growth_atoms=growth_atoms,
             growth_load_note=growth_note,

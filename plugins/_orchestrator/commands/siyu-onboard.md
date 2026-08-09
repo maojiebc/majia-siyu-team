@@ -20,7 +20,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 4. **失败即停**。任何步骤失败（尤其合规官命中 `COMPLIANCE_RED`）立即 STOP。
 5. **只用本地 agent**。所有 `subagent_type` 指向本 repo plugins 里的 agent 或 `general-purpose`。
 6. **不自行进 plan mode**。这个 command 就是计划——执行它。
-7. **先结构化再派发**。没有通过 `SiyuRuntime.plan()` 生成有效 Task 和 RouteDecision，不得把原始文本直接交给 Skill 或四官。
+7. **先结构化再派发**。Python 模式必须由真实 `siyu-plan` 生成 ExecutionPlan；CLI 不可用或契约哈希不匹配时，必须按入口的生成契约走 Prompt-only，并明确标记降级，不能假装调用 Runtime。
 8. **动态事实先留证**。厂商、产品、价格、功能、案例、政策、平台规则、市场排名或公司存续等事实，必须先完成 `siyu-market-research`；内部知识、Get 笔记和 BI 数据不能替代公开网络证据。
 
 （1–6 照搬 full-stack-feature.md:8-18，仅第 4 条补了合规红线；第 7 条是 Runtime 边界。）
@@ -30,10 +30,12 @@ You MUST follow these rules exactly. Violating any of them is a failure.
    - 存在且 `status=="in_progress"`：读出，显示 `current_step`，问用户 **1. 续跑 / 2. 重开（归档旧档）/ 3. 退出**。
    - 存在且 `status=="complete"`：问是否归档后重开。
 2. **解析 `$ARGUMENTS`**：抽出 `$CLIENT`、`--industry`、`--stage`。
-3. **建立结构化计划**：调 `SiyuRuntime.plan($ARGUMENTS, hints)`，把 `plan.to_dict()` 写入 `.siyu-team/task.json`。
+3. **确定执行模式并建立结构化计划**：先读取主入口的 `references/route-contract.json`。
+   - 能执行 `siyu-plan --contract-info` 且哈希匹配：执行真实 `siyu-plan "$ARGUMENTS" --industry ... --stage ...`，把 JSON 输出写入 `.siyu-team/task.json`；其 `runtime_mode` 必须为 `python`。
+   - CLI 不可用或哈希不匹配：按同一生成契约建立符合 `schemas/execution-plan-v1.schema.json` 的最小计划，写入 `.siyu-team/task.json`，并标记 `runtime_mode: prompt_only` 与相应 warning。此模式不声称 trace、上下文隔离或知识装配已由代码强制。
    - `decision.skill != "siyu-onboard"`：停止本命令，按 RouteDecision 转给对应单步能力。
    - `needs_clarification=true`：只在 Step 0 补 `required_fields`，不得提前创建或派发四官上下文。
-4. **初始化 state.json**（字段见 `src/siyu_team/state.py` / docs/blueprint.md §3c），调 `state.init_state(client, industry, stage)`。
+4. **初始化 state.json**：按 `src/siyu_team/state.py` / docs/blueprint.md §3c 的字段直接写文件；后续状态更新也必须是可核验的文件写入，不使用概念性 `state.*` 调用。
 
 ---
 
@@ -59,12 +61,12 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 - 能给的真实数据（有就给，没有就估）
 
 （若用户授权，可调 `connectors/getnote.py` 抓行业素材、`connectors/bi_platform.py` 拉真实漏斗验证口径，结果并入。）
-→ 写 `.siyu-team/00-intake.md` → `state.update(step=1, add_file="00-intake.md", add_completed=0)`
+→ 写 `.siyu-team/00-intake.md`，再把 `state.json.current_step` 写为 `1`，登记产物与已完成步骤 `0`
 
 ## Step 1 · 按行业×阶段路由（规则路由，不花 token）
-读 `00-intake.md`，把调研字段映射进 `Task.context`，重新调 `SiyuRuntime.plan()`。只有 RouteDecision 不再缺字段时才更新 `.siyu-team/task.json`，并加载 `knowledge/02-industry/<industry>/` 行业册。
+读 `00-intake.md`，把调研字段映射进 Task context。Python 模式重新执行真实 `siyu-plan`；Prompt-only 继续按同一生成契约重建计划并保留降级标记。只有 RouteDecision 不再缺字段时才更新 `.siyu-team/task.json`；仅当契约给出非空 `industry_book` 时才加载该行业册。
 产出：选定行业册 + 阶段重点 + **四官各自要重点回答的子问题**。
-→ 写 `.siyu-team/01-routing.md` → `state.update(step="checkpoint-1")`
+→ 写 `.siyu-team/01-routing.md`，再把 `state.json.current_step` 写为 `checkpoint-1`
 
 ### == PHASE CHECKPOINT 1 — User Approval Required ==
 展示 `00-intake` 与 `01-routing` 摘要，`AskUserQuestion` 三选项：
@@ -76,7 +78,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ## Step 2 · 并行派四官（多 Task 单 response）
 **Launch four agents in parallel using multiple Task tool calls in a single response.**
-每个 Task 必须先用 `context.build_agent_context()` 做字段白名单投影，再由 `perspectives.build_isolated_officer_prompt()` 生成；禁止调用接受未过滤 intake 的旧接口：
+Python 模式直接使用 ExecutionPlan 已生成的 `agent_contexts`，不得把未过滤 intake 另行传入。Prompt-only 没有代码强制隔离能力：必须先按最小必要原则人工删去令牌、联系方式和无关字段，并在产物 warning 标注 `prompt_only_context_isolation_not_code_enforced`：
 
 - **Task 2a 公关官** `subagent_type: "private-pr-officer-private-pr-officer"` → `.siyu-team/02a-pr.md`
 - **Task 2b 产品官** `subagent_type: "content-product-officer-content-product-officer"` → `.siyu-team/02b-product.md`
@@ -84,7 +86,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 - **Task 2d 合规官** `subagent_type: "compliance-critic-compliance-critic"` → `.siyu-team/02d-critic.md`
 
 四官互不读对方输出，也不直接读取 `00-intake.md`；公关/产品/广告官看不到原始请求，只有合规官可读取已脱敏的 `source_text` 与风险字段，故可真并行。
-→ `state.update(add_completed="2a/2b/2c/2d")`
+→ 把 `2a/2b/2c/2d` 追加写入 `state.json.completed_steps`
 
 ## Step 3 · 主持收口（团长综合）
 1. 跑 `make eval FILE=.siyu-team/02*.md`（`src/siyu_team/eval/cli.py`）对四份产物打质量门分。**命中 `COMPLIANCE_RED` → 打回对应官重做，不进收口。**
@@ -92,7 +94,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 3. 用 `host.build_host_prompt()`（docs/blueprint.md §3e）综合四官 → 写 `.siyu-team/04-playbook.md` + `reports/deliberation.md`。
    - 默认 `host_mode=codex`：你（掌握全程上下文的主控）直接当团长综合。
    - 需二审时 `rounds=2`，把第一轮综合当 H1 输入再审一遍。
-→ `state.update(status="complete")`
+→ 把 `state.json.status` 写为 `complete`
 
 ## == Completion ==
 `state.json: status="complete"`。打印 final summary：

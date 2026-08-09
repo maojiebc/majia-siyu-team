@@ -208,7 +208,11 @@ def format_growth_atoms_for_context(
         rows.append(
             {
                 "id": atom.id,
+                "source_id": atom.source.source_id,
                 "locator": atom.source.locator,
+                "why_selected": [
+                    "legacy growth layer matched the declared industry"
+                ],
                 "layer": layer,
                 "type": atom.type,
                 "statement": atom.statement,

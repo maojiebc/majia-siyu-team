@@ -31,6 +31,8 @@ links:
 
 # Python 路由目标、行业能力、知识引用与分发包路径对账。
 contracts:
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/render_route_contract.py --check
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/build_skillhub_bundle.py --check
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_route_contracts.py
 
 # Runtime 与状态层回归测试（stdlib unittest，零额外依赖）

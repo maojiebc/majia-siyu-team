@@ -6,9 +6,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
+import json
 from typing import Any
 
-from .task import CONFIDENCE_CLARIFY_THRESHOLD, Task, TaskKind
+from .task import (
+    CONFIDENCE_CLARIFY_THRESHOLD,
+    Task,
+    TaskKind,
+    task_routing_contract,
+)
 from .knowledge.growth_layers import describe_growth_load, select_growth_doc_refs
 from .knowledge.paths import COMPLIANCE_REDLINES_DOC, METHODOLOGY_AXIOMS_DOC
 
@@ -35,22 +42,29 @@ STAGE_FOCUS = {
     "mature": "先解决『规模化裂变 + 会员体系』：合规裂变机制、会员等级、案例复制。",
 }
 
+ROUTE_CONTRACT_VERSION = "1.0"
+EXTERNAL_ROUTE_TARGETS = frozenset({"majia-huiyuan"})
+
 TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
     TaskKind.MOMENTS_COPY: (
-        "/siyu-pyq",
+        "siyu-pyq",
         "请求的是朋友圈内容生产，走执行层并做生成前合规检查。",
     ),
     TaskKind.GROUP_CAMPAIGN: (
-        "/siyu-qunfa",
+        "siyu-qunfa",
         "请求的是群发或社群推送，走栏目与承接脚本执行层。",
     ),
     TaskKind.CONVERSATION_SCRIPT: (
-        "/siyu-huashu",
+        "siyu-huashu",
         "请求的是欢迎、破冰或答疑话术，走一对一承接执行层。",
     ),
     TaskKind.MARKET_RESEARCH: (
         "siyu-market-research",
         "请求涉及厂商、产品、价格或市场动态，先实时检索并生成证据快照。",
+    ),
+    TaskKind.MEMBERSHIP_DATA: (
+        "majia-huiyuan",
+        "请求涉及会员指标、字段、SQL 或人群圈选，转交会员数据能力处理。",
     ),
     TaskKind.DIAGNOSIS: (
         "siyu-wenzhen",
@@ -61,22 +75,84 @@ TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
         "请求涉及整盘结构，进入四位专家分头评审和总协调收口。",
     ),
     TaskKind.SAVE_MEMORY: (
-        "/siyu-save",
+        "siyu-save",
         "请求是保存当前结论，进入本地客户档案。",
     ),
     TaskKind.RESTORE_MEMORY: (
-        "/siyu-restore",
+        "siyu-restore",
         "请求是恢复上次结论，读取本地客户档案。",
     ),
     TaskKind.REPORT: (
-        "/siyu-report",
+        "siyu-report",
         "请求是汇总交付物，进入报告生成与合规扫描。",
+    ),
+    TaskKind.UPDATE: (
+        "siyu-update",
+        "请求更新已安装的私域专家团，进入专用版本检查与安装流程。",
     ),
     TaskKind.UNKNOWN: (
         "majia-siyu",
         "当前信息不足以安全选择执行能力，由入口只补问一个关键问题。",
     ),
 }
+
+
+def normalize_skill_slug(value: str) -> str:
+    """Return the canonical route target used by Runtime and distributions."""
+    return value.strip().lstrip("/")
+
+
+def route_contract_payload() -> dict[str, Any]:
+    """Build the hashable prompt-only route contract from Runtime constants."""
+    return {
+        "contract_schema_version": ROUTE_CONTRACT_VERSION,
+        "task": task_routing_contract(),
+        "routes": {
+            kind.value: {
+                "skill": normalize_skill_slug(skill),
+                "reason": reason,
+                "target_type": (
+                    "external"
+                    if normalize_skill_slug(skill) in EXTERNAL_ROUTE_TARGETS
+                    else "bundled"
+                ),
+            }
+            for kind, (skill, reason) in TASK_ROUTES.items()
+        },
+        "industry_capabilities": {
+            industry: {
+                "label": INDUSTRIES[industry],
+                "status": status,
+                "industry_book": INDUSTRY_BOOKS.get(industry),
+            }
+            for industry, status in INDUSTRY_CAPABILITIES.items()
+        },
+        "stages": {
+            stage: {"label": STAGES[stage], "focus": STAGE_FOCUS[stage]}
+            for stage in STAGES
+        },
+        "required_fields": {
+            "unknown": ["kind"],
+            "strategy_review": ["industry", "stage"],
+            "low_confidence": ["kind"],
+        },
+    }
+
+
+def route_contract_digest(payload: dict[str, Any] | None = None) -> str:
+    body = payload if payload is not None else route_contract_payload()
+    canonical = json.dumps(
+        body,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return "sha256:" + hashlib.sha256(canonical).hexdigest()
+
+
+def route_contract_document() -> dict[str, Any]:
+    payload = route_contract_payload()
+    return {**payload, "content_sha256": route_contract_digest(payload)}
 
 
 @dataclass(frozen=True)
@@ -126,7 +202,8 @@ def route(industry: str, stage: str) -> dict[str, Any]:
 
 
 def route_task(task: Task) -> RouteDecision:
-    skill, reason = TASK_ROUTES[task.kind]
+    raw_skill, reason = TASK_ROUTES[task.kind]
+    skill = normalize_skill_slug(raw_skill)
     industry_route = route(task.industry, task.stage)
     required: list[str] = []
     if task.kind is TaskKind.UNKNOWN:
@@ -146,8 +223,13 @@ def route_task(task: Task) -> RouteDecision:
             required.append("kind")
         reason = f"{reason}（意图信号不足/命中多个意图，先确认要解决哪一个）"
 
+    no_local_knowledge = {
+        TaskKind.MARKET_RESEARCH,
+        TaskKind.MEMBERSHIP_DATA,
+        TaskKind.UPDATE,
+    }
     knowledge_refs: list[str] = []
-    if task.kind is not TaskKind.MARKET_RESEARCH:
+    if task.kind not in no_local_knowledge:
         knowledge_refs.extend(
             [
                 COMPLIANCE_REDLINES_DOC,
@@ -157,11 +239,9 @@ def route_task(task: Task) -> RouteDecision:
         # 增长分层：未声明业态只 L0；catering/retail 叠加 L1
         knowledge_refs.extend(select_growth_doc_refs(task.industry))
     industry_book = (
-        None
-        if task.kind is TaskKind.MARKET_RESEARCH
-        else industry_route["industry_book"]
+        None if task.kind in no_local_knowledge else industry_route["industry_book"]
     )
-    if industry_book and task.kind is not TaskKind.MARKET_RESEARCH:
+    if industry_book and task.kind not in no_local_knowledge:
         # industry_book 是目录；L1 文档已在 select_growth_doc_refs 精确挂上
         if industry_book not in knowledge_refs:
             knowledge_refs.append(industry_book)
@@ -169,6 +249,10 @@ def route_task(task: Task) -> RouteDecision:
     focus = industry_route["focus"]
     if task.kind is TaskKind.MARKET_RESEARCH:
         focus = "先完成实时检索与证据快照；证据不足的对象不得进入正式推荐。"
+    elif task.kind is TaskKind.MEMBERSHIP_DATA:
+        focus = "按会员数据能力的字段、口径、SQL 与看板边界继续处理。"
+    elif task.kind is TaskKind.UPDATE:
+        focus = "只执行版本检查、兼容性确认与安装更新，不改写业务内容。"
     else:
         growth_note = describe_growth_load(task.industry)
         if focus:

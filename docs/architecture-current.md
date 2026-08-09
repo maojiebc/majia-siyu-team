@@ -8,8 +8,8 @@
 
 | 执行面 | 当前真实入口 | 已自动验证 | 尚未闭环 |
 |---|---|---|---|
-| 插件与 SkillHub | Markdown Skill 由宿主解释执行 | 文件结构、发布版本、静态 bundle | 宿主是否实际调用 Python Runtime |
-| Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | Task、路由、上下文隔离、状态与追踪单测 | 干净 wheel 与各宿主安装态 |
+| 插件与 SkillHub | Markdown Skill 由宿主解释执行 | 文件结构、发布版本、生成路由契约、84 条人工对照 | Prompt-only 不具备代码强制隔离/追踪 |
+| Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | ExecutionPlan v1、Task、路由、上下文隔离、状态与追踪单测 | 干净 wheel 与各宿主安装态 |
 | Knowledge Pilot | `siyu-pilot` 与离线夹具 | 盲化、数据契约、Dry Run 工具 | H1/H2/H3 真实人工评估与生产装配一致性 |
 
 这三条链目前并非同一条生产执行链。源码态 Python 测试通过，不能推导出
@@ -19,8 +19,8 @@ Markdown 宿主一定经过 Runtime；Pilot 工具可运行，也不能推导出
 
 ```text
 用户请求
-  ├─ Python 可用：Task → RouteDecision → ExecutionPlan
-  └─ 仅 Markdown：宿主按入口 Skill 的降级路由表解释执行
+  ├─ CLI 可用且契约哈希匹配：siyu-plan → ExecutionPlan(runtime_mode=python)
+  └─ 否则：生成 route-contract.json → Prompt-only 计划(runtime_mode=prompt_only)
 
 ExecutionPlan
   ├─ 单能力路由
@@ -30,6 +30,11 @@ ExecutionPlan
   ├─ 静态合规/反模式扫描
   └─ 宿主另行回填 Judge 分数后才有质量分
 ```
+
+`plugins/.../references/route-contract.json` 与
+`skillhub/.../modules/_runtime/route-contract.json` 均由 Python 常量生成，字节和
+`content_sha256` 必须一致。SkillHub 包不含 Python Runtime，因此不能因为携带该契约
+就宣称执行过 Runtime；Python 模式必须先用 `siyu-plan --contract-info` 完成哈希握手。
 
 ## 行业能力状态
 
@@ -43,6 +48,8 @@ ExecutionPlan
 
 ```bash
 python tools/check_links.py
+python tools/render_route_contract.py --check
+python tools/build_skillhub_bundle.py --check
 python tools/check_route_contracts.py
 make check
 ```

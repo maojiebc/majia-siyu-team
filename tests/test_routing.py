@@ -13,7 +13,7 @@ class TestRouteTask(unittest.TestCase):
     def test_moments_copy_route(self) -> None:
         task = Task(kind=TaskKind.MOMENTS_COPY, source_text="写朋友圈")
         decision = route_task(task)
-        self.assertEqual(decision.skill, "/siyu-pyq")
+        self.assertEqual(decision.skill, "siyu-pyq")
         self.assertFalse(decision.needs_clarification)
 
     def test_market_research_skip_industry_book(self) -> None:

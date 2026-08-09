@@ -12,11 +12,11 @@
 
 | 能力 | 状态 | 可核验证据 | 当前边界 |
 |---|---|---|---|
-| Task 与确定性路由 | 仅 Python 实现 | `src/siyu_team/task.py`、`routing.py`、路由单测 | Markdown 宿主调用尚未闭环 |
-| 插件入口路由 | 仅提示词实现 | `plugins/siyu-core/skills/majia-siyu/SKILL.md` | 路由表仍需与 Python 单一真源对齐 |
+| Task 与确定性路由 | 仅 Python 实现 | `task.py`、`routing.py`、84 条人工路由对照 | Prompt-only 解释契约，不等于执行 Python 解析器 |
+| 插件入口路由 | 仅提示词实现 | 主入口与生成的 `route-contract.json` | 与 Python 路由同源；宿主执行语义仍不可由仓库强制 |
 | 四官上下文白名单 | 仅 Python 实现 | `context.py`、Runtime 隔离测试 | 宿主是否执行投影未做安装态验证 |
-| Python 执行计划 CLI | 仅 Python 实现 | `siyu-plan`、CLI 冒烟测试 | wheel 干净安装尚未纳入 CI |
-| SkillHub 单入口包 | 已实现 | `tools/build_skillhub_bundle.py`、干净 bundle 契约测试 | 包内不包含可执行 Python Runtime |
+| Python 执行计划 CLI | 仅 Python 实现 | ExecutionPlan v1、`siyu-plan --contract-info`、CLI 测试 | wheel 干净安装尚未纳入 CI |
+| SkillHub 单入口包 | 已实现 | bundle `--check`、生成路由契约、分发测试 | 包内不包含可执行 Python Runtime，固定 Prompt-only |
 | 餐饮行业知识目录 | 已实现 | `knowledge/02-industry/catering/` | 仅餐饮具有行业包 |
 | 零售/教培通用回答 | 已实现 | `generic_only` 路由回归 | 零售可复用跨业态 L1，但两者都不得伪造独立行业册 |
 | 公开知识 Runtime 注入 | 仅 Python 实现 | `growth_layers.py` 与注入测试 | 严格批准门、相关性装配和安装态待完成 |

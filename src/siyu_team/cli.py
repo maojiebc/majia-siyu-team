@@ -7,7 +7,8 @@ import sys
 from typing import Sequence
 
 from .errors import KnowledgeLoadError, SiyuBaseError
-from .runtime import SiyuRuntime
+from .routing import ROUTE_CONTRACT_VERSION, route_contract_digest
+from .runtime import PLAN_SCHEMA_VERSION, RuntimeMode, SiyuRuntime
 from .task import TaskValidationError
 from .tracing import TraceRecorder, cleanup_old_traces
 
@@ -23,6 +24,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--client", default="")
     parser.add_argument("--audience", default="")
     parser.add_argument("--no-trace", action="store_true")
+    parser.add_argument(
+        "--contract-info",
+        action="store_true",
+        help="输出 Runtime/路由契约版本与哈希后退出",
+    )
     parser.add_argument(
         "--cleanup-traces",
         action="store_true",
@@ -44,6 +50,20 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.contract_info:
+        print(
+            json.dumps(
+                {
+                    "plan_schema_version": PLAN_SCHEMA_VERSION,
+                    "route_contract_version": ROUTE_CONTRACT_VERSION,
+                    "route_contract_hash": route_contract_digest(),
+                    "runtime_modes": [mode.value for mode in RuntimeMode],
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
     if args.cleanup_traces:
         count, size = cleanup_old_traces(args.trace_dir, args.trace_days)
         print(f"已删除 {count} 个追踪文件，释放 {size / 1024:.1f} KB")

@@ -14,6 +14,7 @@ import json
 import re
 import shutil
 from pathlib import Path
+import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +31,7 @@ KNOWLEDGE_PUBLIC_DIRS = (
 )
 # 随包分发的原子工具（零依赖可跑；atoms_validate 分发态自动降级 v1-only）。
 BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
+ROUTE_CONTRACT = ROUTER / "references/route-contract.json"
 # 包内路径重写：SKILL.md 里的仓库根相对引用改指包内 _knowledge，
 # 否则独立安装态全是死指针。顺序敏感：先收相对逃逸，再收裸路径；
 # 裸路径用负向后顾防止把已改写的 `_knowledge/...` 再匹配一次。
@@ -141,6 +143,21 @@ def copy_tools(output: Path) -> int:
     return len(BUNDLED_TOOLS)
 
 
+def copy_runtime_contract(output: Path) -> int:
+    """Ship the generated prompt-only contract without implying Python exists."""
+    if not ROUTE_CONTRACT.is_file():
+        raise RuntimeError(
+            "路由契约缺失：先运行 python3 tools/render_route_contract.py"
+        )
+    target = output / "modules/_runtime/route-contract.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROUTE_CONTRACT, target)
+    duplicate = output / "references/route-contract.json"
+    if duplicate.is_file():
+        duplicate.unlink()
+    return 1
+
+
 def rewrite_knowledge_paths(output: Path) -> int:
     """把 bundle 副本 markdown 里的仓库根路径改写成包内路径（源文件不动）。"""
     rewritten = 0
@@ -148,6 +165,10 @@ def rewrite_knowledge_paths(output: Path) -> int:
         text = path.read_text(encoding="utf-8")
         updated = text.replace(*RELATIVE_ESCAPE)
         updated = updated.replace(*EXPERT_REFERENCE_ESCAPE)
+        updated = updated.replace(
+            "references/route-contract.json",
+            "modules/_runtime/route-contract.json",
+        )
         updated = BARE_KNOWLEDGE_RE.sub(r"modules/_knowledge/\1", updated)
         if updated != text:
             path.write_text(updated, encoding="utf-8")
@@ -177,6 +198,7 @@ def build(output: Path) -> dict[str, object]:
     index = copy_modules(output, modules)
     knowledge_files = copy_knowledge(output)
     tool_files = copy_tools(output)
+    runtime_files = copy_runtime_contract(output)
     rewritten = rewrite_knowledge_paths(output)
     add_bundle_rules(output / "SKILL.md")
     license_file = ROOT / "LICENSE"
@@ -198,6 +220,7 @@ def build(output: Path) -> dict[str, object]:
         "bytes": total,
         "knowledgeFiles": knowledge_files,
         "bundledTools": tool_files,
+        "runtimeFiles": runtime_files,
         "pathRewrites": rewritten,
         "removed": removed,
     }
@@ -206,8 +229,49 @@ def build(output: Path) -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="构建单入口 majia-siyu 发布包")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="在临时目录重建并与已提交 bundle 逐字节比较",
+    )
     args = parser.parse_args()
-    result = build(args.output.expanduser().resolve())
+    output = args.output.expanduser().resolve()
+    if args.check:
+        with tempfile.TemporaryDirectory(prefix="siyu-bundle-check-") as directory:
+            candidate = Path(directory) / "majia-siyu"
+            result = build(candidate)
+            expected_files = {
+                path.relative_to(candidate): path.read_bytes()
+                for path in candidate.rglob("*")
+                if path.is_file()
+            }
+            actual_files = {
+                path.relative_to(output): path.read_bytes()
+                for path in output.rglob("*")
+                if path.is_file()
+            } if output.is_dir() else {}
+            if actual_files != expected_files:
+                missing = sorted(
+                    str(path)
+                    for path in expected_files.keys() - actual_files.keys()
+                )
+                extra = sorted(str(path) for path in actual_files.keys() - expected_files)
+                changed = sorted(
+                    str(path)
+                    for path in expected_files.keys() & actual_files.keys()
+                    if expected_files[path] != actual_files[path]
+                )
+                print(
+                    json.dumps(
+                        {"missing": missing, "extra": extra, "changed": changed},
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                )
+                return 1
+            print("SkillHub bundle 生成物一致")
+            return 0
+    result = build(output)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

@@ -26,11 +26,13 @@ class TaskKind(str, Enum):
     GROUP_CAMPAIGN = "group_campaign"
     CONVERSATION_SCRIPT = "conversation_script"
     MARKET_RESEARCH = "market_research"
+    MEMBERSHIP_DATA = "membership_data"
     DIAGNOSIS = "diagnosis"
     STRATEGY_REVIEW = "strategy_review"
     SAVE_MEMORY = "save_memory"
     RESTORE_MEMORY = "restore_memory"
     REPORT = "report"
+    UPDATE = "update"
     UNKNOWN = "unknown"
 
 
@@ -63,10 +65,27 @@ class RiskLevel(str, Enum):
 # 内容生产类权重大于存档类，避免「保存上次朋友圈文案」误判为 SAVE_MEMORY。
 _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
     (
+        TaskKind.MEMBERSHIP_DATA,
+        re.compile(
+            r"((会员|复购率|留存率|流失|RFM|人群).{0,24}"
+            r"(怎么算|计算|口径|SQL|DDL|数仓|字段|看板|数据质量|指标定义|"
+            r"分层规则|标签字段|圈出|阈值|怎么定)|"
+            r"(SQL|DDL|数仓|字段词典|数据质量|会员看板|圈出).{0,24}"
+            r"(会员|复购|留存|流失|RFM|未购|高频)|"
+            r"RFM.{0,12}(分层|规则|标签))",
+            re.IGNORECASE,
+        ),
+        3.4,
+    ),
+    (
         TaskKind.MARKET_RESEARCH,
         re.compile(
             r"(厂商|供应商|服务商|竞品|市场格局|市场地图|产品选型|"
-            r"SCRM|CRM|公司存续|客户案例|最新政策|平台规则|"
+            r"SCRM|CRM|公司存续|客户案例|最新政策|"
+            r"(政策|平台规则|企微规则|广告政策).{0,12}"
+            r"(变化|更新|调整|新规|现行|当前|最新|允许|限制|核验)|"
+            r"(当前|现行|最新).{0,8}(政策|平台规则|企微规则|广告政策)|"
+            r"平台.{0,10}(最新限制|当前限制|规则变化)|"
             r"对比.{0,16}(报价|功能|价格|厂商|软件|系统|平台)|"
             r"(产品|软件|平台|系统).{0,8}(价格|报价|收费|功能|版本|接口|停服|在营)|"
             r"(价格|报价|功能|版本|接口).{0,8}(厂商|供应商|服务商|软件|平台|产品|系统)|"
@@ -75,18 +94,31 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
         3.0,
     ),
     (
+        TaskKind.GROUP_CAMPAIGN,
+        re.compile(
+            r"((打开率|点击率|触达).{0,12}(低|差|下滑|不高).{0,20}"
+            r"(写|出|生成|重写|给).{0,16}(新推送|推送|群发|通知)|"
+            r"(重写|改写|给我|来).{0,12}(新推送|新版推送|新的推送))"
+        ),
+        3.1,
+    ),
+    (
         TaskKind.STRATEGY_REVIEW,
-        re.compile(r"(全盘|整盘|战略评审|私域体系|全面搭建|怎么搭|四官)"),
+        re.compile(
+            r"(全盘|整盘|战略评审|私域体系|全面搭建|怎么搭|四官|"
+            r"私域.{0,20}(评审|规模化复制|盘子|搭起来))"
+        ),
         2.8,
     ),
     (
         TaskKind.DIAGNOSIS,
         re.compile(
-            r"(为什么|怎么办|问题出在哪|长期|一直|连续.{0,5}(低|差|没)|"
+            r"(为什么|怎么办|问题.{0,4}(在哪|哪里)|诊断|长期|一直|"
+            r"连续.{0,8}(低|差|没|下降)|下降|"
             r"转化差|留存.{0,3}(掉|差)|没人加微|不活跃|没回复|没打开|"
             r"打开率.{0,6}(低|差|还是))"
         ),
-        2.6,
+        3.0,
     ),
     (
         TaskKind.MOMENTS_COPY,
@@ -105,8 +137,23 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
     ),
     (
         TaskKind.REPORT,
-        re.compile(r"(出报告|生成报告|打包给.{0,6}(老板|客户))"),
-        2.0,
+        re.compile(
+            r"(出报告|生成报告|打包成.{0,16}报告|打包给.{0,10}(老板|客户)|"
+            r"(汇总|合并).{0,12}报告|老板报告)"
+        ),
+        2.2,
+    ),
+    (
+        TaskKind.UPDATE,
+        re.compile(
+            r"(/siyu-update|"
+            r"(更新|升级|同步|检查并安装|安装).{0,16}"
+            r"(私域专家团|majia-siyu|siyu-team|siyu|最新版|最新正式版)|"
+            r"(私域专家团|majia-siyu|siyu-team|siyu).{0,16}"
+            r"(更新|升级|最新版|最新正式版|v\d+\.\d+\.\d+))",
+            re.IGNORECASE,
+        ),
+        2.1,
     ),
     (
         TaskKind.RESTORE_MEMORY,
@@ -115,7 +162,7 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
     ),
     (
         TaskKind.SAVE_MEMORY,
-        re.compile(r"(保存|存档|记下来|留下结论)"),
+        re.compile(r"(保存|存档|记下来|留下结论|结论.{0,4}(留下|保存)|把.{0,8}留下)"),
         1.0,
     ),
 )
@@ -139,6 +186,17 @@ _GOAL_RULES: tuple[tuple[Goal, re.Pattern[str]], ...] = (
     (Goal.ENGAGEMENT, re.compile(r"(活跃|打开|回复|互动)")),
     (Goal.TRUST, re.compile(r"(信任|口碑|人设|公关)")),
     (Goal.CONVERSION, re.compile(r"(转化|成交|下单|销售|GMV|活动)")),
+)
+
+_INDUSTRY_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("catering", re.compile(r"(餐饮|餐厅|饭店|门店套餐)")),
+    ("retail", re.compile(r"(零售|商超|便利店)")),
+    ("edu", re.compile(r"(教培|培训机构|试听课)")),
+)
+_STAGE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("cold", re.compile(r"(冷启动|从\s*0\s*开始|0\s*[→到-]\s*1|零基础)")),
+    ("growth", re.compile(r"(扩张|已有.{0,6}体系.{0,8}提效|整盘提效)")),
+    ("mature", re.compile(r"(成熟|规模化.{0,6}(复制|裂变)|体系复制)")),
 )
 
 _HIGH_RISK = re.compile(
@@ -290,10 +348,16 @@ class Task:
         )
 
 
-def _score_kinds(text: str) -> dict[TaskKind, float]:
+def _score_kinds(
+    text: str,
+    *,
+    excluded_kinds: frozenset[TaskKind] = frozenset(),
+) -> dict[TaskKind, float]:
     """多规则积分；内容生产类命中时压低存档/恢复分，避免顺序依赖误判。"""
     scores: dict[TaskKind, float] = {}
     for kind, pattern, weight in _KIND_RULES:
+        if kind in excluded_kinds:
+            continue
         if pattern.search(text):
             scores[kind] = scores.get(kind, 0.0) + weight
     # 「保存上次朋友圈文案」会同时命中 SAVE_MEMORY 与 MOMENTS_COPY。
@@ -304,9 +368,13 @@ def _score_kinds(text: str) -> dict[TaskKind, float]:
     return scores
 
 
-def _infer_kind(text: str) -> TaskKind:
+def _infer_kind(
+    text: str,
+    *,
+    excluded_kinds: frozenset[TaskKind] = frozenset(),
+) -> TaskKind:
     """多规则积分取最高分；同分保留先登记顺序。"""
-    scores = _score_kinds(text)
+    scores = _score_kinds(text, excluded_kinds=excluded_kinds)
     if not scores:
         return TaskKind.UNKNOWN
     best_score = max(scores.values())
@@ -318,8 +386,8 @@ def _infer_kind(text: str) -> TaskKind:
 
 # 置信度语义：信号强度（权重归一）乘歧义系数（与次高分的差距）。
 # 差距小于该阈值视为歧义（同句命中多个意图），应触发澄清而不是猜。
-_AMBIGUITY_GAP = 0.5
-_MAX_RULE_WEIGHT = 3.0
+_AMBIGUITY_GAP = 0.7
+_MAX_RULE_WEIGHT = 3.4
 # 存档/恢复类信号（纯存档请求是明确意图，不是低置信度）。
 _ARCHIVE_KINDS = frozenset({TaskKind.SAVE_MEMORY, TaskKind.RESTORE_MEMORY})
 _ARCHIVE_SIGNALS = re.compile(
@@ -327,15 +395,19 @@ _ARCHIVE_SIGNALS = re.compile(
 )
 
 
-def infer_kind_with_confidence(text: str) -> tuple[TaskKind, float]:
+def infer_kind_with_confidence(
+    text: str,
+    *,
+    excluded_kinds: frozenset[TaskKind] = frozenset(),
+) -> tuple[TaskKind, float]:
     """对外暴露 kind + 置信度（0-1），便于路由层在低分时改问用户。
 
     confidence 综合信号强度与歧义：权重越高越强；与次高分差距越小越不确定。
     """
-    scores = _score_kinds(text)
+    scores = _score_kinds(text, excluded_kinds=excluded_kinds)
     if not scores:
         return TaskKind.UNKNOWN, 0.0
-    kind = _infer_kind(text)
+    kind = _infer_kind(text, excluded_kinds=excluded_kinds)
     best = scores[kind]
     second = max(
         (score for cand, score in scores.items() if cand is not kind),
@@ -350,13 +422,41 @@ def infer_kind_with_confidence(text: str) -> tuple[TaskKind, float]:
         ambiguity = 1.0
     confidence = strength * ambiguity
 
+    # 并列执行意图回入口补问，不把低置信度猜测伪装成确定路由。
+    # 市场事实、会员数据属于前置步骤；显式先后顺序也保留第一步。
+    has_order = bool(re.search(r"(据此|定稿后)", text))
+    precedence = {TaskKind.MARKET_RESEARCH, TaskKind.MEMBERSHIP_DATA}
+    if (
+        second > 0
+        and gap < _AMBIGUITY_GAP
+        and kind not in precedence
+        and not has_order
+    ):
+        kind = TaskKind.UNKNOWN
+
     # 纯存档请求只命中存档类，是明确意图，直接抬高置信度。
     if kind in _ARCHIVE_KINDS and not (scores.keys() - _ARCHIVE_KINDS):
         confidence = 0.9
     # 内容优先的混合场景（保存+朋友圈）本身已明确，轻微上调。
     if kind in _CONTENT_KINDS and _ARCHIVE_SIGNALS.search(text):
         confidence = min(1.0, confidence + 0.15)
+    if kind in precedence:
+        confidence = max(confidence, 0.9)
     return kind, round(confidence, 3)
+
+
+def _infer_industry(text: str) -> str:
+    for industry, pattern in _INDUSTRY_RULES:
+        if pattern.search(text):
+            return industry
+    return ""
+
+
+def _infer_stage(text: str) -> str:
+    for stage, pattern in _STAGE_RULES:
+        if pattern.search(text):
+            return stage
+    return ""
 
 
 def _infer_channel(kind: TaskKind, text: str) -> Channel:
@@ -375,6 +475,7 @@ def _infer_goal(kind: TaskKind, text: str) -> Goal:
     if kind in {
         TaskKind.DIAGNOSIS,
         TaskKind.MARKET_RESEARCH,
+        TaskKind.MEMBERSHIP_DATA,
         TaskKind.STRATEGY_REVIEW,
     }:
         fallback = Goal.DIAGNOSIS
@@ -382,6 +483,7 @@ def _infer_goal(kind: TaskKind, text: str) -> Goal:
         TaskKind.SAVE_MEMORY,
         TaskKind.RESTORE_MEMORY,
         TaskKind.REPORT,
+        TaskKind.UPDATE,
     }:
         fallback = Goal.DOCUMENTATION
     else:
@@ -411,6 +513,63 @@ _HINT_KEYS = frozenset(
 )
 
 
+def task_routing_contract() -> dict[str, Any]:
+    """Serialize the deterministic parser rules for prompt-only distributions."""
+    return {
+        "task_schema_version": SCHEMA_VERSION,
+        "task_kinds": [item.value for item in TaskKind],
+        "channels": [item.value for item in Channel],
+        "goals": [item.value for item in Goal],
+        "risk_levels": [item.value for item in RiskLevel],
+        "kind_rules": [
+            {
+                "kind": kind.value,
+                "pattern": pattern.pattern,
+                "ignore_case": bool(pattern.flags & re.IGNORECASE),
+                "weight": weight,
+            }
+            for kind, pattern, weight in _KIND_RULES
+        ],
+        "kind_rule_order_is_tiebreaker": True,
+        "content_kinds": sorted(item.value for item in _CONTENT_KINDS),
+        "archive_kinds": sorted(item.value for item in _ARCHIVE_KINDS),
+        "archive_signal_pattern": _ARCHIVE_SIGNALS.pattern,
+        "confidence": {
+            "ambiguity_gap": _AMBIGUITY_GAP,
+            "max_rule_weight": _MAX_RULE_WEIGHT,
+            "clarify_threshold": CONFIDENCE_CLARIFY_THRESHOLD,
+        },
+        "goal_rules": [
+            {"goal": goal.value, "pattern": pattern.pattern}
+            for goal, pattern in _GOAL_RULES
+        ],
+        "industry_rules": [
+            {"industry": industry, "pattern": pattern.pattern}
+            for industry, pattern in _INDUSTRY_RULES
+        ],
+        "stage_rules": [
+            {"stage": stage, "pattern": pattern.pattern}
+            for stage, pattern in _STAGE_RULES
+        ],
+        "overrides": {
+            "verified_market_snapshot_excludes": TaskKind.MARKET_RESEARCH.value,
+            "completed_content_archive_pattern": (
+                r"(已(经)?定稿|不要重写|只存档) + (保存|存档|留下)"
+            ),
+            "ambiguous_parallel_intent_kind": TaskKind.UNKNOWN.value,
+            "precedence_kinds": [
+                TaskKind.MARKET_RESEARCH.value,
+                TaskKind.MEMBERSHIP_DATA.value,
+            ],
+        },
+        "risk_rules": {
+            "high": _HIGH_RISK.pattern,
+            "medium": _MEDIUM_RISK.pattern,
+        },
+        "hint_keys": sorted(_HINT_KEYS),
+    }
+
+
 def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
     """把自然语言转成 Task；显式 hints 始终覆盖规则推断。"""
     clean_text = str(text).strip()
@@ -421,7 +580,27 @@ def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
             f"未知 hint 字段：{', '.join(sorted(unknown_hints))}；"
             f"合法字段：{', '.join(sorted(_HINT_KEYS))}"
         )
-    inferred_kind = _infer_kind(clean_text)
+    raw_context = supplied.get("context")
+    verified_snapshot = (
+        isinstance(raw_context, Mapping)
+        and raw_context.get("verified_market_snapshot") is True
+    )
+    excluded = (
+        frozenset({TaskKind.MARKET_RESEARCH})
+        if verified_snapshot
+        else frozenset()
+    )
+    inferred_kind, inferred_confidence = infer_kind_with_confidence(
+        clean_text,
+        excluded_kinds=excluded,
+    )
+    # 已完成内容且明确要求“不重写/只存档”，以存档动作覆盖内容名词。
+    if (
+        re.search(r"(已(经)?定稿|不要重写|只存档)", clean_text)
+        and re.search(r"(保存|存档|留下)", clean_text)
+    ):
+        inferred_kind = TaskKind.SAVE_MEMORY
+        inferred_confidence = 0.9
     effective_kind = _enum_value(
         TaskKind,
         supplied.get("kind", inferred_kind.value),
@@ -437,6 +616,8 @@ def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
         "channel": inferred_channel.value,
         "goal": inferred_goal.value,
         "risk": inferred_risk.value,
+        "industry": _infer_industry(clean_text),
+        "stage": _infer_stage(clean_text),
     }
     payload.update(supplied)
     payload["source_text"] = clean_text
@@ -446,6 +627,5 @@ def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
     if "kind" in supplied:
         payload["confidence"] = 1.0
     else:
-        _kind, confidence = infer_kind_with_confidence(clean_text)
-        payload["confidence"] = confidence
+        payload["confidence"] = inferred_confidence
     return Task.from_dict(payload)
