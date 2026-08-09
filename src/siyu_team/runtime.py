@@ -6,12 +6,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-import hashlib
-import json
 from typing import Any, Mapping
 
 from .context import AgentContext, build_agent_context
-from .knowledge.growth_layers import format_growth_atoms_for_context
+from .knowledge.assembler import KnowledgeAssembler
+from .knowledge.growth_layers import describe_growth_load
 from .roster import MAX_OFFICERS, load_roster, normalize_officers
 from .routing import RouteDecision, route_task
 from .task import Task, TaskKind, parse_task
@@ -21,21 +20,15 @@ from .tracing import TraceRecorder
 # 内置四官（roster 缺失/损坏时的回退名单；正常路径从 roster 读取）。
 PANEL_OFFICERS = ("公关官", "产品官", "广告官", "合规官")
 PLAN_SCHEMA_VERSION = "1.0"
-LEGACY_CORPUS_VERSION = "0.3.0"
+EMPTY_CORPUS_HASH = (
+    "sha256:e3b0c44298fc1c149afbf4c8996fb924"
+    "27ae41e4649b934ca495991b7852b855"
+)
 
 
 class RuntimeMode(str, Enum):
     PYTHON = "python"
     PROMPT_ONLY = "prompt_only"
-
-# 诊断与全盘诊断注入增长 draft 原子
-_GROWTH_CONTEXT_KINDS = frozenset(
-    {
-        TaskKind.DIAGNOSIS,
-        TaskKind.STRATEGY_REVIEW,
-    }
-)
-
 
 @dataclass(frozen=True)
 class ExecutionPlan:
@@ -51,7 +44,15 @@ class ExecutionPlan:
     growth_load_note: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        knowledge = dict(self.knowledge or _legacy_knowledge(self.growth_atoms))
+        knowledge = dict(
+            self.knowledge
+            or {
+                "corpus_version": "unavailable",
+                "corpus_hash": EMPTY_CORPUS_HASH,
+                "selection_count": 0,
+                "atoms": [],
+            }
+        )
         return {
             "plan_schema_version": self.plan_schema_version,
             "runtime_mode": self.runtime_mode.value,
@@ -66,25 +67,6 @@ class ExecutionPlan:
             "growth_atoms": [dict(row) for row in self.growth_atoms],
             "growth_load_note": self.growth_load_note,
         }
-
-
-def _legacy_knowledge(
-    growth_atoms: tuple[dict[str, Any], ...],
-) -> dict[str, Any]:
-    """Expose legacy rows through the v1 envelope until PR-03 replaces loading."""
-    atoms = [dict(row) for row in growth_atoms]
-    canonical = json.dumps(
-        atoms,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    return {
-        "corpus_version": LEGACY_CORPUS_VERSION,
-        "corpus_hash": "sha256:" + hashlib.sha256(canonical).hexdigest(),
-        "selection_count": len(atoms),
-        "atoms": atoms,
-    }
 
 
 def _panel_from_roster(roster: Mapping[str, Any]) -> tuple[tuple[str, frozenset[str] | None], ...]:
@@ -116,12 +98,14 @@ class SiyuRuntime:
         self,
         trace_recorder: TraceRecorder | None = None,
         roster: Mapping[str, Any] | None = None,
+        knowledge_assembler: KnowledgeAssembler | None = None,
     ) -> None:
         self.trace_recorder = trace_recorder or TraceRecorder()
         # 官名单来自 roster（默认 examples/roster.example.json 或内置四官）。
         self._panel = _panel_from_roster(roster if roster is not None else load_roster())
-        # 增长原子内存缓存：key=归一化业态，生命周期与实例绑定，跨 plan 复用。
-        self._atom_cache: dict[str, tuple[Any, ...]] = {}
+        # Corpus 由 Assembler 在首次 plan 时严格加载并在实例内复用。
+        # 选择结果不按业态缓存，因为它必须随任务与路由变化。
+        self._knowledge_assembler = knowledge_assembler or KnowledgeAssembler()
 
     def plan(
         self,
@@ -134,11 +118,14 @@ class SiyuRuntime:
         decision = route_task(task)
         trace_id = self.trace_recorder.new_trace_id()
 
-        growth_atoms: tuple[dict[str, Any], ...] = ()
+        selection = self._knowledge_assembler.assemble(task, decision)
+        growth_atoms = selection.context_rows()
         growth_note = ""
-        if task.kind in _GROWTH_CONTEXT_KINDS:
-            growth_atoms, growth_note = format_growth_atoms_for_context(
-                task.industry, cache=self._atom_cache
+        if growth_atoms:
+            growth_note = (
+                f"{describe_growth_load(task.industry)}"
+                f"（已按任务与路由相关性装配 "
+                f"{selection.selection_count} 条）"
             )
 
         shared: dict[str, Any] | None = None
@@ -165,12 +152,8 @@ class SiyuRuntime:
             trace_id=trace_id,
             task=task,
             decision=decision,
-            knowledge=_legacy_knowledge(growth_atoms),
-            warnings=(
-                ("legacy_growth_selection_pending_strict_corpus",)
-                if growth_atoms
-                else ()
-            ),
+            knowledge=selection.to_dict(),
+            warnings=selection.warnings,
             agent_contexts=contexts,
             growth_atoms=growth_atoms,
             growth_load_note=growth_note,
@@ -183,16 +166,27 @@ class SiyuRuntime:
                 trace_id, task.task_id, "task.routed", decision.to_dict()
             )
             if growth_atoms or growth_note:
+                knowledge_payload = {
+                    "corpus_version": selection.corpus_version,
+                    "corpus_hash": selection.corpus_hash,
+                    "count": selection.selection_count,
+                    "note": growth_note,
+                    "locators": [row.get("locator") for row in growth_atoms[:20]],
+                    "kind": task.kind.value,
+                    "skill": decision.skill,
+                }
+                self.trace_recorder.emit(
+                    trace_id,
+                    task.task_id,
+                    "knowledge.attached",
+                    knowledge_payload,
+                )
+                # 保留旧事件名一个稳定版本，让现有 trace 消费方可平滑迁移。
                 self.trace_recorder.emit(
                     trace_id,
                     task.task_id,
                     "growth_atoms.attached",
-                    {
-                        "count": len(growth_atoms),
-                        "note": growth_note,
-                        "locators": [row.get("locator") for row in growth_atoms[:20]],
-                        "kind": task.kind.value,
-                    },
+                    knowledge_payload,
                 )
             if contexts:
                 self.trace_recorder.emit(

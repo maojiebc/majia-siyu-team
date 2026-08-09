@@ -9,7 +9,14 @@ import os
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from siyu_team.knowledge import KnowledgeAtomV2, KnowledgeValidationError
+from siyu_team.knowledge import (
+    Corpus,
+    KnowledgeAssembler,
+    KnowledgeAtomV2,
+    KnowledgeValidationError,
+)
+from siyu_team.routing import route_task
+from siyu_team.task import Goal, Task, TaskKind
 
 from .models import GenerationManifest, PilotTask, PilotValidationError, THEMES, canonical_json
 
@@ -22,6 +29,12 @@ KNOWLEDGE_HEADER = """## 本次可使用的行业知识
 以下内容只作为条件性证据，不是绝对规则。
 每条包含成立条件和失效边界。不得超出证据范围。"""
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
+PILOT_SELECTION_LIMIT = 3
+_PILOT_GOALS = {
+    "add_wechat": Goal.ACQUISITION,
+    "activity_increment": Goal.CONVERSION,
+    "repurchase_recall": Goal.RETENTION,
+}
 
 
 def _sha256_text(value: str) -> str:
@@ -237,6 +250,18 @@ def _is_inside_repository(path: Path) -> bool:
         return False
 
 
+def _runtime_task(task: PilotTask) -> Task:
+    """把 Golden Task 转成与生产装配器共用的结构化任务。"""
+    return Task(
+        kind=TaskKind.DIAGNOSIS,
+        source_text=task.request,
+        goal=_PILOT_GOALS[task.theme],
+        industry="catering",
+        context={**dict(task.context), "pilot_theme": task.theme},
+        task_id=f"task_{task.id}",
+    )
+
+
 def prepare_run(
     *,
     tasks: Sequence[PilotTask],
@@ -264,16 +289,41 @@ def prepare_run(
         )
     selected_mapping = {task.id: mapping[task.id] for task in selected if task.id in mapping}
     validate_mapping(selected, atoms, selected_mapping)
-    atom_by_id = {atom.id: atom for atom in atoms}
+    # mapping 仅是事先登记的期望参考，不再直接拼装 knowledge prompt。
+    # 实际试验输入与生产 Runtime 共用 KnowledgeAssembler。
+    corpus = Corpus.from_atoms(
+        sorted(atoms, key=lambda item: item.id),
+        corpus_version="pilot-controlled-v1",
+        release_batch="pilot-controlled",
+    )
+    assembler = KnowledgeAssembler(
+        corpus=corpus,
+        limit=PILOT_SELECTION_LIMIT,
+        public_runtime=False,
+    )
     _private_dir(output)
     baseline_dir = output / "generation" / "baseline"
     knowledge_dir = output / "generation" / "knowledge"
     for directory in (baseline_dir, knowledge_dir, output / "blind" / "pairs", output / "results"):
         _private_dir(directory)
+    selected_atoms: dict[str, tuple[KnowledgeAtomV2, ...]] = {}
+    selected_atom_ids: dict[str, list[str]] = {}
+    expected_atom_ids: dict[str, list[str]] = {}
     for task in selected:
-        mapped = tuple(atom_by_id[atom_id] for atom_id in selected_mapping[task.id])
+        runtime_task = _runtime_task(task)
+        selection = assembler.assemble(runtime_task, route_task(runtime_task))
+        if not selection.raw_atoms:
+            raise PilotValidationError(
+                f"Assembler 未为 Task 选出知识：{task.id}"
+            )
+        selected_atoms[task.id] = selection.raw_atoms
+        selected_atom_ids[task.id] = [atom.id for atom in selection.raw_atoms]
+        expected_atom_ids[task.id] = list(selected_mapping[task.id])
         write_private_text(baseline_dir / f"{task.id}.md", _prompt(task))
-        write_private_text(knowledge_dir / f"{task.id}.md", _prompt(task, mapped))
+        write_private_text(
+            knowledge_dir / f"{task.id}.md",
+            _prompt(task, selected_atoms[task.id]),
+        )
 
     task_payload = [task.to_dict() for task in selected]
     atom_payload = [atom.to_dict() for atom in sorted(atoms, key=lambda item: item.id)]
@@ -294,7 +344,17 @@ def prepare_run(
         "manifest": manifest.to_dict(),
         "seed": seed,
         "tasks": task_payload,
-        "task_atom_counts": {task.id: len(selected_mapping[task.id]) for task in selected},
+        "knowledge_assembler": {
+            "mode": "shared_runtime_assembler",
+            "selection_limit": PILOT_SELECTION_LIMIT,
+            "corpus_version": corpus.corpus_version,
+            "corpus_hash": corpus.corpus_hash,
+        },
+        "task_atom_counts": {
+            task.id: len(selected_atoms[task.id]) for task in selected
+        },
+        "task_selected_atom_ids": selected_atom_ids,
+        "task_expected_atom_ids": expected_atom_ids,
     }
     write_private_text(output / "manifest.json", json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
     return output

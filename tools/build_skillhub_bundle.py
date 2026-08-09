@@ -20,6 +20,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 ROUTER = ROOT / "plugins/siyu-core/skills/majia-siyu"
 DEFAULT_OUTPUT = ROOT / "skillhub/majia-siyu"
+PUBLIC_KNOWLEDGE = ROOT / "src/siyu_team/knowledge/data"
 RASTER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico"}
 
 # 随包分发的公开知识子集；03-majia-sop 是护城河，永不进包。
@@ -29,8 +30,9 @@ KNOWLEDGE_PUBLIC_DIRS = (
     "02-industry",
     "04-atoms",
 )
-# 随包分发的原子工具（零依赖可跑；atoms_validate 分发态自动降级 v1-only）。
+# 随包分发的原子工具（零依赖，在分发态也执行严格 v2 契约）。
 BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
+BUNDLED_KNOWLEDGE_MODULES = ("models.py", "paths.py", "corpus.py", "query.py")
 ROUTE_CONTRACT = ROUTER / "references/route-contract.json"
 # 包内路径重写：SKILL.md 里的仓库根相对引用改指包内 _knowledge，
 # 否则独立安装态全是死指针。顺序敏感：先收相对逃逸，再收裸路径；
@@ -119,12 +121,12 @@ def copy_knowledge(output: Path) -> int:
     target.mkdir(parents=True, exist_ok=True)
     copied = 0
     for name in KNOWLEDGE_PUBLIC_DIRS:
-        source = ROOT / "knowledge" / name
+        source = PUBLIC_KNOWLEDGE / name
         if not source.is_dir():
             raise RuntimeError(f"公开知识目录缺失：{source}")
         shutil.copytree(source, target / name)
         copied += sum(1 for path in (target / name).rglob("*") if path.is_file())
-    manifest = ROOT / "knowledge" / "manifest.json"
+    manifest = PUBLIC_KNOWLEDGE / "manifest.json"
     if manifest.exists():
         shutil.copy2(manifest, target / "manifest.json")
         copied += 1
@@ -135,12 +137,23 @@ def copy_knowledge(output: Path) -> int:
 
 
 def copy_tools(output: Path) -> int:
-    """SKILL.md 引用的原子工具随包走，独立安装态命令不再是死指针。"""
+    """Ship query tools plus their strict knowledge-only Python support."""
     target = output / "tools"
     target.mkdir(parents=True, exist_ok=True)
     for name in BUNDLED_TOOLS:
         shutil.copy2(ROOT / "tools" / name, target / name)
-    return len(BUNDLED_TOOLS)
+    package = target / "siyu_team"
+    knowledge_package = package / "knowledge"
+    knowledge_package.mkdir(parents=True)
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (knowledge_package / "__init__.py").write_text("", encoding="utf-8")
+    shutil.copy2(ROOT / "src/siyu_team/errors.py", package / "errors.py")
+    for name in BUNDLED_KNOWLEDGE_MODULES:
+        source = ROOT / "src/siyu_team/knowledge" / name
+        if not source.is_file():
+            raise RuntimeError(f"知识查询模块缺失：{source}")
+        shutil.copy2(source, knowledge_package / name)
+    return len(BUNDLED_TOOLS) + len(BUNDLED_KNOWLEDGE_MODULES) + 3
 
 
 def copy_runtime_contract(output: Path) -> int:

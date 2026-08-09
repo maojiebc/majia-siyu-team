@@ -23,6 +23,7 @@ atoms:
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/atoms_validate.py knowledge/04-atoms/growth-layers.approved.jsonl
 	@cmp -s knowledge/04-atoms/growth-layers.approved.jsonl tests/fixtures/pilot/growth-approved-atoms.jsonl \
 		|| { echo "❌ approved 本体与 Pilot 夹具漂移：重跑 PYTHONPATH=src python3 tools/build_growth_atoms.py"; exit 1; }
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/sync_public_knowledge.py --check
 	@echo "原子闸门通过：本体与夹具零漂移"
 
 # 仓库与已提交 SkillHub 包的 Markdown 本地链接。

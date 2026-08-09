@@ -1,0 +1,3 @@
+# Generated wheel knowledge must remain byte-identical to its Markdown truth source.
+# Source documents intentionally use two trailing spaces for Markdown hard breaks.
+src/siyu_team/knowledge/data/** -whitespace

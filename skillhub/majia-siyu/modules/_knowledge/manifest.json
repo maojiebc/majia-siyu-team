@@ -1,10 +1,24 @@
 {
   "schema_version": "1.0",
-  "corpus_version": "0.3.0",
+  "corpus_version": "0.4.0",
+  "release_batch": "2026-08-09-v1.4.2-stabilization",
+  "corpus_hash": "sha256:b415e13ab62e28afba1b9e4ebedf8ee5aa24f7c710568dc5e8bc3ad6bc330802",
+  "atom_count": 35,
+  "atom_schema_version": "2.0",
   "atom_schema": "04-atoms/schema/atom-v2.schema.json",
-  "public_corpora": [],
-  "status": "pilot-validation",
-  "notes": "增长 L0/L1 正式集 approved；route_task + 诊断注入；Pilot 双夹具校验。",
+  "public_corpora": [
+    {
+      "name": "growth-layers",
+      "path": "04-atoms/growth-layers.approved.jsonl",
+      "corpus_version": "0.4.0",
+      "release_batch": "2026-08-09-v1.4.2-stabilization",
+      "sha256": "sha256:b415e13ab62e28afba1b9e4ebedf8ee5aa24f7c710568dc5e8bc3ad6bc330802",
+      "atom_count": 35,
+      "schema_version": "2.0"
+    }
+  ],
+  "status": "editorial-approved",
+  "notes": "增长 L0/L1 原子已完成编辑与安全批准；不代表 Pilot 或真实业务效果已验证。",
   "methodology": [
     "00-methodology/私域公理与消解案例库.md",
     "00-methodology/L0-通用用户增长原则.md",

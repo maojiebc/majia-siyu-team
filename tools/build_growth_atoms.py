@@ -23,6 +23,7 @@ from siyu_team.knowledge.models import (  # noqa: E402
     Applicability,
     KnowledgeAtomV2,
     Lifecycle,
+    Metric,
     Privacy,
     Quality,
     Scope,
@@ -31,7 +32,7 @@ from siyu_team.knowledge.models import (  # noqa: E402
 from siyu_team.pilot.models import THEMES  # noqa: E402
 
 SECTION_RE = re.compile(r"^### (L0-\d+|L1-C\d+|L1-\d+)\s+(.+)$", re.M)
-FIELD_RE = re.compile(r"^- \*\*(.+?)：\*\*\s*(.+)$", re.M)
+FIELD_RE = re.compile(r"^- \*\*(.+?)(?:：)?\*\*\s*[：:]?\s*(.+)$", re.M)
 
 # 每个逻辑 id 绑定唯一 Pilot 主题（add_wechat / activity_increment / repurchase_recall）
 PILOT_THEME_BY_LOCATOR: dict[str, str] = {
@@ -83,7 +84,11 @@ def _parse_sections(text: str) -> list[dict[str, str]]:
         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
         body = text[start:end].strip()
         fields = {"id": m.group(1), "title": m.group(2).strip()}
-        jm = re.search(r"^- \*\*判断：\*\*\s*(.+)$", body, re.M)
+        jm = re.search(
+            r"^- \*\*判断(?:：)?\*\*\s*[：:]?\s*(.+)$",
+            body,
+            re.M,
+        )
         if jm:
             fields["statement"] = jm.group(1).strip()
         else:
@@ -163,9 +168,30 @@ def build_atom(
     if why:
         preconditions.append(f"依据：{why[:160]}")
     preconditions.append("业态：通用（L0）" if not industry else f"业态层：{industry}")
-    recommended = [action] if action else []
-    failure_modes = [failure] if failure else []
-    counterexamples = [boundary] if boundary else []
+    recommended = [action] if action else [f"按此判断执行最小动作：{statement[:80]}"]
+    failure_modes = [failure] if failure else ["成立条件不满足时直接套用该判断"]
+    counterexamples = [
+        boundary
+        if boundary
+        else "缺少可验证的前置数据时，应先补数而不是直接套用"
+    ]
+    metric_by_theme = {
+        "add_wechat": Metric(
+            "有效加微率",
+            "有效添加企业微信的人数除以可观测触点人数",
+            "同一活动或观察周期",
+        ),
+        "activity_increment": Metric(
+            "关键行为转化率",
+            "完成本次目标行为的人数除以可触达人数",
+            "同一活动或观察周期",
+        ),
+        "repurchase_recall": Metric(
+            "观察窗复购率",
+            "观察窗内再次消费人数除以符合观察条件人数",
+            "按品类复购周期设定",
+        ),
+    }
 
     quality = (
         Quality(
@@ -207,7 +233,7 @@ def build_atom(
         applicability=Applicability(
             preconditions=tuple(preconditions),
             recommended_action=tuple(recommended),
-            metrics=(),
+            metrics=(metric_by_theme[pilot_theme],),
             failure_modes=tuple(failure_modes),
             counterexamples=tuple(counterexamples),
         ),

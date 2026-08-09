@@ -12,7 +12,12 @@ from pathlib import Path
 import re
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+TOOL_ROOT = Path(__file__).resolve().parent
+REPOSITORY_ROOT = TOOL_ROOT.parent
+# SkillHub 会把严格知识模型放到 tools/siyu_team；源码态则使用 src/。
+# 两者都在 ``python -I`` 下显式注入，避免偷吃用户 site-packages。
+sys.path.insert(0, str(REPOSITORY_ROOT / "src"))
+sys.path.insert(0, str(TOOL_ROOT))
 
 try:
     from siyu_team.knowledge.models import (  # noqa: E402
@@ -59,6 +64,21 @@ def validate_atom_v2(atom: dict, line: int, skills: set[str]) -> list[str]:
     unknown = [s for s in parsed.skills if s not in skills]
     if skills and unknown:
         return [f"{prefix}: skills 引用了不存在的目录 {unknown!r}"]
+    if parsed.quality.review_status == "approved":
+        applicability = parsed.applicability
+        missing: list[str] = []
+        if not applicability.preconditions:
+            missing.append("precondition")
+        if not applicability.recommended_action:
+            missing.append("action")
+        if not applicability.metrics and not any(
+            "不适用" in item for item in applicability.preconditions
+        ):
+            missing.append("metric 或不适用说明")
+        if not applicability.failure_modes and not applicability.counterexamples:
+            missing.append("failure mode/counterexample")
+        if missing:
+            return [f"{prefix}: approved 原子缺少：{', '.join(missing)}"]
     return []
 
 

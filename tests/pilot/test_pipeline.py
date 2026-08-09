@@ -121,6 +121,49 @@ class PilotPipelineTest(unittest.TestCase):
             with self.assertRaisesRegex(PilotValidationError, "尚未"):
                 create_blind_pairs(run)
 
+    def test_mapping_is_expectation_not_prompt_assembly_input(self) -> None:
+        task = self.tasks[0]
+        alternate = dict(self.mapping)
+        alternate[task.id] = ("ka_0000000000000002",)
+        self.assertNotEqual(alternate[task.id], self.mapping[task.id])
+
+        with tempfile.TemporaryDirectory() as temporary:
+            first = Path(temporary) / "run-mapping-a"
+            second = Path(temporary) / "run-mapping-b"
+            prepare_run(
+                tasks=self.tasks,
+                atoms=self.atoms,
+                mapping=self.mapping,
+                output=first,
+                seed=7,
+                limit=1,
+            )
+            prepare_run(
+                tasks=self.tasks,
+                atoms=self.atoms,
+                mapping=alternate,
+                output=second,
+                seed=7,
+                limit=1,
+            )
+            first_prompt = first / "generation" / "knowledge" / f"{task.id}.md"
+            second_prompt = second / "generation" / "knowledge" / f"{task.id}.md"
+            self.assertEqual(first_prompt.read_bytes(), second_prompt.read_bytes())
+
+            payload = json.loads((second / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(
+                payload["knowledge_assembler"]["mode"],
+                "shared_runtime_assembler",
+            )
+            self.assertEqual(
+                payload["task_expected_atom_ids"][task.id],
+                list(alternate[task.id]),
+            )
+            self.assertNotEqual(
+                payload["task_selected_atom_ids"][task.id],
+                payload["task_expected_atom_ids"][task.id],
+            )
+
     def test_thirty_tasks_three_reviewers_can_reach_preregistered_pass(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             run = Path(temporary) / "run-full"

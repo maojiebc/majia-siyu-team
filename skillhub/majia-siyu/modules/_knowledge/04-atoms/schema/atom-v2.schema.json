@@ -111,6 +111,69 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "privacy": {
+            "properties": {"exportable": {"const": true}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope": {
+            "properties": {"visibility": {"const": "public"}}
+          },
+          "privacy": {
+            "properties": {
+              "contains_pii": {"const": false},
+              "contains_client_secret": {"const": false}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "properties": {"review_status": {"const": "approved"}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "applicability": {
+            "properties": {
+              "preconditions": {"minItems": 1},
+              "recommended_action": {"minItems": 1}
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {"properties": {"metrics": {"minItems": 1}}},
+                  {
+                    "properties": {
+                      "preconditions": {
+                        "contains": {"type": "string", "pattern": "不适用"}
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {"properties": {"failure_modes": {"minItems": 1}}},
+                  {"properties": {"counterexamples": {"minItems": 1}}}
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "uniqueStrings": {
       "type": "array",

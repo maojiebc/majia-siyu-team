@@ -110,7 +110,8 @@ class GrowthLayerTests(unittest.TestCase):
             routing="test",
         )
         self.assertIn("增长参考", prompt)
-        self.assertIn("L0-01", prompt)
+        self.assertRegex(prompt, r"\[L0-\d+\|l0\]")
+        self.assertIn("按任务与路由相关性装配", prompt)
 
 
 

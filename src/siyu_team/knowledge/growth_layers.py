@@ -18,9 +18,9 @@ from pathlib import Path
 from typing import Iterable
 
 from ..errors import KnowledgeLoadError
+from .corpus import CorpusLoader
 from .models import KnowledgeAtomV2, generate_atom_id, generate_source_id
 from .paths import (
-    GROWTH_ATOMS_APPROVED,
     GROWTH_ATOMS_DRAFT,
     GROWTH_INDEX_DOC,
     KnowledgePathResolver,
@@ -111,13 +111,19 @@ def select_atoms_for_skill(
 
 
 def _find_growth_atoms_file(resolver: KnowledgePathResolver) -> Path | None:
-    """优先正式 approved，其次 draft（兼容）。"""
-    names = (GROWTH_ATOMS_APPROVED, GROWTH_ATOMS_DRAFT)
+    """只发现 approved；draft 永不参与生产候选。"""
+    for candidate, _manifest in resolver.approved_corpus_candidates():
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _find_growth_draft_file(resolver: KnowledgePathResolver) -> Path | None:
+    """开发态显式查找 draft；不得被生产加载器调用。"""
     for root in resolver.candidates():
-        for name in names:
-            candidate = root / name
-            if candidate.is_file():
-                return candidate
+        candidate = root / GROWTH_ATOMS_DRAFT
+        if candidate.is_file():
+            return candidate
     return None
 
 
@@ -127,8 +133,24 @@ def load_growth_draft_atoms(
     resolver: KnowledgePathResolver | None = None,
     cache: dict[str, tuple[KnowledgeAtomV2, ...]] | None = None,
 ) -> tuple[KnowledgeAtomV2, ...]:
-    """读取增长原子并按业态过滤（函数名保留兼容；优先 approved 正式集）。"""
-    return load_growth_atoms(industry, resolver=resolver, cache=cache)
+    """显式读取开发 draft 并按业态过滤。
+
+    该 API 只供编辑/迁移工具使用。生产 Runtime 只经过
+    :class:`CorpusLoader` 加载 manifest 声明的 approved 正式集。
+    """
+    normalized = (industry or "").strip().lower()
+    cache_key = f"draft:{normalized}"
+    if cache is not None and cache_key in cache:
+        return cache[cache_key]
+    active_resolver = resolver or KnowledgePathResolver()
+    path = _find_growth_draft_file(active_resolver)
+    if path is None:
+        atoms: tuple[KnowledgeAtomV2, ...] = ()
+    else:
+        atoms = filter_atoms_by_growth_layer(_read_atom_lines(path), normalized)
+    if cache is not None:
+        cache[cache_key] = atoms
+    return atoms
 
 
 def load_growth_atoms(
@@ -156,10 +178,13 @@ def _read_growth_atoms(
     *,
     resolver: KnowledgePathResolver | None,
 ) -> tuple[KnowledgeAtomV2, ...]:
-    resolver = resolver or KnowledgePathResolver()
-    path = _find_growth_atoms_file(resolver)
-    if path is None:
-        return ()
+    active_resolver = resolver or KnowledgePathResolver()
+    corpus = CorpusLoader(active_resolver).load()
+    return filter_atoms_by_growth_layer(corpus.atoms, industry)
+
+
+def _read_atom_lines(path: Path) -> tuple[KnowledgeAtomV2, ...]:
+    """读取显式开发文件；不替代 CorpusLoader 的正式门禁。"""
     atoms: list[KnowledgeAtomV2] = []
     for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         line = line.strip()
@@ -171,7 +196,7 @@ def _read_growth_atoms(
             raise KnowledgeLoadError(
                 f"增长原子解析失败：{path}:{line_no}（{exc}）"
             ) from exc
-    return filter_atoms_by_growth_layer(atoms, industry)
+    return tuple(atoms)
 
 
 def describe_growth_load(industry: str = "") -> str:
@@ -191,10 +216,10 @@ def format_growth_atoms_for_context(
     resolver: KnowledgePathResolver | None = None,
     cache: dict[str, tuple[KnowledgeAtomV2, ...]] | None = None,
 ) -> tuple[tuple[dict, ...], str]:
-    """供诊断/全盘诊断上下文使用的精简原子列表 + 人话加载说明。
+    """兼容旧调用方的分层原子列表 + 人话加载说明。
 
-    只输出 locator/statement/type/layer，控制体积；正式集进入诊断上下文
-    （仍不是 Pilot approved 检索真源）。
+    Runtime 已经由 :class:`KnowledgeAssembler` 按任务相关性装配；
+    本函数仅保留 API 兼容，不是生产选择器。
     """
     atoms = load_growth_atoms(industry, resolver=resolver, cache=cache)
     note = describe_growth_load(industry)
