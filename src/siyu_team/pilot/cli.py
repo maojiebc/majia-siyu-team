@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 from siyu_team.knowledge import KnowledgeValidationError
 
@@ -26,6 +26,18 @@ from .scoring import score_run, write_score_report
 
 
 FIXTURE_ROOT = REPOSITORY_ROOT / "tests" / "fixtures" / "pilot"
+
+
+def _json_object(value: str) -> Mapping[str, Any]:
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise argparse.ArgumentTypeError(
+            f"model-config JSON 非法：{exc.msg}"
+        ) from exc
+    if not isinstance(parsed, Mapping):
+        raise argparse.ArgumentTypeError("model-config 必须是 JSON 对象")
+    return dict(parsed)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -57,6 +69,17 @@ def _parser() -> argparse.ArgumentParser:
     prepare.add_argument("--generated-at", default="")
     prepare.add_argument("--temperature", default="")
     prepare.add_argument("--max-output", default=0, type=int)
+    prepare.add_argument(
+        "--commit-sha",
+        default="",
+        help="生成答案所用的完整 Git commit（30 题正式运行必填）",
+    )
+    prepare.add_argument(
+        "--model-config",
+        default={},
+        type=_json_object,
+        help="其他模型参数的 JSON 对象，例如 top_p 或 reasoning_effort",
+    )
     prepare.add_argument("--limit", type=int)
     prepare.add_argument(
         "--fixture-atoms", action="store_true", help="仅开发 Dry Run 时允许仓库合成 Atom"
@@ -137,6 +160,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 generated_at=args.generated_at,
                 temperature=args.temperature,
                 max_output=args.max_output,
+                commit_sha=args.commit_sha,
+                model_config=args.model_config,
                 limit=args.limit,
             )
             print(output)

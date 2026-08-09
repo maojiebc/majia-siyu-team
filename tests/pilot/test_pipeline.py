@@ -8,7 +8,11 @@ import tempfile
 import unittest
 
 from siyu_team.pilot.blind import create_blind_pairs
-from siyu_team.pilot.models import PilotValidationError, SCORE_DIMENSIONS
+from siyu_team.pilot.models import (
+    RATING_AUDIT_FIELDS,
+    PilotValidationError,
+    SCORE_DIMENSIONS,
+)
 from siyu_team.pilot.packets import (
     load_atoms,
     load_mapping,
@@ -173,6 +177,12 @@ class PilotPipelineTest(unittest.TestCase):
                 mapping=self.mapping,
                 output=run,
                 seed=20260805,
+                model_name="fixture-model",
+                host="unittest",
+                temperature="0",
+                max_output=800,
+                commit_sha="a" * 40,
+                model_config={"top_p": 1},
             )
             for task in self.tasks:
                 for version in ("baseline", "knowledge"):
@@ -184,6 +194,7 @@ class PilotPipelineTest(unittest.TestCase):
             fields = ["reviewer_id", "task_id"]
             fields.extend(f"left_{dimension}" for dimension in SCORE_DIMENSIONS)
             fields.extend(f"right_{dimension}" for dimension in SCORE_DIMENSIONS)
+            fields.extend(RATING_AUDIT_FIELDS)
             fields.extend(("preference", "reason"))
             for reviewer_index in range(3):
                 path = Path(temporary) / f"reviewer-{reviewer_index}.csv"
@@ -216,6 +227,8 @@ class PilotPipelineTest(unittest.TestCase):
                                 for dimension in SCORE_DIMENSIONS
                             }
                         )
+                        row[f"{knowledge_side}_unsupported_precise_claims"] = 0
+                        row[f"{baseline_side}_unsupported_precise_claims"] = 1
                         writer.writerow(row)
             result = score_run(run, rating_paths)
             self.assertTrue(result["scope"]["eligible_for_h1"])

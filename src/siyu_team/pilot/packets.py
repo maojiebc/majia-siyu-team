@@ -274,6 +274,8 @@ def prepare_run(
     generated_at: str = "",
     temperature: str = "",
     max_output: int = 0,
+    commit_sha: str = "",
+    model_config: Mapping[str, Any] | None = None,
     limit: int | None = None,
 ) -> Path:
     if limit is not None and limit <= 0:
@@ -286,6 +288,32 @@ def prepare_run(
     if output.exists() and (not output.is_dir() or any(output.iterdir())):
         raise PilotValidationError(
             "输出目录非空；请使用新的 run 目录避免覆盖"
+        )
+    formal_evaluation = len(selected) == 30
+    if formal_evaluation:
+        validate_tasks(selected)
+    task_payload = [task.to_dict() for task in selected]
+    atom_payload = [atom.to_dict() for atom in sorted(atoms, key=lambda item: item.id)]
+    template_hash = _sha256_text(BASE_PROTOCOL + "\n" + KNOWLEDGE_HEADER)
+    timestamp = generated_at or datetime.now(timezone.utc).isoformat()
+    manifest = GenerationManifest(
+        run_id=output.name,
+        model_name=model_name,
+        host=host,
+        generated_at=timestamp,
+        task_hash=_sha256_text(canonical_json(task_payload)),
+        atom_corpus_hash=_sha256_text(canonical_json(atom_payload)),
+        prompt_template_hash=template_hash,
+        temperature=temperature,
+        max_output=max_output,
+        commit_sha=commit_sha,
+        model_config=dict(model_config or {}),
+    )
+    missing_config = manifest.missing_for_evaluation()
+    if formal_evaluation and missing_config:
+        raise PilotValidationError(
+            "30 题正式 H1 运行必须完整记录配置："
+            + ", ".join(missing_config)
         )
     selected_mapping = {task.id: mapping[task.id] for task in selected if task.id in mapping}
     validate_mapping(selected, atoms, selected_mapping)
@@ -325,24 +353,14 @@ def prepare_run(
             _prompt(task, selected_atoms[task.id]),
         )
 
-    task_payload = [task.to_dict() for task in selected]
-    atom_payload = [atom.to_dict() for atom in sorted(atoms, key=lambda item: item.id)]
-    template_hash = _sha256_text(BASE_PROTOCOL + "\n" + KNOWLEDGE_HEADER)
-    timestamp = generated_at or datetime.now(timezone.utc).isoformat()
-    manifest = GenerationManifest(
-        run_id=output.name,
-        model_name=model_name,
-        host=host,
-        generated_at=timestamp,
-        task_hash=_sha256_text(canonical_json(task_payload)),
-        atom_corpus_hash=_sha256_text(canonical_json(atom_payload)),
-        prompt_template_hash=template_hash,
-        temperature=temperature,
-        max_output=max_output,
-    )
     payload = {
         "manifest": manifest.to_dict(),
         "seed": seed,
+        "run_mode": (
+            "formal_evaluation" if formal_evaluation else "tooling_dry_run"
+        ),
+        "run_config_complete": not missing_config,
+        "run_config_missing": list(missing_config),
         "tasks": task_payload,
         "knowledge_assembler": {
             "mode": "shared_runtime_assembler",

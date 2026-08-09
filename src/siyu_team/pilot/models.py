@@ -1,7 +1,7 @@
 """Pilot 数据模型；只描述离线试验，不接 Runtime 或外部 API。"""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 import json
 import re
@@ -19,6 +19,10 @@ SCORE_DIMENSIONS = (
     "actionability",
 )
 PREFERENCES = ("left", "right", "tie")
+RATING_AUDIT_FIELDS = (
+    "left_unsupported_precise_claims",
+    "right_unsupported_precise_claims",
+)
 EDITORIAL_STATUSES = ("submitted", "need_info", "qualified", "rejected")
 _TASK_ID = re.compile(r"pilot_[a-z0-9_]+_[0-9]{3}")
 
@@ -176,10 +180,12 @@ class GenerationManifest:
     prompt_template_hash: str
     temperature: str
     max_output: int
+    commit_sha: str = ""
+    model_config: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "run_id", _text(self.run_id, "run_id", required=True))
-        for name in ("model_name", "host", "temperature"):
+        for name in ("model_name", "host", "temperature", "commit_sha"):
             object.__setattr__(self, name, _text(getattr(self, name), name))
         if self.generated_at:
             try:
@@ -192,19 +198,73 @@ class GenerationManifest:
                 raise PilotValidationError(f"{name} 必须是 SHA-256")
         if not isinstance(self.max_output, int) or self.max_output < 0:
             raise PilotValidationError("max_output 必须是非负整数")
+        if self.commit_sha and not re.fullmatch(
+            r"(?:[0-9a-f]{40}|[0-9a-f]{64})", self.commit_sha
+        ):
+            raise PilotValidationError("commit_sha 必须是完整的 40/64 位 Git commit")
+        config = dict(_mapping(self.model_config, "model_config"))
+        try:
+            canonical_json(config)
+        except (TypeError, ValueError) as exc:
+            raise PilotValidationError("model_config 必须可 JSON 序列化") from exc
+        object.__setattr__(self, "model_config", config)
+
+    def missing_for_evaluation(self) -> tuple[str, ...]:
+        """返回正式 H1 运行配置中缺失的字段。"""
+        missing: list[str] = []
+        for name in ("model_name", "host", "generated_at", "temperature", "commit_sha"):
+            if getattr(self, name) in {"", "未记录"}:
+                missing.append(name)
+        if self.max_output <= 0:
+            missing.append("max_output")
+        return tuple(missing)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "run_id": self.run_id,
-            "model_name": self.model_name or "未记录",
-            "host": self.host or "未记录",
-            "generated_at": self.generated_at or "未记录",
+            "model_name": self.model_name,
+            "host": self.host,
+            "generated_at": self.generated_at,
             "task_hash": self.task_hash,
             "atom_corpus_hash": self.atom_corpus_hash,
             "prompt_template_hash": self.prompt_template_hash,
-            "temperature": self.temperature or "未记录",
+            "temperature": self.temperature,
             "max_output": self.max_output,
+            "commit_sha": self.commit_sha,
+            "model_config": dict(self.model_config),
         }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "GenerationManifest":
+        required = {
+            "run_id",
+            "model_name",
+            "host",
+            "generated_at",
+            "task_hash",
+            "atom_corpus_hash",
+            "prompt_template_hash",
+            "temperature",
+            "max_output",
+        }
+        optional = {"commit_sha", "model_config"}
+        _strict_keys(data, required, optional)
+        max_output = data["max_output"]
+        if not isinstance(max_output, int) or isinstance(max_output, bool):
+            raise PilotValidationError("max_output 必须是非负整数")
+        return cls(
+            run_id=str(data["run_id"]),
+            model_name=str(data["model_name"]),
+            host=str(data["host"]),
+            generated_at=str(data["generated_at"]),
+            task_hash=str(data["task_hash"]),
+            atom_corpus_hash=str(data["atom_corpus_hash"]),
+            prompt_template_hash=str(data["prompt_template_hash"]),
+            temperature=str(data["temperature"]),
+            max_output=max_output,
+            commit_sha=str(data.get("commit_sha", "")),
+            model_config=_mapping(data.get("model_config", {}), "model_config"),
+        )
 
 
 @dataclass(frozen=True)
@@ -215,6 +275,8 @@ class BlindRating:
     right_scores: Mapping[str, int]
     preference: str
     reason: str
+    left_unsupported_precise_claims: int | None = None
+    right_unsupported_precise_claims: int | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -232,6 +294,12 @@ class BlindRating:
         object.__setattr__(self, "left_scores", dict(self.left_scores))
         object.__setattr__(self, "right_scores", dict(self.right_scores))
         object.__setattr__(self, "reason", _text(self.reason, "reason", required=True))
+        for name in RATING_AUDIT_FIELDS:
+            value = getattr(self, name)
+            if value is not None and (
+                not isinstance(value, int) or isinstance(value, bool) or value < 0
+            ):
+                raise PilotValidationError(f"{name} 必须是非负整数或留空")
 
 
 @dataclass(frozen=True)

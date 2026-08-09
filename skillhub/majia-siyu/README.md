@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.2.9-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.2-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-majia--siyu--team-171515.svg)](https://github.com/maojiebc/majia-siyu-team)
 
@@ -10,7 +10,7 @@
 
 私域经营动作全景图（统一入口 → 当前一步 → 执行 / 问诊 / 升级全盘诊断；动态事实先检索留证；知识 Pilot 仅离线验证）：
 
-![majia-siyu v1.2.9 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.4.2 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 完整框架 SVG 与源码说明见 [GitHub docs/framework.svg](https://github.com/maojiebc/majia-siyu-team/blob/main/docs/framework.svg)。
 
@@ -62,6 +62,7 @@ skillhub install siyu
 
 ## 📋 版本记录
 
+- **v1.4.2** — 入口与 Runtime / 分发契约对齐；公开知识严格装配；合规、隐私、会话和安装态边界加固。H1/H2/H3 仍待真实 Pilot 评估。
 - **v1.2.9** — 增长 L0/L1 接入路由（无业态只 L0）。
 - **v1.2.5** — 与 1.2.4 相同的用增方法映射；SkillHub 渠道对齐（1.2.4 槽位异常）。  
 - **v1.2.4** — 公开「用增方法映射·餐饮零售」16 条增长 Know-how；问诊/漏斗/促活可挂口径；不自动灌进后台。  

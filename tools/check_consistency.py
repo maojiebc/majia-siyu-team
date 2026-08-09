@@ -8,6 +8,9 @@ import sys
 
 
 ROOT = Path(os.environ.get("SIYU_CONSISTENCY_ROOT", Path(__file__).resolve().parents[1])).resolve()
+MAX_SKILL_BYTES = 8192
+MAIN_ENTRY_MAX_BYTES = MAX_SKILL_BYTES - 500
+MAIN_ENTRY = Path("plugins/siyu-core/skills/majia-siyu/SKILL.md")
 FOOTER = """---
 
 ## 不知道下一步用哪个 skill？
@@ -31,8 +34,13 @@ def skill_checks() -> list[str]:
         raw = path.read_bytes()
         text = raw.decode("utf-8")
         rel = path.relative_to(ROOT)
-        if len(raw) > 8 * 1024:
-            errors.append(f"{rel}: {len(raw)} bytes，超过 8KB")
+        if len(raw) > MAX_SKILL_BYTES:
+            errors.append(f"{rel}: {len(raw)} bytes，超过 {MAX_SKILL_BYTES} bytes 硬门")
+        if rel == MAIN_ENTRY and len(raw) > MAIN_ENTRY_MAX_BYTES:
+            errors.append(
+                f"{rel}: {len(raw)} bytes，主入口必须不超过 "
+                f"{MAIN_ENTRY_MAX_BYTES} bytes（为宿主执行预留至少 500 bytes）"
+            )
         stripped = text.rstrip()
         footer_is_last = stripped.endswith(FOOTER)
         author_follows_footer = (
