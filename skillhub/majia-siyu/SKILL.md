@@ -59,7 +59,7 @@ metadata:
 
 - **Python 模式**：仅当宿主能执行 `siyu-plan --contract-info`，且返回的 `route_contract_hash` 与契约哈希完全一致时，才执行 `siyu-plan "<原始请求>" ...` 并使用其 ExecutionPlan；`runtime_mode` 必须为 `python`。
 - **Prompt-only 模式**：不能执行 CLI、版本或哈希不匹配时，直接按契约解析与路由，并在内部计划标记 `runtime_mode: prompt_only`。此模式不得声称代码已强制上下文隔离、trace、状态机或知识检索。
-- SkillHub 单入口包不含 Python Runtime，默认走 Prompt-only；会员数据类路由到外部 `majia-huiyuan`。零售/教培只用通用能力，不虚构行业册。
+- SkillHub 单入口包不含 Python 后台执行层，默认走 Prompt-only；会员数据类路由到外部 `majia-huiyuan`。零售/教培只用通用能力，不虚构行业册。
 
 不存在可调用的概念性后台对象；只能使用真实 CLI 或明确降级。
 
@@ -105,7 +105,7 @@ metadata:
 
 ## 📋 版本记录
 
-- **v1.4.2** — 入口与 Runtime / 分发契约对齐；知识严格装配；合规、隐私、会话与安装态边界加固。
+- **v1.4.2** — 入口与后台执行、分发契约对齐；知识严格装配；合规、隐私、会话与安装态边界加固。
 - **v1.4.1** — 会员动作的数据依据互指姊妹篇 majia-huiyuan。
 - **v1.4.0** — 原子工具链双轨（v2 检索/校验 + `make atoms` 闸门）；skills 绑定接线；roster 官名单可配置；发布包随包分发公开知识层与查询工具；CLI 冒烟测试补齐。
 

@@ -159,10 +159,9 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 
 ## Version history
 
-- **v1.4.2** — Stabilization: aligned the entry point with Runtime and distribution contracts; made public-knowledge assembly strict; separated static compliance gates from Judge scoring; hardened prompt, privacy, session, and installed-artifact boundaries. H1/H2/H3 still await real Pilot results.
+- **v1.4.2** — Stabilization: aligned the entry point with the background execution and distribution contracts; made public-knowledge assembly strict; separated static compliance gates from independent scoring; hardened prompt, privacy, session, and installed-artifact boundaries. H1/H2/H3 still await real pilot results.
 - **v1.4.1** — Dual-track atom toolchain (v2 query/validate + `make atoms` gate); skills-binding wiring; configurable officer roster; bundle ships public knowledge layer + query tools; CLI smoke tests.
-- **v1.3.0** — Runtime hardening: scored kind routing, weighted compliance penalties, path constants, external host prompt, trace cleanup, and regression tests.
-- **v1.2.9** — Runtime hardening groundwork: scored routing, weighted penalties, trace cleanup.
+- **v1.3.0** — Background execution hardening: scored kind routing, weighted compliance penalties, path constants, external host prompt, trace cleanup, and regression tests.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) · [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 
