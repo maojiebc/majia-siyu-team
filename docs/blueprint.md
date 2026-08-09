@@ -1,6 +1,23 @@
 > [!IMPORTANT]
 > 本文是项目创建期的历史蓝图，保留用于追溯设计来源，其中部分“计划实现”描述已经过时。当前可验证事实以 [`architecture-current.md`](./architecture-current.md)、[`capability-status.md`](./capability-status.md)、`src/siyu_team/` 和首页架构图为准；[`runtime-v0.4.md`](./runtime-v0.4.md) 仅保留为历史版本说明。
 
+### v1.4.2 稳定化校正
+
+阅读下方历史草案时，以下当前契约优先：
+
+- 运行状态位于 `.siyu-team/runs/{run_id}/`，`.siyu-team/current` 只保存当前 run
+  指针；旧 `.siyu-team/state.json` 仅只读复制迁移，原文件不删除、不回写。状态更新
+  使用 revision、文件锁与原子替换，两个 run 不共享状态文件。
+- Trace 默认级别是 `metadata`，不保存原始请求或客户上下文；`redacted/full` 必须
+  显式选择，并受 TTL、文件数与总容量上限约束。
+- Python Prompt 工厂在派发四官前检查最小充分字段和大小。用户输入、外部证据与
+  官员输出均为 `untrusted_data`；其中的操作指令不得覆盖系统流程，Host 只把官员
+  输出当 `data_only` 的待评审材料。
+- `siyu-save` 默认只保存结构化结论，不保存完整对话。写盘前必须展示敏感信息预览，
+  并等待用户明确选择脱敏后保存、原文保存或取消；“原文”仍只指结构化草稿。
+- 上述 Python 边界不能反推所有 Prompt-only 宿主都执行了同一代码路径；保存隐私
+  流程当前仍是 Markdown Skill 契约。H1/H2/H3 仍为 `Not Evaluated`。
+
 下面是历史蓝图文本。
 
 ---
@@ -63,7 +80,8 @@ siyu-expert-team/
 │   ├── orchestrator.py                # 团长串行四 Step 的执行壳（读 state→派官→落盘→checkpoint）
 │   ├── roster.py                      # 【核心骨架文件 3f】角色=视角配置表（换 prompt 不换代码）
 │   ├── host.py                        # 【核心骨架文件 3e】主持人 prompt 工厂 + 报告渲染（仿 heavy.py）
-│   ├── state.py                       # 【核心骨架文件 3c】state.json 读写/续跑/防重入（仿 full-stack）
+│   ├── state.py                       # 【核心骨架文件 3c】run 状态、revision/CAS、锁与旧状态迁移
+│   ├── security.py                    # 不可信数据封装、最小字段与 Prompt 大小边界
 │   ├── routing.py                     # 行业×阶段 规则路由（仿 qiaomu routing.py，私域类目）
 │   ├── perspectives.py                # 四官独立采样 prompt 工厂（仿 heavy.build_perspective_prompt）
 │   ├── eval/                          # == plugin-eval 化质量门 ==
@@ -98,11 +116,14 @@ siyu-expert-team/
 │   ├── generate.py                    # 一份源分发到 codex/cursor/opencode/gemini（仿 wshobson）
 │   └── validate_generated.py          # 结构化往返校验 + 自带 remediation
 │
-└── .siyu-team/                        # == 运行时状态目录（git-ignore，仿 .full-stack-feature/）==
-    ├── state.json                     # 当前客户诊断进度（续跑核心）
-    ├── 00-intake.md                   # 客户原始信息
-    ├── 01-diagnosis.md ~ 04-*.md      # 四官/各 Step 落盘产物
-    └── reports/                       # 主持收口产物 deliberation.md / *.html
+└── .siyu-team/                        # == 运行时状态目录（git-ignore）==
+    ├── current                        # 当前 run_id 文本指针
+    ├── state.json                     # 仅兼容旧版本的只读迁移输入（可能不存在）
+    └── runs/{run_id}/
+        ├── state.json                 # 本次运行状态、revision 与续跑进度
+        ├── task.json                  # 本次任务结构摘要
+        ├── outputs/                   # 00-intake.md ~ 04-playbook.md 等产物
+        └── traces/                    # 本次运行 JSONL trace
 ```
 
 ---
@@ -113,7 +134,7 @@ siyu-expert-team/
 |---|---|---|
 | **编排机制·范式 A 七段式骨架** | `full-stack-feature.md` 全文 | `plugins/_orchestrator/commands/siyu-onboard.md`(prompt 编排) + `src/siyu_team/orchestrator.py`(执行壳) |
 | **6 条 CRITICAL BEHAVIORAL RULES**(防自由发挥护栏) | `full-stack-feature.md:8-18` | `siyu-onboard.md` 顶部,**一字不改照搬** |
-| **state.json 结构 + 每步更新指令** | `full-stack-feature.md:44-58,127` | `src/siyu_team/state.py` + 运行时 `.siyu-team/state.json` |
+| **state.json 结构 + 每步更新指令** | `full-stack-feature.md:44-58,127` | `src/siyu_team/state.py` + `.siyu-team/runs/{run_id}/state.json`（旧根状态只读迁移） |
 | **Pre-flight session 检测(续跑/重开/幂等)** | `full-stack-feature.md:23-38` | `state.py` 的 `check_session()` + `siyu-onboard.md` 开头 |
 | **PHASE CHECKPOINT 三选项模板**(Approve/Request changes/Pause) | `full-stack-feature.md:207-223` | `siyu-onboard.md` 每个 Step 后(诊断后、策略后) |
 | **子专家 Task 派发块**(内联上下文+编号 Deliverables) | `full-stack-feature.md:133-156` | `siyu-onboard.md` 派四官的四个 Task 块 |
@@ -147,7 +168,7 @@ siyu-expert-team/
 
 ### (a) 团长 orchestrator —— `plugins/_orchestrator/commands/siyu-onboard.md`
 
-> 母版 = `full-stack-feature.md` 七段式。四 Step = 调研诊断官 → 按行业/阶段路由 → 并行派四官 → 主持收口。铁律段/checkpoint/state 续跑**原样保留**。
+> 母版 = `full-stack-feature.md` 七段式。四 Step = 调研诊断官 → 按行业/阶段路由 → 并行派四官 → 主持收口。铁律段/checkpoint 的节奏保留；state 路径与并发语义已按 v1.4.2 改为 run 隔离，不能再原样照搬单文件状态。
 
 ```markdown
 ---
@@ -158,7 +179,7 @@ argument-hint: "<客户名/品类> [--industry catering|retail|edu] [--stage col
 ## CRITICAL BEHAVIORAL RULES
 You MUST follow these rules exactly. Violating any of them is a failure.
 1. Execute steps in order. Do NOT skip ahead, reorder, or merge steps.
-2. Write output files. Each step MUST produce its output file in `.siyu-team/`
+2. Write output files. Each step MUST produce its output file in `$RUN_DIR/outputs/`
    before the next step begins. Read from prior step files -- do NOT rely on context window memory.
 3. Stop at checkpoints. When you reach a PHASE CHECKPOINT you MUST stop and wait for
    explicit user approval via the AskUserQuestion tool.
@@ -169,26 +190,27 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ## Pre-flight Checks
 ### 1. Check for existing session
-检查 `.siyu-team/state.json` 是否存在：
-- 存在且 status=="in_progress"：读出，显示 current_step，问用户 1.续跑 / 2.重开(归档旧档) / 3.退出
-- 存在且 status=="complete"：问是否归档后重开
-### 2. 初始化 state.json（字段见 §3c）
+通过 `.siyu-team/current` 解析 `$RUN_ID` 与 `$RUN_DIR=.siyu-team/runs/$RUN_ID`：
+- current 指向的 state.status=="in_progress"：读出 revision/current_step，问用户 1.续跑 / 2.重开 / 3.退出
+- current 指向的 state.status=="complete"：问是否新建 run；不得覆盖旧 run
+- 只有旧 `.siyu-team/state.json`：用 StateStore 只读复制迁移，保留旧文件原样
+### 2. 初始化新 run（字段见 §3c），产物只写 `$RUN_DIR/outputs/`
 ### 3. 解析 $ARGUMENTS：抽出 $CLIENT、--industry、--stage（缺则在 Step 0 调研里补问）
 
 ## Step 0 调研诊断（Interactive，团长亲自做）
 用 AskUserQuestion 一次问一个，收齐：品类 / 阶段 / 现有私域规模 / 变现模式 / 当前核心痛点 / 可给的数据。
-→ 写 `.siyu-team/00-intake.md` → Update state.json(current_step=1)
+→ 写 `$RUN_DIR/outputs/00-intake.md` → 锁内 Update state.json(current_step=1, expected_revision=...)
 （若用户授权，可调 connectors/getnote.py 抓行业素材、bi_platform.py 验证口径，结果并入 00-intake.md）
 
 ## Step 1 按行业×阶段路由（团长决策，不花 token 的规则路由）
 读 00-intake.md，调 `src/siyu_team/routing.py` 推断 task 类目，加载 knowledge/02-industry/<industry>/ 对应阶段册。
-→ 写 `.siyu-team/01-routing.md`（产出：选定行业册 + 阶段重点 + 四官各自要重点回答的子问题）→ Update state
+→ 写 `$RUN_DIR/outputs/01-routing.md`（产出：选定行业册 + 阶段重点 + 四官各自要重点回答的子问题）→ Update state
 
 == PHASE CHECKPOINT 1 — User Approval Required ==
 展示 00-intake 与 01-routing 摘要，AskUserQuestion 三选项：
   1. Approve -- 派四官评审
   2. Request changes -- 调整诊断/路由后重审（不前进）
-  3. Pause -- 落盘退出（state.json 记 current_step="checkpoint-1"）
+  3. Pause -- 落盘退出（本 run 的 state.json 记 current_step="checkpoint-1"）
 Do NOT proceed until user selects option 1.
 
 ## Step 2 并行派四官（多 Task 单 response）
@@ -206,11 +228,11 @@ Task(2a 公关官):
     ## Deliverables（按此结构输出）
     1. 信任资产现状盘点  2. 公关视角的核心问题  3. 可落地动作（触发人群/话术/时间/指标）
     4. 最脆弱的前提  5. 合规风险提示
-  → 输出存到 .siyu-team/02a-pr.md
-Task(2b 产品官): subagent_type:"content-product-officer-content-product-officer" …→ 02b-product.md
-Task(2c 广告官): subagent_type:"ops-ad-officer-ops-ad-officer" …→ 02c-ad.md
+  → 输出存到 $RUN_DIR/outputs/02a-pr.md
+Task(2b 产品官): subagent_type:"content-product-officer-content-product-officer" …→ $RUN_DIR/outputs/02b-product.md
+Task(2c 广告官): subagent_type:"ops-ad-officer-ops-ad-officer" …→ $RUN_DIR/outputs/02c-ad.md
 Task(2d 合规官): subagent_type:"compliance-critic-compliance-critic"
-  prompt 内联 00+01，Deliverables：企微红线核查 / 违禁词扫描 / 落地性质疑 → 02d-critic.md
+  prompt 内联 00+01，Deliverables：企微红线核查 / 违禁词扫描 / 落地性质疑 → $RUN_DIR/outputs/02d-critic.md
 
 四官互不读对方输出（都只读已落盘的 00+01），故可真并行。
 → Update state(completed_steps += [2a,2b,2c,2d])
@@ -218,13 +240,13 @@ Task(2d 合规官): subagent_type:"compliance-critic-compliance-critic"
 ## Step 3 主持收口（团长综合）
 1. 跑 `make compliance` 对四份产物做静态合规门；若命中硬规则，打回对应官重做。需要质量分时另由独立宿主 Judge 回填完整 `JudgeReport`，否则不得显示分数或徽章（当前事实见 `architecture-current.md`）。
 2. stable_shuffle_traces 洗牌去位置偏差。
-3. 用 §3e 的 host prompt 综合四官 → 写 `.siyu-team/04-playbook.md` + reports/deliberation.md(+.html)
+3. 用 §3e 的 host prompt 综合四官 → 写 `$RUN_DIR/outputs/04-playbook.md` + reports/deliberation.md(+.html)
    收口模式：默认 host_mode=codex（你这个掌握全程上下文的主控直接当团长综合）；
    需二审时 rounds=2，把第一轮综合当 H1 输入再审一遍。
 → Update state(status="complete")
 
 == Completion ==
-state.json: status="complete"。打印 final summary：
+本 run 的 state.json: status="complete"。打印 final summary：
 - 列出 00~04 全部产物路径
 - 有完整独立 `JudgeReport` 时列质量分 + 徽章；否则写“本轮未做独立质量评分”
 - Next Steps：①方案落飞书 docx(connectors/lark.py) ②埋点指标进某 BI 平台(connectors/bi_platform.py) ③复盘周期
@@ -281,12 +303,16 @@ version: 1.0.0
 
 (同款模板复制成公关官、产品官、广告官的 skill,只换标题/五步内容/指标/合规重点。)
 
-### (c) state / 进度持久化结构 —— `.siyu-team/state.json`(由 `src/siyu_team/state.py` 读写)
+### (c) state / 进度持久化结构 —— `.siyu-team/runs/{run_id}/state.json`
 
-> 仿 `full-stack-feature.md:44-58`,`current_step` 一个字段同时编码 普通步/卡点/完结 三态。
+> `current_step` 仍同时编码普通步、卡点和完结三态；v1.4.2 在此基础上增加
+> run 隔离、revision/CAS 和文件锁。根目录旧 `state.json` 不再是写入目标。
 
 ```json
 {
+  "schema_version": "1.0",
+  "run_id": "run_20260809T000000Z_example",
+  "revision": 3,
   "client": "$CLIENT",
   "industry": "catering",
   "stage": "growth",
@@ -302,11 +328,39 @@ version: 1.0.0
 }
 ```
 
-`state.py` 三个核心函数(签名即可,逻辑照搬母版):
-- `check_session() -> dict|None`:存在且 in_progress 则返回供续跑;幂等入口。
-- `init_state(client, industry, stage)`:写死字段结构。
-- `update(step=..., add_file=..., add_completed=..., status=...)`:每步末手动调。
+每个 run 同时创建 `task.json`、`outputs/` 和 `traces/`。`.siyu-team/current`
+保存当前 run_id，但已经绑定 run 的 Store 实例不会因 current 改变而串写。
+
+`state.py` 当前核心接口：
+
+- `StateStore(root, run_id=...)`：显式打开某个 run；不传 run_id 的
+  `initialize()` 会新建 run，而不是覆盖 current。
+- `check_session() -> dict|None`：解析 current，存在会话时返回供续跑。
+- `init_state(client, industry, stage, run_id=...)`：初始化独立 run。
+- `update(..., expected_revision=N)`：锁内重读、校验 revision、原子替换；过期
+  revision 明确报冲突。未传 expected_revision 也由文件锁串行化更新。
+- 只有旧 `.siyu-team/state.json` 时，将它复制到新 run 并补齐版本字段；旧文件原样
+  保留，不删除、不继续回写。
+
 - `current_step` 取值流转:`1 → "checkpoint-1" → 2 → ... → "complete"`(Pause 时写 `"checkpoint-N"`,靠 check_session 续跑兜底)。
+
+### (c.1) v1.4.2 隐私与数据边界
+
+追踪不再以“尽力正则脱敏”作为默认安全模型。默认 `TraceLevel.METADATA` 只写
+任务/路由元数据、原文长度和 SHA256；需要排障内容时由用户显式选择
+`--trace-level redacted`，只有明确授权的本地审计才选择 `full`。Recorder 自动按
+30 天 TTL、文件数和总字节上限淘汰旧记录；调用方可覆盖这些容量参数。
+
+`security.py` 为用户输入、外部知识/证据和官员输出建立统一 `untrusted_data`
+信封，数据内的角色切换、工具调用、密钥读取或“忽略上文”要求均不可执行。Runtime
+计划层与四官 Prompt 构造层都检查 `required_any_of` 和大小；信息不足返回
+`context_incomplete` 且不派发整组四官。Host 要求每份官员材料至少有 name、engine、content，并把整个
+输出作为 `data_only` 数据块评审，不能把内容中的命令当系统指令。
+
+长期客户档案与运行状态分开。`siyu-save` 只生成结构化最小草稿，排除完整聊天、
+Trace、调试信息、官员原始输出和外部文档全文。任何写盘之前先显示敏感信息的掩码
+预览，再等待用户选择“脱敏后保存 / 原文保存 / 取消”；未明确选择不得创建目录。
+该流程当前由 Markdown Skill 约束，不能描述为 Python Runtime 已强制。
 
 ### (d) 私域方案质量门 rubric —— `src/siyu_team/eval/rubrics.py`(+ `engine.py` 合成)
 
@@ -389,13 +443,17 @@ version: 1.0.0
 **当前双门**：`make compliance` 的硬合规命中会阻断；完整独立 JudgeReport 低于阈值
 也会阻断。没有独立报告时状态为未评分，不能伪造分数或徽章。用法：
 ```bash
-make compliance FILE=.siyu-team/04-playbook.md
-make judge FILE=.siyu-team/04-playbook.md SCORES=.siyu-team/judge-scores.json
+make compliance FILE=$RUN_DIR/outputs/04-playbook.md
+make judge FILE=$RUN_DIR/outputs/04-playbook.md SCORES=$RUN_DIR/outputs/judge-scores.json
 ```
 
 ### (e) 主持人(团长)收口 prompt 草案 —— `src/siyu_team/host.py` 的 `build_host_prompt()`
 
 > 结构照搬 `heavy.py:196-245`,只改身份与五段为入驻决策版。核心句"不投票不平均、评推理质量、保留少数意见"直接对位 `heavy.py:204`。
+>
+> 下方只是便于阅读的历史模板。当前代码不会把 `question`、约束或官员原文直接插值；
+> 它们都先进入 `untrusted_data`，并在 Prompt 顶部声明 data-only 策略。官员输出还要
+> 先过最低结构和大小检查。
 
 ```text
 <task>
@@ -498,7 +556,7 @@ make judge FILE=.siyu-team/04-playbook.md SCORES=.siyu-team/judge-scores.json
 只用 **wshobson 范式 A 编排 + qiaomu host 收口**,先不上 eval 全流水线、不上多端分发。
 
 1. `plugins/_orchestrator/commands/siyu-onboard.md` —— 团长四 Step 编排(§3a)
-2. `src/siyu_team/state.py` + 运行时 `.siyu-team/state.json` —— 续跑(§3c)
+2. `src/siyu_team/state.py` + `.siyu-team/runs/{run_id}/` —— 隔离续跑、revision/CAS 与旧状态迁移(§3c)
 3. `src/siyu_team/roster.py` + `examples/roster.example.json` —— 四官角色表(§3f)
 4. `plugins/private-pr-officer/agents/private-pr-officer.md`(+另三官 agent.md) —— 四官人设(§3b 同款 frontmatter+SOP)
 5. `plugins/content-product-officer/skills/reactivation-playbook/SKILL.md` —— 至少一个 skill 跑通(§3b)

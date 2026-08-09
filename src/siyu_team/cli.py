@@ -10,7 +10,33 @@ from .errors import KnowledgeLoadError, SiyuBaseError
 from .routing import ROUTE_CONTRACT_VERSION, route_contract_digest
 from .runtime import PLAN_SCHEMA_VERSION, RuntimeMode, SiyuRuntime
 from .task import TaskValidationError
-from .tracing import TraceRecorder, cleanup_old_traces
+from .tracing import (
+    DEFAULT_TRACE_MAX_BYTES,
+    DEFAULT_TRACE_MAX_FILES,
+    MAX_TRACE_RETENTION_DAYS,
+    TraceLevel,
+    TraceRecorder,
+    cleanup_old_traces,
+)
+
+
+def _non_negative_int(value: str) -> int:
+    try:
+        number = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("必须是非负整数") from exc
+    if number < 0:
+        raise argparse.ArgumentTypeError("必须是非负整数")
+    return number
+
+
+def _retention_days(value: str) -> int:
+    number = _non_negative_int(value)
+    if number > MAX_TRACE_RETENTION_DAYS:
+        raise argparse.ArgumentTypeError(
+            f"不得超过 {MAX_TRACE_RETENTION_DAYS} 天"
+        )
+    return number
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -23,7 +49,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--stage", default="")
     parser.add_argument("--client", default="")
     parser.add_argument("--audience", default="")
-    parser.add_argument("--no-trace", action="store_true")
+    trace_group = parser.add_mutually_exclusive_group()
+    trace_group.add_argument("--no-trace", action="store_true")
+    trace_group.add_argument(
+        "--trace-level",
+        choices=[level.value for level in TraceLevel],
+        default=TraceLevel.METADATA.value,
+        help=(
+            "追踪级别（默认 metadata 不保存原文；redacted/full 必须显式选择）"
+        ),
+    )
     parser.add_argument(
         "--contract-info",
         action="store_true",
@@ -36,14 +71,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--trace-days",
-        type=int,
+        type=_retention_days,
         default=30,
-        help="与 --cleanup-traces 联用，保留最近 N 天（默认 30）",
+        help="追踪保留天数（默认 30；启动时自动清理）",
     )
     parser.add_argument(
         "--trace-dir",
         default=".siyu-team/traces",
         help="追踪目录（默认 .siyu-team/traces）",
+    )
+    parser.add_argument(
+        "--trace-max-bytes",
+        type=_non_negative_int,
+        default=DEFAULT_TRACE_MAX_BYTES,
+        help="追踪目录容量上限（默认 50 MiB）",
+    )
+    parser.add_argument(
+        "--trace-max-files",
+        type=_non_negative_int,
+        default=DEFAULT_TRACE_MAX_FILES,
+        help="追踪文件数量上限（默认 1000）",
     )
     return parser
 
@@ -58,6 +105,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "route_contract_version": ROUTE_CONTRACT_VERSION,
                     "route_contract_hash": route_contract_digest(),
                     "runtime_modes": [mode.value for mode in RuntimeMode],
+                    "trace_levels": [level.value for level in TraceLevel],
+                    "default_trace_level": TraceLevel.METADATA.value,
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -65,7 +114,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 0
     if args.cleanup_traces:
-        count, size = cleanup_old_traces(args.trace_dir, args.trace_days)
+        try:
+            count, size = cleanup_old_traces(
+                args.trace_dir,
+                args.trace_days,
+                max_bytes=args.trace_max_bytes,
+                max_files=args.trace_max_files,
+            )
+        except (OSError, ValueError) as exc:
+            print(f"追踪清理失败：{exc}", file=sys.stderr)
+            return 2
         print(f"已删除 {count} 个追踪文件，释放 {size / 1024:.1f} KB")
         return 0
     if not args.request:
@@ -82,7 +140,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         if value
     }
     try:
-        runtime = SiyuRuntime(trace_recorder=TraceRecorder(args.trace_dir))
+        runtime = SiyuRuntime(
+            trace_recorder=TraceRecorder(
+                args.trace_dir,
+                level=args.trace_level,
+                retention_days=args.trace_days,
+                max_bytes=args.trace_max_bytes,
+                max_files=args.trace_max_files,
+            )
+        )
         plan = runtime.plan(
             args.request, hints=hints, trace=not args.no_trace
         )
@@ -105,6 +171,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
     except SiyuBaseError as exc:
         print(f"执行失败：{exc}", file=sys.stderr)
+        return 2
+    except (OSError, ValueError) as exc:
+        print(f"追踪配置或路径无效：{exc}", file=sys.stderr)
         return 2
     if (
         plan.decision.needs_clarification

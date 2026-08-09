@@ -60,6 +60,28 @@ class TestPlanCli(unittest.TestCase):
             written = list(trace_dir.rglob("*.jsonl"))
             self.assertTrue(written, "--trace-dir 应真实生效，而不是被静默忽略")
 
+    def test_unsafe_trace_path_returns_friendly_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            trace_path = Path(tmp) / "not-a-directory"
+            trace_path.write_text("keep", encoding="utf-8")
+            code, _, err = self._run(
+                ["帮我写一条朋友圈文案", "--trace-dir", str(trace_path)]
+            )
+        self.assertEqual(code, 2)
+        self.assertIn("追踪配置或路径无效", err)
+
+    def test_cleanup_symlink_trace_root_returns_friendly_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "real-traces"
+            target.mkdir()
+            linked = Path(tmp) / "linked-traces"
+            linked.symlink_to(target, target_is_directory=True)
+            code, _, err = self._run(
+                ["--cleanup-traces", "--trace-dir", str(linked)]
+            )
+        self.assertEqual(code, 2)
+        self.assertIn("追踪清理失败", err)
+
     def test_broken_knowledge_file_friendly_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             atoms_dir = Path(tmp) / "04-atoms"

@@ -9,7 +9,7 @@
 | 执行面 | 当前真实入口 | 已自动验证 | 尚未闭环 |
 |---|---|---|---|
 | 插件与 SkillHub | Markdown Skill 由宿主解释执行 | 文件结构、发布版本、生成路由契约、84 条人工对照、公开知识副本一致性 | Prompt-only 不具备代码强制隔离/追踪 |
-| Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | ExecutionPlan v1、Task、路由、上下文隔离、严格 Corpus 与相关性装配、安装态回归 | Markdown 宿主是否真正调用 Runtime |
+| Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | ExecutionPlan v1、Task、路由、上下文隔离、默认 metadata Trace、严格 Corpus 与相关性装配、安装态回归 | Markdown 宿主是否真正调用 Runtime；plan 本身不执行专家 Prompt |
 | Knowledge Pilot | `siyu-pilot` 与离线夹具 | 盲化、数据契约、Dry Run 工具、与 Runtime 共用 `KnowledgeAssembler` | H1/H2/H3 真实人工评估 |
 
 这三个执行面目前仍非同一条强制生产链：Markdown 宿主可以处于
@@ -26,6 +26,11 @@ Prompt-only 模式。知识分支已收敛为共用的 `CorpusLoader` 与 `Knowl
 ExecutionPlan
   ├─ 单能力路由
   └─ 信息齐备的全盘任务 → 四官白名单上下文
+
+本地运行状态（独立组件，不由每次 plan 自动创建）
+  ├─ StateStore → .siyu-team/runs/{run_id}/
+  ├─ current → 当前 run 指针
+  └─ revision + 文件锁 + 原子替换 → 并发更新不覆盖
 
 公开 approved Corpus
   ├─ CorpusLoader → manifest/hash/count/schema/安全/生命周期硬门
@@ -55,6 +60,29 @@ Python Runtime 模式。
 同时存在时，报告才可含质量分与徽章。分数不会自动批准案例入库或知识原子；缺失
 独立评审时，主编排固定记录“本轮未做独立质量评分”。`make eval` 仅保留一个版本的
 deprecated 静态合规兼容别名。
+
+## 运行状态、追踪与 Prompt 边界
+
+- `TraceRecorder` 默认 `metadata`，不保存原始 `source_text`、客户上下文或完整路由
+  理由；只保留长度、SHA256、kind、risk、route、知识定位和错误码等元数据。
+  `redacted` 与 `full` 只能通过 `--trace-level` 显式选择。Recorder 启动及写入后按
+  TTL、总字节数和文件数上限清理旧 JSONL。
+- `StateStore` 把状态隔离在 `.siyu-team/runs/{run_id}/`，每个 run 有自己的
+  `state.json`、`task.json`、`outputs/` 和 `traces/`；`.siyu-team/current` 只是
+  当前 run 指针。更新在文件锁内完成，`revision` 与可选 `expected_revision` 提供
+  compare-and-swap 冲突检测。
+- 旧 `.siyu-team/state.json` 只读复制到新 run，旧文件原样保留。迁移不会删除或
+  继续回写用户的旧状态。
+- `SiyuRuntime.plan()` 在生成四官面板时检查 `required_any_of` 与上下文大小；任一官
+  不足就不返回整组 `agent_contexts`，并以 `context_incomplete` warning 和澄清字段
+  收口。`build_isolated_officer_prompt()` 在真正派发前再执行一次同样的 fail-closed
+  检查，避免绕过计划层直接构造 Prompt。
+- 用户输入、外部知识/证据和官员输出均编码为 `untrusted_data`。数据块内要求忽略
+  上文、读取密钥、调用工具或执行命令的文字只可作为待分析数据；Host 对官员输出
+  校验最低结构和大小，并以 `data_only` 材料收口。
+- `siyu-save` 默认只存结构化结论，写盘前展示敏感信息掩码预览，并等待用户明确选择
+  脱敏保存、原文保存或取消。“原文”不等于保存完整对话。该约束当前属于 Markdown
+  Skill 契约，尚无 Python 写入器强制。
 
 ## 公开知识分发与装配
 
@@ -97,3 +125,5 @@ SkillHub 包和 wheel 安装态也有独立回归。
 - H1、H2、H3 均仍为 `Not Evaluated`；不得把工具 Dry Run 写成业务验证通过。
 - 严格加载、相关性装配和安装态回归是工程证据，不是“知识飞轮”或“同行共建”已成立的证据。
 - 当前版本不新增 Skill、角色或行业包；先完成 Runtime、分发、知识和质量语义对齐。
+- run_id 隔离解决本地运行状态覆盖，不代表长期客户档案已经具备 tenant/workspace
+  权限隔离或加密存储。

@@ -4,7 +4,7 @@ Runtime 只制定可验证的执行计划，不直接调用模型，也不替 Sk
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any, Mapping
 
@@ -13,6 +13,7 @@ from .knowledge.assembler import KnowledgeAssembler
 from .knowledge.growth_layers import describe_growth_load
 from .roster import MAX_OFFICERS, load_roster, normalize_officers
 from .routing import RouteDecision, route_task
+from .security import ContentTooLargeError, ContextIncompleteError
 from .task import Task, TaskKind, parse_task
 from .tracing import TraceRecorder
 
@@ -137,23 +138,53 @@ class SiyuRuntime:
             }
 
         contexts: tuple[AgentContext, ...] = ()
+        context_warnings: list[str] = []
         if (
             task.kind is TaskKind.STRATEGY_REVIEW
             and not decision.needs_clarification
         ):
-            contexts = tuple(
+            candidates = tuple(
                 build_agent_context(
                     task, name, shared_fields=shared, allowed_context=allowed
                 )
                 for name, allowed in self._panel
             )
+            blocked_fields: list[str] = []
+            for context in candidates:
+                try:
+                    context.assert_dispatchable()
+                except ContextIncompleteError as exc:
+                    context_warnings.append(str(exc))
+                    blocked_fields.append(f"context.{context.officer}")
+                except ContentTooLargeError as exc:
+                    context_warnings.append(
+                        f"context_too_large: {context.officer}: {exc}"
+                    )
+                    blocked_fields.append(f"context.{context.officer}")
+            if blocked_fields:
+                # 四官面板必须作为一个完整评审单元运行。只派一部分会让 Host
+                # 在缺失视角的情况下误以为已完成盲审，因此整组 fail-closed。
+                required = tuple(
+                    dict.fromkeys((*decision.required_fields, *blocked_fields))
+                )
+                decision = replace(
+                    decision,
+                    needs_clarification=True,
+                    required_fields=required,
+                    reason=(
+                        decision.reason
+                        + "（专家上下文不足，先补齐业务事实后再派发四官）"
+                    ),
+                )
+            else:
+                contexts = candidates
 
         plan = ExecutionPlan(
             trace_id=trace_id,
             task=task,
             decision=decision,
             knowledge=selection.to_dict(),
-            warnings=selection.warnings,
+            warnings=tuple((*selection.warnings, *context_warnings)),
             agent_contexts=contexts,
             growth_atoms=growth_atoms,
             growth_load_note=growth_note,
@@ -170,6 +201,7 @@ class SiyuRuntime:
                     "corpus_version": selection.corpus_version,
                     "corpus_hash": selection.corpus_hash,
                     "count": selection.selection_count,
+                    "atom_ids": [row.get("id") for row in growth_atoms[:20]],
                     "note": growth_note,
                     "locators": [row.get("locator") for row in growth_atoms[:20]],
                     "kind": task.kind.value,

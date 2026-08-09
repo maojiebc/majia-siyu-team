@@ -124,7 +124,15 @@ class RuntimeTests(unittest.TestCase):
             runtime = SiyuRuntime(recorder)
             plan = runtime.plan(
                 "帮我做整盘私域战略评审",
-                hints={"industry": "catering", "stage": "growth"},
+                hints={
+                    "industry": "catering",
+                    "stage": "growth",
+                    "context": {
+                        "brand": "示例品牌",
+                        "offer": "会员权益",
+                        "budget": 5000,
+                    },
+                },
             )
             self.assertEqual(plan.decision.skill, "siyu-onboard")
             self.assertFalse(plan.decision.needs_clarification)
@@ -152,6 +160,21 @@ class RuntimeTests(unittest.TestCase):
         plan = SiyuRuntime().plan("帮我做整盘私域战略评审", trace=False)
         self.assertTrue(plan.decision.needs_clarification)
         self.assertEqual(plan.agent_contexts, ())
+
+    def test_role_context_gaps_block_the_entire_panel(self) -> None:
+        plan = SiyuRuntime().plan(
+            "帮我做整盘私域战略评审",
+            hints={"industry": "catering", "stage": "growth"},
+            trace=False,
+        )
+        self.assertTrue(plan.decision.needs_clarification)
+        self.assertEqual(plan.agent_contexts, ())
+        self.assertIn("context.公关官", plan.decision.required_fields)
+        self.assertIn("context.产品官", plan.decision.required_fields)
+        self.assertIn("context.广告官", plan.decision.required_fields)
+        self.assertTrue(
+            any(warning.startswith("context_incomplete:") for warning in plan.warnings)
+        )
 
     def test_trace_redacts_credentials_and_personal_data(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

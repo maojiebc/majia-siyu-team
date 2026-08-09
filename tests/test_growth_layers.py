@@ -100,7 +100,15 @@ class GrowthLayerTests(unittest.TestCase):
     def test_officer_prompt_lists_growth_locators(self) -> None:
         plan = SiyuRuntime().plan(
             "帮我做整盘私域战略评审",
-            hints={"industry": "catering", "stage": "growth"},
+            hints={
+                "industry": "catering",
+                "stage": "growth",
+                "context": {
+                    "brand": "示例品牌",
+                    "offer": "会员权益",
+                    "budget": 5000,
+                },
+            },
             trace=False,
         )
         ctx = plan.agent_contexts[0]
@@ -207,7 +215,15 @@ class GrowthContextInjectionTests(unittest.TestCase):
         from siyu_team.runtime import SiyuRuntime
         plan = SiyuRuntime().plan(
             "帮我做整盘私域战略评审",
-            hints={"industry": "catering", "stage": "growth"},
+            hints={
+                "industry": "catering",
+                "stage": "growth",
+                "context": {
+                    "brand": "示例品牌",
+                    "offer": "会员权益",
+                    "budget": 5000,
+                },
+            },
             trace=False,
         )
         self.assertFalse(plan.decision.needs_clarification)

@@ -16,7 +16,17 @@ from siyu_team.tracing import TraceRecorder
 def _strategy_review_plan(runtime: SiyuRuntime):
     return runtime.plan(
         "帮我全面复盘这盘私域该怎么打",
-        hints={"kind": "strategy_review", "industry": "catering", "stage": "growth"},
+        hints={
+            "kind": "strategy_review",
+            "industry": "catering",
+            "stage": "growth",
+            "context": {
+                "brand": "示例品牌",
+                "offer": "会员权益",
+                "budget": 5000,
+                "metrics": {"conversion_rate": 0.1},
+            },
+        },
         trace=False,
     )
 

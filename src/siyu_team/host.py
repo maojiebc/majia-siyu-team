@@ -3,6 +3,7 @@
 提示词默认从 ``plugins/siyu-core/prompts/host-v1.md`` 读取，支持热更新；
 文件缺失时回退到内置 ``HOST_PROMPT``。
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -10,11 +11,25 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List
 
+from .security import (
+    MAX_OFFICER_ENGINE_CHARS,
+    MAX_OFFICER_NAME_CHARS,
+    MAX_OFFICER_OUTPUT_CHARS,
+    MAX_USER_INPUT_CHARS,
+    UNTRUSTED_DATA_POLICY,
+    UntrustedSource,
+    ensure_prompt_size,
+    ensure_text_size,
+    json_size,
+    wrap_untrusted_data,
+)
+
 
 _PROMPT_CANDIDATES = (
     Path(__file__).resolve().parents[2] / "plugins/siyu-core/prompts/host-v1.md",
     Path(__file__).resolve().parent / "prompts" / "host-v1.md",
 )
+MAX_HOST_OFFICERS = 6
 
 HOST_PROMPT = """\
 <task>
@@ -110,23 +125,87 @@ def build_host_prompt(
 ) -> str:
     if len(officer_outputs) < 2:
         raise ValueError("主持人收口至少需要 2 位官的独立意见")
+    if len(officer_outputs) > MAX_HOST_OFFICERS:
+        raise ValueError(f"主持人收口最多接收 {MAX_HOST_OFFICERS} 位官的意见")
+
+    validated: List[Dict[str, str]] = []
+    for index, output in enumerate(officer_outputs, start=1):
+        if not isinstance(output, dict):
+            raise ValueError(f"第 {index} 位官员输出必须是对象")
+        missing = [
+            field
+            for field in ("name", "engine", "content")
+            if not isinstance(output.get(field), str)
+            or not str(output.get(field)).strip()
+        ]
+        if missing:
+            raise ValueError(
+                f"第 {index} 位官员输出缺少最低结构字段：{', '.join(missing)}"
+            )
+        validated.append(
+            {
+                "name": ensure_text_size(
+                    output["name"],
+                    max_chars=MAX_OFFICER_NAME_CHARS,
+                    label=f"officer[{index}].name",
+                ),
+                "engine": ensure_text_size(
+                    output["engine"],
+                    max_chars=MAX_OFFICER_ENGINE_CHARS,
+                    label=f"officer[{index}].engine",
+                ),
+                "content": ensure_text_size(
+                    output["content"],
+                    max_chars=MAX_OFFICER_OUTPUT_CHARS,
+                    label=f"officer[{index}].content",
+                ),
+            }
+        )
+
     template = load_host_prompt()
-    shuffled = stable_shuffle_traces(question, officer_outputs)
+    shuffled = stable_shuffle_traces(question, validated)
     blocks = []
     for i, o in enumerate(shuffled, 1):
+        payload = {
+            "position": i,
+            "name": o["name"],
+            "engine": o["engine"],
+            "content": o["content"],
+        }
         blocks.append(
-            "<officer>\n[%d] %s（引擎：%s）\n%s\n</officer>"
-            % (i, o.get("name", "官"), o.get("engine", ""), o.get("content", ""))
+            wrap_untrusted_data(
+                payload,
+                UntrustedSource.OFFICER_OUTPUT,
+                # content 已经过严格上限校验；这里使用实际编码长度，避免因
+                # 换行/引号的 JSON 转义而对合法官员输出做二次静默截断。
+                max_chars=json_size(payload),
+                label=f"officer_review_material_{i}",
+            )
         )
     # 逐个替换已知占位符（不用 str.format：热更模板里出现示例花括号
     # 如 {分母} 时 format 会 KeyError 崩掉整条收口链，replace 原样保留）。
     fields = {
-        "question": question,
-        "success_criteria": success_criteria or "（未指定）",
-        "constraints": constraints or "（无）",
+        "question": wrap_untrusted_data(
+            question,
+            UntrustedSource.USER_INPUT,
+            max_chars=MAX_USER_INPUT_CHARS,
+            label="host_question",
+        ),
+        "success_criteria": wrap_untrusted_data(
+            success_criteria or "（未指定）",
+            UntrustedSource.USER_INPUT,
+            max_chars=MAX_USER_INPUT_CHARS,
+            label="success_criteria",
+        ),
+        "constraints": wrap_untrusted_data(
+            constraints or "（无）",
+            UntrustedSource.USER_INPUT,
+            max_chars=MAX_USER_INPUT_CHARS,
+            label="constraints",
+        ),
         "officers": "\n\n".join(blocks),
     }
-    prompt = template
+    prompt = UNTRUSTED_DATA_POLICY.strip() + "\n\n" + template
     for key, value in fields.items():
         prompt = prompt.replace("{" + key + "}", value)
-    return prompt
+    return ensure_prompt_size(prompt)
