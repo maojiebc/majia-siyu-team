@@ -216,7 +216,7 @@ Task(2d 合规官): subagent_type:"compliance-critic-compliance-critic"
 → Update state(completed_steps += [2a,2b,2c,2d])
 
 ## Step 3 主持收口（团长综合）
-1. 跑 src/siyu_team/eval/cli.py 对四份产物打质量门分（见 §3d）。若命中 COMPLIANCE_RED → 打回对应官重做，不进收口。
+1. 跑 `make compliance` 对四份产物做静态合规门；若命中硬规则，打回对应官重做。需要质量分时另由独立宿主 Judge 回填完整 `JudgeReport`，否则不得显示分数或徽章（当前事实见 `architecture-current.md`）。
 2. stable_shuffle_traces 洗牌去位置偏差。
 3. 用 §3e 的 host prompt 综合四官 → 写 `.siyu-team/04-playbook.md` + reports/deliberation.md(+.html)
    收口模式：默认 host_mode=codex（你这个掌握全程上下文的主控直接当团长综合）；
@@ -226,7 +226,7 @@ Task(2d 合规官): subagent_type:"compliance-critic-compliance-critic"
 == Completion ==
 state.json: status="complete"。打印 final summary：
 - 列出 00~04 全部产物路径
-- 质量门得分 + 徽章
+- 有完整独立 `JudgeReport` 时列质量分 + 徽章；否则写“本轮未做独立质量评分”
 - Next Steps：①方案落飞书 docx(connectors/lark.py) ②埋点指标进某 BI 平台(connectors/bi_platform.py) ③复盘周期
 ```
 
@@ -310,6 +310,10 @@ version: 1.0.0
 
 ### (d) 私域方案质量门 rubric —— `src/siyu_team/eval/rubrics.py`(+ `engine.py` 合成)
 
+> **v1.4.2 语义修正**：本节保留创建期 rubric 设计；当前实现已把合规、粗糙度、
+> 独立质量评分和知识批准分开。静态扫描不再自产质量分；只有来源与配置完整的独立
+> `JudgeReport` 才能生成分数和徽章，且不得自动触发案例或知识批准。
+
 > 照 plugin-eval:维度加权 → 每维跨三层混合 → `composite = Σ(权重×维度分) × 100 × 反模式惩罚` → 阈值 exit 1。
 
 **维度权重表**(替换原十维):
@@ -376,15 +380,17 @@ version: 1.0.0
 
 | 徽章 | 方案分 | 含义 |
 |---|---|---|
-| Platinum ≥90 | 进案例库 |
-| Gold ≥80 | 可直接交付客户 |
+| Platinum ≥90 | 独立评审优秀；不自动进入案例库 |
+| Gold ≥80 | 独立评审通过；仍由 Host 决定交付 |
 | Silver ≥70 | 内部复核后交付 |
 | Bronze ≥60 | 需返工 |
 | <60 | 不交付 |
 
-**入驻硬门**:`方案分 < 80 或命中 COMPLIANCE_RED → exit 1`,专家方案打回。用法:
+**当前双门**：`make compliance` 的硬合规命中会阻断；完整独立 JudgeReport 低于阈值
+也会阻断。没有独立报告时状态为未评分，不能伪造分数或徽章。用法：
 ```bash
-siyu-eval score .siyu-team/04-playbook.md --threshold 80   # 低于 80 或踩合规红线 exit 1
+make compliance FILE=.siyu-team/04-playbook.md
+make judge FILE=.siyu-team/04-playbook.md SCORES=.siyu-team/judge-scores.json
 ```
 
 ### (e) 主持人(团长)收口 prompt 草案 —— `src/siyu_team/host.py` 的 `build_host_prompt()`
@@ -505,7 +511,7 @@ siyu-eval score .siyu-team/04-playbook.md --threshold 80   # 低于 80 或踩合
 
 ### 4 档(进头部)—— 在 3 档之上加这四层
 
-- **质量门层**(护城河核心):`src/siyu_team/eval/{static,judge,monte_carlo,engine,rubrics,cli}.py`(§3d)。这层让方案"有可复现分数 + 置信区间 + CI 自动拦截",是区别于"网上私域 prompt 合集"的全部技术差异。`make eval` 接进 orchestrator Step 3。
+- **质量门层**(护城河核心):`src/siyu_team/eval/{static,judge,monte_carlo,engine,rubrics,cli}.py`(§3d)。`make compliance` 负责确定性合规门；宿主完成独立评审并回填后，`make judge` 才产出可复核分数。当前不把未执行的 Judge 或 Pilot 统计描述成 CI 已验证事实。
 - **行业 RAG 层**:补齐 `knowledge/02-industry/catering/benchmarks.md`(餐饮真实基线)+ `knowledge/03-majia-sop/`(护城河 SOP,私仓/git-ignore)。四官 skill 检索这层。
 - **多专家并行 + 二审**:host.py 上 `rounds=2` 团长二审;Step 2 真并行四官(多 Task 单 response)。
 - **多端分发层**(可选,只在要把专家团给别人用时):`tools/generate.py` + `tools/validate_generated.py`,把四官 plugin 分发到 codex/cursor/opencode/gemini。
@@ -518,7 +524,7 @@ siyu-eval score .siyu-team/04-playbook.md --threshold 80   # 低于 80 或踩合
 | 飞书全家桶 | `lark.py` | Completion | 04-playbook.md 落成飞书 docx 交付;进度同步到飞书;改正文走 lark-cli str_replace |
 | Get笔记 | `getnote.py` | Step 0 调研 | 抓行业素材/竞品私域打法,并入 00-intake.md |
 | Nowledge Mem | `nowledge_mem.py` | 四官 skill 检索 | 马甲真实 SOP 语义检索(护城河 RAG 取数,知识库第三层的检索入口) |
-| Obsidian 本地库 | (复用现有同步) | 知识沉淀 | 沉淀成功案例进案例库(Platinum 方案归档) |
+| Obsidian 本地库 | (复用现有同步) | 知识沉淀 | 人工审核后沉淀成功案例；徽章本身不触发归档 |
 
 密钥走 keychain 指针(照 qiaomu `registry.py:107-120`),connector 只存 `keychain:siyu-team/<tool>` 引用,真 token 不入库——同时满足公开 repo 提交脱敏红线。
 

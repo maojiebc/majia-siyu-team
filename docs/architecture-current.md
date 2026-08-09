@@ -33,9 +33,10 @@ ExecutionPlan
        ├─ Runtime → 默认最多 12 条 + why_selected
        └─ Pilot → 同一选择逻辑，mapping 仅作期望夹具
 
-离线质量工具
-  ├─ 静态合规/反模式扫描
-  └─ 宿主另行回填 Judge 分数后才有质量分
+质量与合规工具
+  ├─ ScanMode 静态合规门 → 只报告可解释命中
+  ├─ 粗糙度启发式 → 与违规判定、质量分分离
+  └─ 独立 Judge + 完整 JudgeReport → 才有质量分与徽章
 ```
 
 `plugins/.../references/route-contract.json` 与
@@ -44,6 +45,16 @@ ExecutionPlan
 就宣称执行过 Runtime；Python 模式必须先用 `siyu-plan --contract-info` 完成哈希握手。
 包内的严格知识查询工具只证明 Corpus 可发现，不会把 Prompt-only 模式变成
 Python Runtime 模式。
+
+三个执行文案 lint 与 Runtime 使用同一套 mode-aware 合规扫描器；SkillHub 随包携带
+这套最小扫描支持，因此不会在独立安装时退回另一份粗糙词表。正常序号、否定、引用、
+归因和风险说明可解释地降级，清晰的广告绝对化主张与诱导分享仍按模式阻断。
+
+`make compliance` 只产生合规结果；`make judge` 接收独立宿主回填并生成机器可读
+`JudgeReport`。只有完整维度、逐维理由、来源、模型、配置、ISO 时间和独立评审方式
+同时存在时，报告才可含质量分与徽章。分数不会自动批准案例入库或知识原子；缺失
+独立评审时，主编排固定记录“本轮未做独立质量评分”。`make eval` 仅保留一个版本的
+deprecated 静态合规兼容别名。
 
 ## 公开知识分发与装配
 

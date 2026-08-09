@@ -21,8 +21,8 @@
 | 零售/教培通用回答 | 已实现 | `generic_only` 路由回归 | 零售可复用跨业态 L1，但两者都不得伪造独立行业册 |
 | 公开知识 Runtime 装配 | 已实现 | `CorpusLoader`、`KnowledgeAssembler`、Runtime 与安装态回归 | approved-only 且默认最多 12 条；只证明工程装配，不证明答案效果 |
 | Pilot 知识装配 | 已实现 | Pilot 与 Runtime 共用 `KnowledgeAssembler`；mapping 对照回归 | mapping 只是期望夹具；Dry Run 不是 H1/H2/H3 结果 |
-| Judge 质量评分 | 仅 Python 实现 | `siyu-eval judge` 与 Judge 单测 | 需宿主独立评分并回填，主编排未闭环 |
-| 静态合规扫描 | 已实现 | `siyu-eval score` 与静态扫描测试 | 语境误杀仍需在稳定化版本修正 |
+| Judge 质量评分 | 仅 Python 实现 | `siyu-eval judge`、严格 `JudgeReport` 与主编排条件流程 | 仍需宿主启动独立 Judge 并回填完整来源；缺失时明确为未评分 |
+| 静态合规扫描 | 已实现 | `siyu-eval compliance`、执行 lint、语境与安装态回归 | 按客户文案/内部报告/知识/引证模式解释命中；不产生质量分或徽章 |
 | 飞书/BI/Get 笔记/Nowledge 连接器 | 骨架 | `src/siyu_team/connectors/` | 未接外部 API，不可描述为可用集成 |
 | H1 知识价值 | 未验证 | `docs/pilot/results/h1-knowledge-value.md` | `Not Evaluated` |
 | H2 贡献动力 | 未验证 | `docs/pilot/results/h2-contribution-demand.md` | `Not Evaluated` |

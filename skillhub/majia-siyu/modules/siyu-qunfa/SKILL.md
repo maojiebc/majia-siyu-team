@@ -39,7 +39,7 @@ metadata:
 
 ### 4. 合规前置扫描（群发是重灾区，必做）
 ```bash
-echo "群发文案" | python3 plugins/siyu-execution/skills/siyu-qunfa/scripts/qunfa_lint.py -
+echo "群发文案" | python3 modules/siyu-qunfa/scripts/qunfa_lint.py -
 ```
 除通用红线（第一/100%/绝对化），**重点扫群发特有的诱导分享**（转发得赠/集赞/拉 X 人进群）——这类是企微封号高发。命中就地改走企微官方路径。见 [`references/合规前置扫描.md`](references/合规前置扫描.md)。
 

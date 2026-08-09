@@ -1,7 +1,19 @@
-.PHONY: eval validate pilot atoms links contracts test check report
+.PHONY: compliance judge eval validate pilot atoms links contracts test check report
 
-# 对一份产物方案打质量门分（低于阈值或踩合规红线 exit 1）
+# 静态合规门：只报告规则命中，不产生质量分或徽章。
+compliance:
+	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli compliance $(FILE) --mode $(or $(MODE),customer_copy)
+
+# 独立 Judge：无 SCORES 时生成 prompts；有 SCORES 时生成机器可读 JudgeReport。
+judge:
+	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli judge $(FILE) \
+		$(if $(SCORES),--scores $(SCORES),--emit-prompts) \
+		$(if $(REPORT),--output $(REPORT),) \
+		--threshold $(or $(THRESHOLD),80) --mode $(or $(MODE),customer_copy)
+
+# v1.4.1 兼容别名：deprecated，只执行静态合规检查，不再声称打质量分。
 eval:
+	@echo "⚠️ make eval 已 deprecated；本次仅执行静态合规检查，请改用 make compliance。"
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli score $(FILE) --threshold $(or $(THRESHOLD),80)
 
 # 校验 plugins 下 SKILL.md / agent.md 结构（name==目录名、frontmatter、≤8KB）
@@ -21,6 +33,7 @@ pilot:
 atoms:
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/atoms_validate.py knowledge/04-atoms/atoms.example.jsonl
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/atoms_validate.py knowledge/04-atoms/growth-layers.approved.jsonl
+	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli compliance knowledge/04-atoms/growth-layers.approved.jsonl --mode knowledge
 	@cmp -s knowledge/04-atoms/growth-layers.approved.jsonl tests/fixtures/pilot/growth-approved-atoms.jsonl \
 		|| { echo "❌ approved 本体与 Pilot 夹具漂移：重跑 PYTHONPATH=src python3 tools/build_growth_atoms.py"; exit 1; }
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/sync_public_knowledge.py --check

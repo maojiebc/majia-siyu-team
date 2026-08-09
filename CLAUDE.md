@@ -6,7 +6,7 @@
 
 **收口范式**：走 qiaomu HeavySkill 主持人模式——四官各自独立采样、互不可见，团长（host）不投票不平均，只评推理质量、保留少数意见。合规官红线一票否决。
 
-**质量门**：照 plugin-eval 四层——静态层（正则反模式，免费）→ 判官层（锚定 rubric，**B 路径：宿主 Agent 评分，不调外部 API**）→ 蒙卡层（同一诉求 N 份测一致性 + Wilson 置信区间）→ 加权合成 → 阈值 `exit 1` 硬门。`siyu-eval score` 只走静态层；`siyu-eval judge` 才在宿主逐维评分回填后计算质量分。当前执行事实与未闭环项见 `docs/architecture-current.md`。
+**质量门**：静态合规与质量评分分开。`siyu-eval compliance` 只报告按语境解释的合规命中；`siyu-eval judge` 仅在独立宿主逐维评分并回填完整来源后计算质量分。缺少 `JudgeReport` 时不得显示分数或徽章，分数也不自动批准案例或知识。`siyu-eval score` / `make eval` 只保留一个版本的 deprecated 合规别名。当前事实见 `docs/architecture-current.md`。
 
 **护城河边界**：`knowledge/03-majia-sop/` 是马甲真实 SOP，私有，git-ignore，**绝不进公开库**。所有 `【待马甲填真实SOP】` 标记处由马甲本人注入。
 

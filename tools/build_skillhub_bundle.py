@@ -33,6 +33,12 @@ KNOWLEDGE_PUBLIC_DIRS = (
 # 随包分发的原子工具（零依赖，在分发态也执行严格 v2 契约）。
 BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
 BUNDLED_KNOWLEDGE_MODULES = ("models.py", "paths.py", "corpus.py", "query.py")
+BUNDLED_EVAL_MODULES = (
+    "models.py",
+    "rubrics.py",
+    "compliance_lexicon.py",
+    "static.py",
+)
 ROUTE_CONTRACT = ROUTER / "references/route-contract.json"
 # 包内路径重写：SKILL.md 里的仓库根相对引用改指包内 _knowledge，
 # 否则独立安装态全是死指针。顺序敏感：先收相对逃逸，再收裸路径；
@@ -44,6 +50,9 @@ EXPERT_REFERENCE_ESCAPE = (
 )
 BARE_KNOWLEDGE_RE = re.compile(
     r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms)"
+)
+EXECUTION_SCRIPT_RE = re.compile(
+    r"plugins/siyu-execution/skills/([^/]+)/scripts/"
 )
 
 
@@ -137,23 +146,36 @@ def copy_knowledge(output: Path) -> int:
 
 
 def copy_tools(output: Path) -> int:
-    """Ship query tools plus their strict knowledge-only Python support."""
+    """Ship query/lint tools plus their strict, shared Python support."""
     target = output / "tools"
     target.mkdir(parents=True, exist_ok=True)
     for name in BUNDLED_TOOLS:
         shutil.copy2(ROOT / "tools" / name, target / name)
     package = target / "siyu_team"
     knowledge_package = package / "knowledge"
+    eval_package = package / "eval"
     knowledge_package.mkdir(parents=True)
+    eval_package.mkdir(parents=True)
     (package / "__init__.py").write_text("", encoding="utf-8")
     (knowledge_package / "__init__.py").write_text("", encoding="utf-8")
+    (eval_package / "__init__.py").write_text("", encoding="utf-8")
     shutil.copy2(ROOT / "src/siyu_team/errors.py", package / "errors.py")
     for name in BUNDLED_KNOWLEDGE_MODULES:
         source = ROOT / "src/siyu_team/knowledge" / name
         if not source.is_file():
             raise RuntimeError(f"知识查询模块缺失：{source}")
         shutil.copy2(source, knowledge_package / name)
-    return len(BUNDLED_TOOLS) + len(BUNDLED_KNOWLEDGE_MODULES) + 3
+    for name in BUNDLED_EVAL_MODULES:
+        source = ROOT / "src/siyu_team/eval" / name
+        if not source.is_file():
+            raise RuntimeError(f"合规扫描模块缺失：{source}")
+        shutil.copy2(source, eval_package / name)
+    return (
+        len(BUNDLED_TOOLS)
+        + len(BUNDLED_KNOWLEDGE_MODULES)
+        + len(BUNDLED_EVAL_MODULES)
+        + 4
+    )
 
 
 def copy_runtime_contract(output: Path) -> int:
@@ -183,6 +205,7 @@ def rewrite_knowledge_paths(output: Path) -> int:
             "modules/_runtime/route-contract.json",
         )
         updated = BARE_KNOWLEDGE_RE.sub(r"modules/_knowledge/\1", updated)
+        updated = EXECUTION_SCRIPT_RE.sub(r"modules/\1/scripts/", updated)
         if updated != text:
             path.write_text(updated, encoding="utf-8")
             rewritten += 1

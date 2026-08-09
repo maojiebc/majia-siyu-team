@@ -36,7 +36,7 @@ metadata:
 产出前对每条跑一遍合规扫描（复用专家团合规词库，单一真源）：
 
 ```bash
-echo "你的朋友圈文案" | python3 plugins/siyu-execution/skills/siyu-pyq/scripts/pyq_lint.py -
+echo "你的朋友圈文案" | python3 modules/siyu-pyq/scripts/pyq_lint.py -
 ```
 
 - 命中封号动作 / 广告法绝对化用词（诱导分享、最、第一、100%、包治…）→ **就地改写**，不交带红线的文案。

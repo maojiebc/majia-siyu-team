@@ -41,7 +41,7 @@ metadata:
 
 ## 合规前置扫描（必做）
 ```bash
-echo "话术" | python3 plugins/siyu-execution/skills/siyu-huashu/scripts/huashu_lint.py -
+echo "话术" | python3 modules/siyu-huashu/scripts/huashu_lint.py -
 ```
 欢迎/话术不绝对化、不诱导分享、**不在第一句就索要敏感信息**（手机号/身份证/定位要有授权口径）。见 [`references/合规前置扫描.md`](references/合规前置扫描.md)。
 

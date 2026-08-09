@@ -1,0 +1,17 @@
+{"id":"ordinal-step","mode":"customer_copy","text":"第一步先检查分母","hard_fail":false,"must_flags":[],"forbid_flags":["COMPLIANCE_RED","ABSOLUTE_CLAIM","INDUCE_SHARE"]}
+{"id":"ordinal-week","mode":"customer_copy","text":"第一周由店长每天复盘","hard_fail":false,"must_flags":[],"forbid_flags":["COMPLIANCE_RED","ABSOLUTE_CLAIM","INDUCE_SHARE"]}
+{"id":"ordinal-list","mode":"internal_report","text":"复盘分三段。第一，先核对样本；第二，再看分母。","hard_fail":false,"must_flags":[],"forbid_flags":["COMPLIANCE_RED","ABSOLUTE_CLAIM"]}
+{"id":"negated-induced-share","mode":"internal_report","text":"不要做诱导分享，这属于合规红线。","hard_fail":false,"must_flags":["RISK_TERM_MENTION"],"forbid_flags":["COMPLIANCE_RED"]}
+{"id":"negated-optimal","mode":"customer_copy","text":"这不是最优方案，还需要继续验证。","hard_fail":false,"must_flags":["RISK_TERM_MENTION"],"forbid_flags":["COMPLIANCE_RED"]}
+{"id":"attributed-ranking","mode":"internal_report","text":"对方宣称全国第一，尚未核验。","hard_fail":false,"must_flags":["RISK_TERM_MENTION"],"forbid_flags":["COMPLIANCE_RED"]}
+{"id":"quoted-ranking","mode":"internal_report","text":"竞品材料原文写道：「本品牌全国销量第一」，报告尚未核验。","hard_fail":false,"must_flags":["RISK_TERM_MENTION"],"forbid_flags":["COMPLIANCE_RED"]}
+{"id":"customer-ranking","mode":"customer_copy","text":"本品牌全国销量第一，欢迎立即选购。","hard_fail":true,"must_flags":["COMPLIANCE_RED"],"forbid_flags":[]}
+{"id":"customer-absolute","mode":"customer_copy","text":"本品牌绝对领先，是您的唯一选择。","hard_fail":true,"must_flags":["ABSOLUTE_CLAIM"],"forbid_flags":[]}
+{"id":"manual-review-candidate","mode":"customer_copy","text":"我们正努力达到行业领先水平。","hard_fail":false,"must_flags":["ABSOLUTE_CLAIM"],"forbid_flags":[]}
+{"id":"forward-reward","mode":"customer_copy","text":"转发 3 个群即可领券。","hard_fail":true,"must_flags":["INDUCE_SHARE"],"forbid_flags":[]}
+{"id":"pull-people-unlock","mode":"customer_copy","text":"拉 5 人解锁赠品。","hard_fail":true,"must_flags":["INDUCE_SHARE"],"forbid_flags":[]}
+{"id":"risk-report-mechanism","mode":"internal_report","text":"活动用了“转发三个群领券”的机制，存在合规风险，需要下线。","hard_fail":false,"must_flags":["QUOTED_RISK_MENTION"],"forbid_flags":["INDUCE_SHARE"]}
+{"id":"knowledge-risk-warning","mode":"knowledge","text":"不得设置拉五人解锁赠品的机制，这是失败模式。","hard_fail":false,"must_flags":["RISK_TERM_MENTION"],"forbid_flags":["INDUCE_SHARE"]}
+{"id":"knowledge-prescriptive-risk","mode":"knowledge","text":"建议设置拉五人解锁赠品的营销机制。","hard_fail":true,"must_flags":["INDUCE_SHARE"],"forbid_flags":[]}
+{"id":"knowledge-prescriptive-absolute","mode":"knowledge","text":"建议对外文案写：本品牌全国销量第一。","hard_fail":true,"must_flags":["COMPLIANCE_RED"],"forbid_flags":[]}
+{"id":"quoted-evidence","mode":"quoted_evidence","text":"访谈原话：「本品牌全国销量第一，转发三个群领券。」","hard_fail":false,"must_flags":["QUOTED_RISK_MENTION"],"forbid_flags":["COMPLIANCE_RED","INDUCE_SHARE"]}

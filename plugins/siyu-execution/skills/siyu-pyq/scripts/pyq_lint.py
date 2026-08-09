@@ -12,43 +12,35 @@
     python3 pyq_lint.py 文案.txt
 退出码: 0=通过, 1=命中封号红线(必改), 2=用法/环境错误。
 """
-import sys
 import pathlib
+import sys
 
-# 找到 repo 根，把 src 加入 import 路径（scripts -> siyu-pyq -> skills -> siyu-execution -> plugins -> repo）
-ROOT = pathlib.Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(ROOT / "src"))
+# 源码态从 repo/src 导入；SkillHub 独立安装态从包内 tools 导入。
+SCRIPT = pathlib.Path(__file__).resolve()
+for candidate in (SCRIPT.parents[5] / "src", SCRIPT.parents[3] / "tools"):
+    if candidate.is_dir():
+        sys.path.insert(0, str(candidate))
 
 try:
+    from siyu_team.eval.models import ScanMode
     from siyu_team.eval.static import scan
-except Exception:  # 脱离 repo（如装成独立插件）时降级兜底
-    import re as _re
-
+except ImportError as exc:
     print(
-        "⚠️ 脱离 repo，启用降级合规词表（只拦最关键封号红线；完整词库单一真源见 "
-        "src/siyu_team/eval/compliance_lexicon.py）",
+        "❌ 找不到统一合规扫描器；请从仓库根或完整 SkillHub 包运行："
+        f"{exc}",
         file=sys.stderr,
     )
-    _RED = _re.compile(
-        r"(诱导分享|外挂|群发软件|虚拟定位|改定位|第一|最便宜|最好|最佳|最优|最强"
-        r"|最高级|国家级|世界级|100%|稳赚|包赚)"
-    )
+    raise SystemExit(2) from exc
 
-    def scan(text):
-        hit = _RED.search(text)
-        details = (
-            [{"flag": "COMPLIANCE_RED", "desc": "封号/绝对化（降级词表）",
-              "severity": 0.2, "hard": True}]
-            if hit else []
-        )
-        return {
-            "flags": [d["flag"] for d in details],
-            "details": details,
-            "penalty": 1.0,
-            "hard_fail": bool(hit),
-        }
-
-RELEVANT = {"COMPLIANCE_RED", "ABSOLUTE_CLAIM"}
+RELEVANT = {
+    "COMPLIANCE_RED",
+    "ABSOLUTE_CLAIM",
+    "INDUCE_SHARE",
+    "PRIVACY_COLLECT",
+    "ATTRIBUTED_CLAIM",
+    "QUOTED_RISK_MENTION",
+    "RISK_TERM_MENTION",
+}
 
 
 def main() -> None:
@@ -58,7 +50,7 @@ def main() -> None:
     src = sys.argv[1]
     text = sys.stdin.read() if src == "-" else open(src, encoding="utf-8").read()
 
-    result = scan(text)
+    result = scan(text, mode=ScanMode.CUSTOMER_COPY)
     hits = [d for d in result["details"] if d["flag"] in RELEVANT]
     if not hits:
         print("✅ 合规前置扫描通过（无封号红线 / 绝对化用词）")

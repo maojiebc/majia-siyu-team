@@ -88,10 +88,19 @@ Python 模式直接使用 ExecutionPlan 已生成的 `agent_contexts`，不得�
 四官互不读对方输出，也不直接读取 `00-intake.md`；公关/产品/广告官看不到原始请求，只有合规官可读取已脱敏的 `source_text` 与风险字段，故可真并行。
 → 把 `2a/2b/2c/2d` 追加写入 `state.json.completed_steps`
 
-## Step 3 · 主持收口（团长综合）
-1. 跑 `make eval FILE=.siyu-team/02*.md`（`src/siyu_team/eval/cli.py`）对四份产物打质量门分。**命中 `COMPLIANCE_RED` → 打回对应官重做，不进收口。**
-2. `host.stable_shuffle_traces()` 洗牌去位置偏差。
-3. 用 `host.build_host_prompt()`（docs/blueprint.md §3e）综合四官 → 写 `.siyu-team/04-playbook.md` + `reports/deliberation.md`。
+## Step 3a · 静态合规门
+跑 `make compliance FILE=.siyu-team/02*.md`。它只报告合规命中，不是质量评分，也不生成徽章。**命中硬规则 → 打回对应官重做，不进 Judge 或收口。**
+
+## Step 3b · 独立 Judge（可选，但决定是否有质量分）
+1. 对每份已通过合规门的 `02*.md` 跑 `make judge FILE=<产物>` 生成锚定 prompts。
+2. 为每份产物启动全新的 `general-purpose` Judge subagent；只传该产物的 Judge prompts，禁止传 `00-intake.md`、路由文件、生成对话、其他官产物或主控偏好。Judge 不参与生成，彼此也不读取评分结果。
+3. Judge 返回所有维度的 `score` 与 `why`，连同真实 `model`、非空 `config`、`reviewed_at`、`review_method: independent_host_judge` 写入评分 JSON；再跑 `make judge FILE=<产物> SCORES=<评分JSON> REPORT=<JudgeReport.json>`。
+4. 只有完整机器可读 JudgeReport 才能显示质量分与徽章；`status=failed` 时打回对应官重做，复评通过后才进入主持收口。分数和徽章只用于交付复核，**不得自动批准案例入库或知识原子**。
+5. 宿主不能启动独立 Judge、元数据不全或评分失败时，不得由主控补分，不得生成徽章；在收口状态中原样记录：`本轮未做独立质量评分`，然后继续主持收口。
+
+## Step 3c · 主持收口（团长综合）
+1. `host.stable_shuffle_traces()` 洗牌去位置偏差。
+2. 用 `host.build_host_prompt()`（docs/blueprint.md §3e）综合四官 → 写 `.siyu-team/04-playbook.md` + `reports/deliberation.md`。
    - 默认 `host_mode=codex`：你（掌握全程上下文的主控）直接当团长综合。
    - 需二审时 `rounds=2`，把第一轮综合当 H1 输入再审一遍。
 → 把 `state.json.status` 写为 `complete`
@@ -99,7 +108,7 @@ Python 模式直接使用 ExecutionPlan 已生成的 `agent_contexts`，不得�
 ## == Completion ==
 `state.json: status="complete"`。打印 final summary：
 - 列出 `00~04` 全部产物路径
-- 质量门得分 + 徽章
+- 有完整 JudgeReport：列出独立质量分 + 徽章，并注明不代表案例入库或知识批准；否则原样写：`本轮未做独立质量评分`（静态合规通过不得冒充质量分）
 - **Next Steps**：① 方案落飞书 docx（`connectors/lark.py`）② 埋点指标进某 BI 平台（`connectors/bi_platform.py`）③ 复盘周期
 - 如本轮已有可跨对话追踪的结论或假设，收尾提示一次：「有结论想留下，输入 `/siyu-save`。」一次对话最多提示一次。
 
