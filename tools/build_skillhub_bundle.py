@@ -34,6 +34,10 @@ BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
 # 否则独立安装态全是死指针。顺序敏感：先收相对逃逸，再收裸路径；
 # 裸路径用负向后顾防止把已改写的 `_knowledge/...` 再匹配一次。
 RELATIVE_ESCAPE = ("../../../../knowledge/", "../_knowledge/")
+EXPERT_REFERENCE_ESCAPE = (
+    "../../siyu-core/skills/majia-siyu/references/",
+    "../../references/",
+)
 BARE_KNOWLEDGE_RE = re.compile(
     r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms)"
 )
@@ -143,6 +147,7 @@ def rewrite_knowledge_paths(output: Path) -> int:
     for path in output.rglob("*.md"):
         text = path.read_text(encoding="utf-8")
         updated = text.replace(*RELATIVE_ESCAPE)
+        updated = updated.replace(*EXPERT_REFERENCE_ESCAPE)
         updated = BARE_KNOWLEDGE_RE.sub(r"modules/_knowledge/\1", updated)
         if updated != text:
             path.write_text(updated, encoding="utf-8")

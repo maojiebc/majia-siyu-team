@@ -1,4 +1,4 @@
-.PHONY: eval validate pilot atoms test check report
+.PHONY: eval validate pilot atoms links contracts test check report
 
 # 对一份产物方案打质量门分（低于阈值或踩合规红线 exit 1）
 eval:
@@ -25,12 +25,20 @@ atoms:
 		|| { echo "❌ approved 本体与 Pilot 夹具漂移：重跑 PYTHONPATH=src python3 tools/build_growth_atoms.py"; exit 1; }
 	@echo "原子闸门通过：本体与夹具零漂移"
 
+# 仓库与已提交 SkillHub 包的 Markdown 本地链接。
+links:
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_links.py
+
+# Python 路由目标、行业能力、知识引用与分发包路径对账。
+contracts:
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_route_contracts.py
+
 # Runtime 与状态层回归测试（stdlib unittest，零额外依赖）
 test:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests -v
 
 # 总质量门：测试、结构、原子、发布版本、全库 footer/措辞/体积
-check: test validate pilot atoms
+check: test validate pilot atoms links contracts
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_versions.py
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_consistency.py
 

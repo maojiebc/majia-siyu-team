@@ -145,7 +145,7 @@ class RuntimeTests(unittest.TestCase):
 
     def test_empty_request_requires_clarification(self) -> None:
         plan = SiyuRuntime().plan("", trace=False)
-        self.assertEqual(plan.decision.skill, "/siyu")
+        self.assertEqual(plan.decision.skill, "majia-siyu")
         self.assertTrue(plan.decision.needs_clarification)
 
     def test_incomplete_strategy_does_not_dispatch_officers(self) -> None:

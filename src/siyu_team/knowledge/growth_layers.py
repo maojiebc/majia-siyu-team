@@ -2,7 +2,7 @@
 
 规则（产品约定）：
 - 未声明业态 → 只加载 L0
-- industry=catering|retail → L0 + L1 餐饮零售包（retail 暂共用门店壳）
+- industry=catering|retail → L0 + 共享的餐饮零售 L1 方法层
 - 其他已声明业态（如 edu）→ 只加载 L0，直到有对应 L1
 - 市场调研任务不加载增长层（避免内部方法冒充外部事实）
 

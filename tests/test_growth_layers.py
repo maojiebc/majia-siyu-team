@@ -31,7 +31,7 @@ class GrowthLayerTests(unittest.TestCase):
         self.assertEqual(refs[0], L0_DOC)
         self.assertIn(L1_CATERING_DOC, refs)
 
-    def test_retail_shares_l1_for_now(self) -> None:
+    def test_retail_reuses_shared_l1(self) -> None:
         self.assertIn(L1_CATERING_DOC, select_growth_doc_refs("retail"))
 
     def test_edu_only_l0(self) -> None:

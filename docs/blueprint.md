@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> 本文是项目创建期的历史蓝图，保留用于追溯设计来源，其中部分“计划实现”描述已经被 v0.4.0 取代。当前实现以 [`runtime-v0.4.md`](./runtime-v0.4.md)、`src/siyu_team/` 和首页架构图为准。
+> 本文是项目创建期的历史蓝图，保留用于追溯设计来源，其中部分“计划实现”描述已经过时。当前可验证事实以 [`architecture-current.md`](./architecture-current.md)、[`capability-status.md`](./capability-status.md)、`src/siyu_team/` 和首页架构图为准；[`runtime-v0.4.md`](./runtime-v0.4.md) 仅保留为历史版本说明。
 
 下面是历史蓝图文本。
 

@@ -8,7 +8,7 @@
 - JSONL 是可审计真源，索引只能作为可重建派生物。
 - `public`、`expert_private`、`client_private` 三层严格隔离。
 - `client_private` 必须有 `client_id`，且禁止 `exportable=true`。
-- 只有经人工审核的 `approved` 原子才具备进入正式检索的资格；发布批次门在后续 PR 实现。
+- 只有经人工审核的 `approved` 原子才具备进入正式检索的资格。当前兼容加载器仍有 draft 回退，严格批准门与发布批次门尚未闭环，不能把“可解析”写成“已安全发布”。
 
 ## 稳定 ID
 
@@ -49,7 +49,8 @@ ID 由代码生成。修改来源身份、来源定位或来源内序号会得�
 - 选择器：`siyu_team.knowledge.growth_layers`
 - `route_task` 对非市场调研任务自动注入：
   - 无业态 → `L0-通用用户增长原则.md`
-  - catering/retail → L0 + `L1-餐饮零售用增Know-how.md`
+  - catering/retail → L0 + 共享的 `L1-餐饮零售用增Know-how.md`
+  - retail/edu 的独立行业目录状态均为 `generic_only`，不生成不存在的行业册路径；edu 仅 L0
 - 正式集原子：`knowledge/04-atoms/growth-layers.approved.jsonl`（`load_growth_atoms(industry)`）
 - **仍不**把 draft 原子自动当 approved 检索真源；Pilot 正式集规则不变
 - 旧文 `用增方法映射-餐饮零售.md` 降级为中间稿

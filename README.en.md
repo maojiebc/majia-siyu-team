@@ -139,7 +139,7 @@ flowchart LR
 4. **Diagnosis** — four isolated officers + host quality gate + compliance veto  
 5. **Foundation** — local state, redacted traces, layered knowledge contract, connector stubs (online submit/retrieve not enabled by default)
 
-runtime backend notes: [`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · knowledge contract: [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md).
+current execution facts: [`docs/architecture-current.md`](docs/architecture-current.md) · capability status: [`docs/capability-status.md`](docs/capability-status.md) · knowledge contract: [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md).
 
 ## Community knowledge pilot (invitation only)
 

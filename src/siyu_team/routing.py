@@ -14,6 +14,15 @@ from .knowledge.paths import COMPLIANCE_REDLINES_DOC, METHODOLOGY_AXIOMS_DOC
 
 
 INDUSTRIES = {"catering": "餐饮", "retail": "零售", "edu": "教培"}
+# 行业知识能力必须显式声明。通用能力可以回答，不等于仓库里已有行业包。
+INDUSTRY_CAPABILITIES = {
+    "catering": "supported_with_industry_pack",
+    "retail": "generic_only",
+    "edu": "generic_only",
+}
+INDUSTRY_BOOKS = {
+    "catering": "knowledge/02-industry/catering/",
+}
 STAGES = {
     "cold": "冷启动（0 起步 / 有微信没体系）",
     "growth": "扩张（有体系要提效）",
@@ -64,7 +73,7 @@ TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
         "请求是汇总交付物，进入报告生成与合规扫描。",
     ),
     TaskKind.UNKNOWN: (
-        "/siyu",
+        "majia-siyu",
         "当前信息不足以安全选择执行能力，由入口只补问一个关键问题。",
     ),
 }
@@ -98,11 +107,7 @@ def route(industry: str, stage: str) -> dict[str, Any]:
     """旧版行业×阶段接口，供现有 orchestrator/Skill 继续使用。"""
     normalized_industry = industry if industry in INDUSTRIES else ""
     normalized_stage = stage if stage in STAGES else ""
-    book = (
-        f"knowledge/02-industry/{normalized_industry}/"
-        if normalized_industry
-        else None
-    )
+    book = INDUSTRY_BOOKS.get(normalized_industry)
     return {
         "industry": normalized_industry,
         "industry_cn": INDUSTRIES.get(
@@ -110,6 +115,9 @@ def route(industry: str, stage: str) -> dict[str, Any]:
         ),
         "stage": normalized_stage,
         "stage_cn": STAGES.get(normalized_stage, "未定，需 Step 0 补问"),
+        "capability_status": INDUSTRY_CAPABILITIES.get(
+            normalized_industry, "unknown"
+        ),
         "industry_book": book,
         "focus": STAGE_FOCUS.get(
             normalized_stage, "Step 0 调研补齐阶段后再定重点。"

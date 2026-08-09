@@ -1,7 +1,7 @@
 ---
 name: siyu-wenzhen
 description: |
-  私域业务轻问诊：先用五层消解漏斗判断具体问题是否成立，再给答案或升级全盘诊断全盘诊断。
+  私域业务轻问诊：先用五层消解漏斗判断具体问题是否成立，再给答案或升级全盘诊断。
   触发方式：/siyu-wenzhen、/问诊、「转化差怎么办」「群不活跃」「没人加微」「我有个私域问题」。
 metadata:
   version: "1.4.1"
@@ -20,7 +20,7 @@ metadata:
 5. **沉默盘是机制问题，不是文案问题**：长期低于基线时先查分层、预期与承接机制。
 6. **合规是前置，不是事后**：一句违规能抵消长期运营，生成端就要拦截。
 
-所有判断都要能追溯到至少一条公理。增长类问题：优先用任务计划里的 `growth_atoms`（按业态加载的 L0/L1 精简判断句）；没有计划时读 `modules/_knowledge/00-methodology/L0-通用用户增长原则.md`，业态是餐饮/零售再读 `modules/_knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`。需要更多案例时读取 [`../_knowledge/00-methodology/私域公理与消解案例库.md`](../_knowledge/00-methodology/私域公理与消解案例库.md)。
+所有判断都要能追溯到至少一条公理。增长类问题：优先用任务计划里的 `growth_atoms`（按业态加载的 L0/L1 精简判断句）；没有计划时读 `modules/_knowledge/00-methodology/L0-通用用户增长原则.md`，餐饮/零售可再读共享的 `modules/_knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`，但零售仍不声称有独立行业册。需要更多案例时读取 [`../_knowledge/00-methodology/私域公理与消解案例库.md`](../_knowledge/00-methodology/私域公理与消解案例库.md)。
 
 ## 动态外部事实边界
 
