@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/maojiebc/majia-siyu-team/raw/main/schemas/execution-plan-v1.schema.json",
+  "title": "ExecutionPlan v1",
+  "description": "Contract for a Siyu execution plan produced by the Python runtime or the prompt-only fallback.",
+  "type": "object",
+  "required": [
+    "plan_schema_version",
+    "runtime_mode",
+    "trace_id",
+    "task",
+    "decision",
+    "knowledge",
+    "warnings"
+  ],
+  "properties": {
+    "plan_schema_version": {
+      "const": "1.0"
+    },
+    "runtime_mode": {
+      "type": "string",
+      "enum": [
+        "python",
+        "prompt_only"
+      ]
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task": {
+      "type": "object"
+    },
+    "decision": {
+      "type": "object"
+    },
+    "knowledge": {
+      "type": "object",
+      "required": [
+        "corpus_version",
+        "corpus_hash",
+        "selection_count",
+        "atoms"
+      ],
+      "properties": {
+        "corpus_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "corpus_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selection_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "atoms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "source_id",
+              "locator",
+              "why_selected"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1
+              },
+              "why_selected": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "agent_contexts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "officer",
+          "fields"
+        ],
+        "properties": {
+          "officer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fields": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "growth_atoms": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "growth_load_note": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

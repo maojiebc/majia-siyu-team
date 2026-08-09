@@ -8,7 +8,12 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from .models import PilotTask, PilotValidationError, SCORE_DIMENSIONS
+from .models import (
+    RATING_AUDIT_FIELDS,
+    PilotTask,
+    PilotValidationError,
+    SCORE_DIMENSIONS,
+)
 from .packets import PROMPT_MARKER, render_task, write_private_text
 
 
@@ -51,6 +56,7 @@ def _rating_sheet(task_ids: list[str]) -> str:
     fields = ["reviewer_id", "task_id"]
     fields.extend(f"left_{dimension}" for dimension in SCORE_DIMENSIONS)
     fields.extend(f"right_{dimension}" for dimension in SCORE_DIMENSIONS)
+    fields.extend(RATING_AUDIT_FIELDS)
     fields.extend(("preference", "reason"))
     writer = csv.DictWriter(output, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
@@ -65,13 +71,21 @@ def create_blind_pairs(run: Path) -> Path:
     seed = int(data["seed"])
     pairs: dict[str, dict[str, str]] = {}
     themes: dict[str, str] = {}
+    generation_answer_hashes: dict[str, dict[str, str]] = {}
+    blind_pair_hashes: dict[str, str] = {}
     task_ids: list[str] = []
     for raw_task in data["tasks"]:
         if not isinstance(raw_task, Mapping):
             raise PilotValidationError("manifest.tasks 中的每项必须是对象")
         task = PilotTask.from_dict(raw_task)
-        baseline = _read_answer(run / "generation" / "baseline" / f"{task.id}.md")
-        knowledge = _read_answer(run / "generation" / "knowledge" / f"{task.id}.md")
+        baseline_path = run / "generation" / "baseline" / f"{task.id}.md"
+        knowledge_path = run / "generation" / "knowledge" / f"{task.id}.md"
+        baseline = _read_answer(baseline_path)
+        knowledge = _read_answer(knowledge_path)
+        generation_answer_hashes[task.id] = {
+            "baseline": hashlib.sha256(baseline_path.read_bytes()).hexdigest(),
+            "knowledge": hashlib.sha256(knowledge_path.read_bytes()).hexdigest(),
+        }
         knowledge_left = _knowledge_on_left(seed, task.id)
         left = knowledge if knowledge_left else baseline
         right = baseline if knowledge_left else knowledge
@@ -88,10 +102,20 @@ def create_blind_pairs(run: Path) -> Path:
                 f"## 左侧答案\n\n{left}",
                 f"## 右侧答案\n\n{right}",
             )
-        )
-        write_private_text(run / "blind" / "pairs" / f"{task.id}.md", content + "\n")
+        ) + "\n"
+        write_private_text(run / "blind" / "pairs" / f"{task.id}.md", content)
+        blind_pair_hashes[task.id] = hashlib.sha256(
+            content.encode("utf-8")
+        ).hexdigest()
 
-    map_payload = {"seed": seed, "pairs": pairs, "task_themes": themes}
+    map_payload = {
+        "seed": seed,
+        "pairs": pairs,
+        "task_themes": themes,
+        "hash_algorithm": "sha256",
+        "generation_answer_hashes": generation_answer_hashes,
+        "blind_pair_hashes": blind_pair_hashes,
+    }
     map_path = run / "blind" / "blind-map.json"
     write_private_text(
         map_path,

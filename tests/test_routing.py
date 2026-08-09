@@ -5,7 +5,7 @@ import unittest
 
 from siyu_team.knowledge.growth_layers import L0_DOC, L1_CATERING_DOC
 from siyu_team.knowledge.paths import COMPLIANCE_REDLINES_DOC, METHODOLOGY_AXIOMS_DOC
-from siyu_team.routing import route_task
+from siyu_team.routing import route, route_task
 from siyu_team.task import Task, TaskKind
 
 
@@ -13,7 +13,7 @@ class TestRouteTask(unittest.TestCase):
     def test_moments_copy_route(self) -> None:
         task = Task(kind=TaskKind.MOMENTS_COPY, source_text="写朋友圈")
         decision = route_task(task)
-        self.assertEqual(decision.skill, "/siyu-pyq")
+        self.assertEqual(decision.skill, "siyu-pyq")
         self.assertFalse(decision.needs_clarification)
 
     def test_market_research_skip_industry_book(self) -> None:
@@ -57,12 +57,28 @@ class TestRouteTask(unittest.TestCase):
         decision = route_task(task)
         self.assertTrue(decision.needs_clarification)
         self.assertIn("kind", decision.required_fields)
+        self.assertEqual(decision.skill, "majia-siyu")
 
     def test_diagnosis_focus_includes_growth_note(self) -> None:
         task = Task(kind=TaskKind.DIAGNOSIS, source_text="转化差怎么办")
         decision = route_task(task)
         self.assertIn("L0", decision.focus)
         self.assertIn(L0_DOC, decision.knowledge_refs)
+
+    def test_retail_and_edu_are_generic_only(self) -> None:
+        for industry in ("retail", "edu"):
+            decision = route(industry, "cold")
+            self.assertEqual(decision["capability_status"], "generic_only")
+            self.assertIsNone(decision["industry_book"])
+
+    def test_catering_has_real_industry_pack(self) -> None:
+        decision = route("catering", "cold")
+        self.assertEqual(
+            decision["capability_status"], "supported_with_industry_pack"
+        )
+        self.assertEqual(
+            decision["industry_book"], "knowledge/02-industry/catering/"
+        )
 
 
 

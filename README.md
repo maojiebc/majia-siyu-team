@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.4.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.2-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.4.1 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.4.2 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
 </p>
 
 > **一张图看懂**：说真实处境 → `/siyu` 只选当前最该做的一步 → 高频任务直接写朋友圈 / 群发 / 话术（边写边合规）→ 真结构问题才升级全盘诊断评审 → 结论可存档、可续聊、可出报告。经营动作归本仓；会员指标 / SQL / 数仓请用 [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan)。
@@ -197,7 +197,7 @@ flowchart LR
 4. **诊断层** —— 结构问题才进全盘诊断；四位专家彼此看不见对方意见，总协调只评推理质量，合规可一票否决  
 5. **底座** —— 本地状态、脱敏追踪、分层知识契约、连接器预留（线上提交 / 检索尚未默认打开）
 
-技术细节：[`docs/runtime-v0.4.md`](docs/runtime-v0.4.md) · [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md) · [`docs/framework.svg`](docs/framework.svg) · [`docs/skill-link-map.mmd`](docs/skill-link-map.mmd)（17 个 skill 的路由与原子绑定关系图） · [`docs/标杆移植说明.md`](docs/标杆移植说明.md)
+当前执行事实：[`docs/architecture-current.md`](docs/architecture-current.md) · [`docs/capability-status.md`](docs/capability-status.md) · [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md) · [`docs/framework.svg`](docs/framework.svg) · [`docs/skill-link-map.mmd`](docs/skill-link-map.mmd)（17 个 skill 的路由与原子绑定关系图） · [`docs/标杆移植说明.md`](docs/标杆移植说明.md)
 
 ## 同行知识共建（邀请制）
 
@@ -230,9 +230,9 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v1.4.2** — 稳定化：统一入口与后台执行、分发契约；公开知识严格装配；静态合规与独立评分分轨；提示词、隐私、会话和安装态回归加固。H1/H2/H3 仍待真实试验评估。
 - **v1.4.1** — 原子工具链双轨（v2 检索/校验 + `make atoms` 闸门）；skills 绑定接线；roster 官名单可配置；发布包随包分发公开知识层与查询工具；CLI 冒烟测试补齐。
 - **v1.3.0** — 统一错误码体系、干货判断（知识原子）缓存、低置信度主动追问；合规绝对化软化语境窗口。
-- **v1.2.9** — 后台运行层（Runtime）硬化：kind 积分路由、合规加权惩罚、路径常量化、host 提示词外置、追踪清理与回归测试补齐。
 
 完整变更历史见 [CHANGELOG.md](./CHANGELOG.md) 或 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

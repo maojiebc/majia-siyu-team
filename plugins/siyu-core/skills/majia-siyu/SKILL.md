@@ -5,7 +5,7 @@ description: |
   边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan；召回/提频/防流失的数据依据也在那边。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.4.1"
+  version: "1.4.2"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-siyu-team
 ---
@@ -43,24 +43,13 @@ metadata:
 
 ## 模式 A：任务前路由
 
-源码可用时必须先调用 `Siyu后台自动系统.plan()`，只按 `decision.skill` 路由；需要补信息时只问 `required_fields` 第一项。下表是降级规则。
+完整读取生成契约 [`references/route-contract.json`](references/route-contract.json)，以其中的规则、路由和 `content_sha256` 为唯一真相源；不要另写一份路由表。
 
-### 路由表
+- **Python 模式**：仅当宿主能执行 `siyu-plan --contract-info`，且返回的 `route_contract_hash` 与契约哈希完全一致时，才执行 `siyu-plan "<原始请求>" ...` 并使用其 ExecutionPlan；`runtime_mode` 必须为 `python`。
+- **Prompt-only 模式**：不能执行 CLI、版本或哈希不匹配时，直接按契约解析与路由，并在内部计划标记 `runtime_mode: prompt_only`。此模式不得声称代码已强制上下文隔离、trace、状态机或知识检索。
+- SkillHub 单入口包不含 Python 后台执行层，默认走 Prompt-only；会员数据类路由到外部 `majia-huiyuan`。零售/教培只用通用能力，不虚构行业册。
 
-| 用户意图信号 | 路由到 | 一句话说明 |
-|---|---|---|
-| 写朋友圈、发圈、内容池、节日文案、导购素材 | `/siyu-pyq` | 按配比套结构写朋友圈，合规前置扫描 |
-| 群发、栏目推送、秒杀通知、社群日更、打开率低要新推送 | `/siyu-qunfa` | 写绑定真实优惠的栏目脚本，边写边合规 |
-| 破冰、欢迎语、新人进群、答疑、加人后说什么 | `/siyu-huashu` | 写欢迎与答疑话术，第一句话就是品牌门面 |
-| 厂商选型、竞品、报价、市场地图、产品状态/功能/案例、政策/平台规则 | `siyu-market-research` | 实时检索并生成带日期和证据的调研快照 |
-| 转化差、没人加微、留存掉、有具体私域问题 | `siyu-wenzhen` | 先判断问题本身是否成立，再解决或往上走 |
-| 整盘怎么搭、私域从哪开始、看整个盘子 | 见 `references/整盘怎么搭-老板版.md` | 只装入口 / 店老板 → 出老板版向导（讲人话+图+网页）；完整仓 + 专业运营 → `siyu-onboard` 深度版 |
-| 保存、记下来、存档、把结论留下 | `/siyu-save` | 把本次结论写入本地客户档案 |
-| 上次、接着、之前聊到哪 | `/siyu-restore` | 拉出最近的客户档案接着干 |
-| 出报告、打包给老板或客户看 | `/siyu-report` | 合并同一客户的多份存档并做合规扫描 |
-| 更新私域专家团 | `/siyu-update` | 同步官方项目，不碰本地客户档案 |
-| 圈谁、流失阈值、券力度、效果算账 | 外部 `majia-huiyuan` | 会员动作的数据依据在姊妹篇 |
-| 海报、活动主视觉、配图 | 外部出图 skill | 文案完成后路由 `guizang-social-card` 或 `baoyu-cover-image` |
+不存在可调用的概念性后台对象；只能使用真实 CLI 或明确降级。
 
 ### 工作流程
 
@@ -104,6 +93,7 @@ metadata:
 
 ## 📋 版本记录
 
+- **v1.4.2** — 入口与后台执行、分发契约对齐；知识严格装配；合规、隐私、会话与安装态边界加固。
 - **v1.4.1** — 会员动作的数据依据互指姊妹篇 majia-huiyuan。
 - **v1.4.0** — 原子工具链双轨（v2 检索/校验 + `make atoms` 闸门）；skills 绑定接线；roster 官名单可配置；发布包随包分发公开知识层与查询工具；CLI 冒烟测试补齐。
 

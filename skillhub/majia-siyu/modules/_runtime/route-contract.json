@@ -1,0 +1,322 @@
+{
+  "content_sha256": "sha256:a9dbb97ef31ac283b4516ea78870b442304704ab8de9ba45d8f656c0e1dee578",
+  "contract_schema_version": "1.0",
+  "industry_capabilities": {
+    "catering": {
+      "industry_book": "knowledge/02-industry/catering/",
+      "label": "餐饮",
+      "status": "supported_with_industry_pack"
+    },
+    "edu": {
+      "industry_book": null,
+      "label": "教培",
+      "status": "generic_only"
+    },
+    "retail": {
+      "industry_book": null,
+      "label": "零售",
+      "status": "generic_only"
+    }
+  },
+  "required_fields": {
+    "low_confidence": [
+      "kind"
+    ],
+    "strategy_review": [
+      "industry",
+      "stage"
+    ],
+    "unknown": [
+      "kind"
+    ]
+  },
+  "routes": {
+    "conversation_script": {
+      "reason": "请求的是欢迎、破冰或答疑话术，走一对一承接执行层。",
+      "skill": "siyu-huashu",
+      "target_type": "bundled"
+    },
+    "diagnosis": {
+      "reason": "请求包含结果异常或因果疑问，先验证问题是否成立。",
+      "skill": "siyu-wenzhen",
+      "target_type": "bundled"
+    },
+    "group_campaign": {
+      "reason": "请求的是群发或社群推送，走栏目与承接脚本执行层。",
+      "skill": "siyu-qunfa",
+      "target_type": "bundled"
+    },
+    "market_research": {
+      "reason": "请求涉及厂商、产品、价格或市场动态，先实时检索并生成证据快照。",
+      "skill": "siyu-market-research",
+      "target_type": "bundled"
+    },
+    "membership_data": {
+      "reason": "请求涉及会员指标、字段、SQL 或人群圈选，转交会员数据能力处理。",
+      "skill": "majia-huiyuan",
+      "target_type": "external"
+    },
+    "moments_copy": {
+      "reason": "请求的是朋友圈内容生产，走执行层并做生成前合规检查。",
+      "skill": "siyu-pyq",
+      "target_type": "bundled"
+    },
+    "report": {
+      "reason": "请求是汇总交付物，进入报告生成与合规扫描。",
+      "skill": "siyu-report",
+      "target_type": "bundled"
+    },
+    "restore_memory": {
+      "reason": "请求是恢复上次结论，读取本地客户档案。",
+      "skill": "siyu-restore",
+      "target_type": "bundled"
+    },
+    "save_memory": {
+      "reason": "请求是保存当前结论，进入本地客户档案。",
+      "skill": "siyu-save",
+      "target_type": "bundled"
+    },
+    "strategy_review": {
+      "reason": "请求涉及整盘结构，进入四位专家分头评审和总协调收口。",
+      "skill": "siyu-onboard",
+      "target_type": "bundled"
+    },
+    "unknown": {
+      "reason": "当前信息不足以安全选择执行能力，由入口只补问一个关键问题。",
+      "skill": "majia-siyu",
+      "target_type": "bundled"
+    },
+    "update": {
+      "reason": "请求更新已安装的私域专家团，进入专用版本检查与安装流程。",
+      "skill": "siyu-update",
+      "target_type": "bundled"
+    }
+  },
+  "stages": {
+    "cold": {
+      "focus": "先解决『加得上人 + 加进来不流失』：钩子、承接、第一周 SOP。",
+      "label": "冷启动（0 起步 / 有微信没体系）"
+    },
+    "growth": {
+      "focus": "先解决『分层提效 + 复购』：标签体系、自动化 SOP、复购召回。",
+      "label": "扩张（有体系要提效）"
+    },
+    "mature": {
+      "focus": "先解决『规模化裂变 + 会员体系』：合规裂变机制、会员等级、案例复制。",
+      "label": "成熟（要规模化裂变）"
+    }
+  },
+  "task": {
+    "archive_kinds": [
+      "restore_memory",
+      "save_memory"
+    ],
+    "archive_signal_pattern": "(保存|存档|记下来|留下结论|恢复|接着上次|上次聊|之前聊到哪)",
+    "channels": [
+      "wechat_moments",
+      "wechat_group",
+      "wechat_dm",
+      "multi_channel",
+      "unknown"
+    ],
+    "confidence": {
+      "ambiguity_gap": 0.7,
+      "clarify_threshold": 0.6,
+      "max_rule_weight": 3.4
+    },
+    "content_kinds": [
+      "conversation_script",
+      "diagnosis",
+      "group_campaign",
+      "market_research",
+      "moments_copy",
+      "report",
+      "strategy_review"
+    ],
+    "goal_rules": [
+      {
+        "goal": "retention",
+        "pattern": "(留存|复购|召回|唤醒)"
+      },
+      {
+        "goal": "acquisition",
+        "pattern": "(获客|拉新|加微|引流)"
+      },
+      {
+        "goal": "engagement",
+        "pattern": "(活跃|打开|回复|互动)"
+      },
+      {
+        "goal": "trust",
+        "pattern": "(信任|口碑|人设|公关)"
+      },
+      {
+        "goal": "conversion",
+        "pattern": "(转化|成交|下单|销售|GMV|活动)"
+      }
+    ],
+    "goals": [
+      "conversion",
+      "retention",
+      "acquisition",
+      "engagement",
+      "trust",
+      "diagnosis",
+      "documentation",
+      "unknown"
+    ],
+    "hint_keys": [
+      "audience",
+      "channel",
+      "client",
+      "confidence",
+      "constraints",
+      "context",
+      "goal",
+      "industry",
+      "kind",
+      "need_compliance_check",
+      "risk",
+      "schema_version",
+      "source_text",
+      "stage",
+      "task_id"
+    ],
+    "industry_rules": [
+      {
+        "industry": "catering",
+        "pattern": "(餐饮|餐厅|饭店|门店套餐)"
+      },
+      {
+        "industry": "retail",
+        "pattern": "(零售|商超|便利店)"
+      },
+      {
+        "industry": "edu",
+        "pattern": "(教培|培训机构|试听课)"
+      }
+    ],
+    "kind_rule_order_is_tiebreaker": true,
+    "kind_rules": [
+      {
+        "ignore_case": true,
+        "kind": "membership_data",
+        "pattern": "((会员|复购率|留存率|流失|RFM|人群).{0,24}(怎么算|计算|口径|SQL|DDL|数仓|字段|看板|数据质量|指标定义|分层规则|标签字段|圈出|阈值|怎么定)|(SQL|DDL|数仓|字段词典|数据质量|会员看板|圈出).{0,24}(会员|复购|留存|流失|RFM|未购|高频)|RFM.{0,12}(分层|规则|标签))",
+        "weight": 3.4
+      },
+      {
+        "ignore_case": false,
+        "kind": "market_research",
+        "pattern": "(厂商|供应商|服务商|竞品|市场格局|市场地图|产品选型|SCRM|CRM|公司存续|客户案例|最新政策|(政策|平台规则|企微规则|广告政策).{0,12}(变化|更新|调整|新规|现行|当前|最新|允许|限制|核验)|(当前|现行|最新).{0,8}(政策|平台规则|企微规则|广告政策)|平台.{0,10}(最新限制|当前限制|规则变化)|对比.{0,16}(报价|功能|价格|厂商|软件|系统|平台)|(产品|软件|平台|系统).{0,8}(价格|报价|收费|功能|版本|接口|停服|在营)|(价格|报价|功能|版本|接口).{0,8}(厂商|供应商|服务商|软件|平台|产品|系统)|是否.{0,8}(经营|停服|注销))",
+        "weight": 3.0
+      },
+      {
+        "ignore_case": false,
+        "kind": "group_campaign",
+        "pattern": "((打开率|点击率|触达).{0,12}(低|差|下滑|不高).{0,20}(写|出|生成|重写|给).{0,16}(新推送|推送|群发|通知)|(重写|改写|给我|来).{0,12}(新推送|新版推送|新的推送))",
+        "weight": 3.1
+      },
+      {
+        "ignore_case": false,
+        "kind": "strategy_review",
+        "pattern": "(全盘|整盘|战略评审|私域体系|全面搭建|怎么搭|四官|私域.{0,20}(评审|规模化复制|盘子|搭起来))",
+        "weight": 2.8
+      },
+      {
+        "ignore_case": false,
+        "kind": "diagnosis",
+        "pattern": "(为什么|怎么办|问题.{0,4}(在哪|哪里)|诊断|长期|一直|连续.{0,8}(低|差|没|下降)|下降|转化差|留存.{0,3}(掉|差)|没人加微|不活跃|没回复|没打开|打开率.{0,6}(低|差|还是))",
+        "weight": 3.0
+      },
+      {
+        "ignore_case": false,
+        "kind": "moments_copy",
+        "pattern": "(朋友圈|发圈|内容池|节日文案|导购素材)",
+        "weight": 2.4
+      },
+      {
+        "ignore_case": false,
+        "kind": "group_campaign",
+        "pattern": "(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本)",
+        "weight": 2.2
+      },
+      {
+        "ignore_case": false,
+        "kind": "conversation_script",
+        "pattern": "(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本)",
+        "weight": 2.2
+      },
+      {
+        "ignore_case": false,
+        "kind": "report",
+        "pattern": "(出报告|生成报告|打包成.{0,16}报告|打包给.{0,10}(老板|客户)|(汇总|合并).{0,12}报告|老板报告)",
+        "weight": 2.2
+      },
+      {
+        "ignore_case": true,
+        "kind": "update",
+        "pattern": "(/siyu-update|(更新|升级|同步|检查并安装|安装).{0,16}(私域专家团|majia-siyu|siyu-team|siyu|最新版|最新正式版)|(私域专家团|majia-siyu|siyu-team|siyu).{0,16}(更新|升级|最新版|最新正式版|v\\d+\\.\\d+\\.\\d+))",
+        "weight": 2.1
+      },
+      {
+        "ignore_case": false,
+        "kind": "restore_memory",
+        "pattern": "(恢复|接着上次|上次聊|之前聊到哪)",
+        "weight": 1.5
+      },
+      {
+        "ignore_case": false,
+        "kind": "save_memory",
+        "pattern": "(保存|存档|记下来|留下结论|结论.{0,4}(留下|保存)|把.{0,8}留下)",
+        "weight": 1.0
+      }
+    ],
+    "overrides": {
+      "ambiguous_parallel_intent_kind": "unknown",
+      "completed_content_archive_pattern": "(已(经)?定稿|不要重写|只存档) + (保存|存档|留下)",
+      "precedence_kinds": [
+        "market_research",
+        "membership_data"
+      ],
+      "verified_market_snapshot_excludes": "market_research"
+    },
+    "risk_levels": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "risk_rules": {
+      "high": "(批量.{0,4}(加好友|群发)|手机号|身份证|定位|外挂|虚拟定位|诱导分享|拉.{0,3}\\d+.{0,3}人|100%|稳赚|包赚|最便宜|最好)",
+      "medium": "(群发|裂变|优惠|折扣|秒杀|收集|电话|微信号)"
+    },
+    "stage_rules": [
+      {
+        "pattern": "(冷启动|从\\s*0\\s*开始|0\\s*[→到-]\\s*1|零基础)",
+        "stage": "cold"
+      },
+      {
+        "pattern": "(扩张|已有.{0,6}体系.{0,8}提效|整盘提效)",
+        "stage": "growth"
+      },
+      {
+        "pattern": "(成熟|规模化.{0,6}(复制|裂变)|体系复制)",
+        "stage": "mature"
+      }
+    ],
+    "task_kinds": [
+      "moments_copy",
+      "group_campaign",
+      "conversation_script",
+      "market_research",
+      "membership_data",
+      "diagnosis",
+      "strategy_review",
+      "save_memory",
+      "restore_memory",
+      "report",
+      "update",
+      "unknown"
+    ],
+    "task_schema_version": "1.0"
+  }
+}

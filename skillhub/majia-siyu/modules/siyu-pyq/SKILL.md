@@ -2,7 +2,7 @@
 name: siyu-pyq
 description: 私域朋友圈文案生成——输入主题/产品，按内容配比与爆款结构一次出可直接发的整周朋友圈文案（含 emoji + 标签 + 发布时段），并做合规前置扫描。Use this skill when 写朋友圈文案、排朋友圈内容池、企微/私域运营发圈、按节日节点出朋友圈、给门店导购写发圈素材时。
 metadata:
-  version: "1.4.1"
+  version: "1.4.2"
 ---
 
 # 朋友圈文案官（siyu-pyq）
@@ -36,7 +36,7 @@ metadata:
 产出前对每条跑一遍合规扫描（复用专家团合规词库，单一真源）：
 
 ```bash
-echo "你的朋友圈文案" | python3 plugins/siyu-execution/skills/siyu-pyq/scripts/pyq_lint.py -
+echo "你的朋友圈文案" | python3 modules/siyu-pyq/scripts/pyq_lint.py -
 ```
 
 - 命中封号动作 / 广告法绝对化用词（诱导分享、最、第一、100%、包治…）→ **就地改写**，不交带红线的文案。

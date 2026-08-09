@@ -41,27 +41,27 @@ class StateStoreTests(unittest.TestCase):
             with self.assertRaises(StateError):
                 store.update(current_step=-1)
 
-    def test_legacy_state_is_migrated_on_next_update(self) -> None:
+    def test_legacy_state_is_read_only_migrated_to_run_directory(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             state_directory = Path(directory) / ".siyu-team"
             state_directory.mkdir()
             path = state_directory / "state.json"
-            path.write_text(
-                json.dumps(
-                    {
-                        "client": "旧客户",
-                        "status": "in_progress",
-                        "current_step": 1,
-                    },
-                    ensure_ascii=False,
-                ),
-                encoding="utf-8",
+            original = json.dumps(
+                {
+                    "client": "旧客户",
+                    "status": "in_progress",
+                    "current_step": 1,
+                },
+                ensure_ascii=False,
             )
+            path.write_text(original, encoding="utf-8")
             store = StateStore(state_directory)
             self.assertEqual(store.read()["schema_version"], "1.0")
             store.update(step=2)
-            persisted = json.loads(path.read_text(encoding="utf-8"))
-            self.assertEqual(persisted["schema_version"], "1.0")
+            self.assertEqual(path.read_text(encoding="utf-8"), original)
+            self.assertNotEqual(store.path, path)
+            self.assertEqual(store.read()["current_step"], 2)
+            self.assertEqual(store.read()["migrated_from"], "state.json")
 
 
 if __name__ == "__main__":

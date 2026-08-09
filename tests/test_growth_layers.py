@@ -31,7 +31,7 @@ class GrowthLayerTests(unittest.TestCase):
         self.assertEqual(refs[0], L0_DOC)
         self.assertIn(L1_CATERING_DOC, refs)
 
-    def test_retail_shares_l1_for_now(self) -> None:
+    def test_retail_reuses_shared_l1(self) -> None:
         self.assertIn(L1_CATERING_DOC, select_growth_doc_refs("retail"))
 
     def test_edu_only_l0(self) -> None:
@@ -100,7 +100,15 @@ class GrowthLayerTests(unittest.TestCase):
     def test_officer_prompt_lists_growth_locators(self) -> None:
         plan = SiyuRuntime().plan(
             "帮我做整盘私域战略评审",
-            hints={"industry": "catering", "stage": "growth"},
+            hints={
+                "industry": "catering",
+                "stage": "growth",
+                "context": {
+                    "brand": "示例品牌",
+                    "offer": "会员权益",
+                    "budget": 5000,
+                },
+            },
             trace=False,
         )
         ctx = plan.agent_contexts[0]
@@ -110,7 +118,8 @@ class GrowthLayerTests(unittest.TestCase):
             routing="test",
         )
         self.assertIn("增长参考", prompt)
-        self.assertIn("L0-01", prompt)
+        self.assertRegex(prompt, r"\[L0-\d+\|l0\]")
+        self.assertIn("按任务与路由相关性装配", prompt)
 
 
 
@@ -206,7 +215,15 @@ class GrowthContextInjectionTests(unittest.TestCase):
         from siyu_team.runtime import SiyuRuntime
         plan = SiyuRuntime().plan(
             "帮我做整盘私域战略评审",
-            hints={"industry": "catering", "stage": "growth"},
+            hints={
+                "industry": "catering",
+                "stage": "growth",
+                "context": {
+                    "brand": "示例品牌",
+                    "offer": "会员权益",
+                    "budget": 5000,
+                },
+            },
             trace=False,
         )
         self.assertFalse(plan.decision.needs_clarification)
