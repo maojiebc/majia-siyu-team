@@ -5,6 +5,7 @@ import unittest
 from siyu_team.knowledge.growth_layers import (
     L0_DOC,
     L1_CATERING_DOC,
+    L1_RETAIL_DOC,
     describe_growth_load,
     filter_atoms_by_skills,
     format_growth_atoms_for_context,
@@ -32,7 +33,9 @@ class GrowthLayerTests(unittest.TestCase):
         self.assertIn(L1_CATERING_DOC, refs)
 
     def test_retail_reuses_shared_l1(self) -> None:
-        self.assertIn(L1_CATERING_DOC, select_growth_doc_refs("retail"))
+        refs = select_growth_doc_refs("retail")
+        self.assertIn(L1_CATERING_DOC, refs)
+        self.assertIn(L1_RETAIL_DOC, refs)
 
     def test_edu_only_l0(self) -> None:
         self.assertEqual(select_growth_doc_refs("edu"), (L0_DOC,))

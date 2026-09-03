@@ -47,6 +47,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("request", nargs="?", default="", help="用户的原始私域请求")
     parser.add_argument("--industry", default="")
     parser.add_argument("--stage", default="")
+    parser.add_argument(
+        "--model",
+        dest="business_model",
+        default="",
+        help="经营模式：direct 直营 / franchise 加盟 / mixed 混合",
+    )
     parser.add_argument("--client", default="")
     parser.add_argument("--audience", default="")
     trace_group = parser.add_mutually_exclusive_group()
@@ -134,6 +140,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         for key, value in {
             "industry": args.industry,
             "stage": args.stage,
+            "business_model": args.business_model,
             "client": args.client,
             "audience": args.audience,
         }.items()

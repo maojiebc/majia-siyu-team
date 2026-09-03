@@ -20,6 +20,7 @@ from .models import KnowledgeAtomV2
 DEFAULT_SELECTION_LIMIT = 12
 L0_TOPIC = "growth_l0"
 L1_CATERING_TOPIC = "growth_l1_catering"
+L1_RETAIL_TOPIC = "growth_l1_retail"
 
 # These routes either obtain evidence elsewhere or do not have enough task
 # information to select public growth knowledge safely.
@@ -86,10 +87,13 @@ _THEME_ALIASES: Mapping[str, tuple[str, ...]] = {
 
 _CONFIDENCE_RANK = {"high": 3, "medium": 2, "low": 1}
 _EVIDENCE_RANK = {
+    "A": 7,
     "A1": 7,
     "A2": 6,
+    "B": 5,
     "B1": 5,
     "B2": 4,
+    "C": 3,
     "C1": 3,
     "C2": 2,
     "D": 1,
@@ -147,6 +151,8 @@ def _requested_themes(task: Task, text: str) -> tuple[str, ...]:
 
 def _layer_of(atom: KnowledgeAtomV2) -> str:
     topics = {topic.casefold() for topic in atom.topics}
+    if L1_RETAIL_TOPIC in topics:
+        return "l1_retail"
     if L1_CATERING_TOPIC in topics:
         return "l1_catering"
     if L0_TOPIC in topics:
@@ -176,7 +182,12 @@ def _industry_reason(atom: KnowledgeAtomV2, industry: str) -> str | None:
     atom_industry = atom.scope.industry.strip().casefold()
     layer = _layer_of(atom)
 
-    # The only shared L1 currently published is the catering/retail layer.
+    if layer == "l1_retail":
+        if declared != "retail":
+            return None
+        return "industry:retail:l1_retail"
+
+    # Shared L1 currently published is the catering/retail layer.
     if layer == "l1_catering":
         if declared not in {"catering", "retail"}:
             return None
@@ -207,6 +218,7 @@ def _skill_match(
     if route_skill == "siyu-onboard" and (
         L0_TOPIC in {topic.casefold() for topic in atom.topics}
         or L1_CATERING_TOPIC in {topic.casefold() for topic in atom.topics}
+        or L1_RETAIL_TOPIC in {topic.casefold() for topic in atom.topics}
     ) and bound:
         return 35, (
             "skill:siyu-onboard",
@@ -288,6 +300,16 @@ def _relevance(
     return score, _unique(reasons)
 
 
+def _community_grade_tag(atom: KnowledgeAtomV2) -> str:
+    grade = atom.quality.evidence_grade
+    companies = len({item.company_hash for item in atom.quality.confirmations})
+    if grade == "A":
+        return "维护者A级"
+    if grade == "C":
+        return f"社区C级·{companies}家印证"
+    return "单源D级"
+
+
 def _applicability_summary(atom: KnowledgeAtomV2) -> dict[str, Any]:
     """Return the complete bounded context needed to use an atom safely."""
     return atom.applicability.to_dict()
@@ -353,6 +375,7 @@ class KnowledgeAssembler:
         limit: int = DEFAULT_SELECTION_LIMIT,
         *,
         public_runtime: bool = True,
+        community_atoms: tuple[KnowledgeAtomV2, ...] | None = None,
     ) -> None:
         if limit < 0:
             raise ValueError("limit 不能为负数")
@@ -360,12 +383,22 @@ class KnowledgeAssembler:
         self._loader = loader or CorpusLoader()
         self.limit = limit
         self.public_runtime = public_runtime
+        self._community_atoms = community_atoms
+        self._auto_community = community_atoms is None and corpus is None
 
     @property
     def corpus(self) -> Corpus:
         if self._corpus is None:
             self._corpus = self._loader.load()
         return self._corpus
+
+    @property
+    def community_atoms(self) -> tuple[KnowledgeAtomV2, ...]:
+        if self._community_atoms is None:
+            if not self._auto_community:
+                return ()
+            self._community_atoms = self._loader.load_community()
+        return self._community_atoms
 
     def assemble(
         self,
@@ -390,9 +423,51 @@ class KnowledgeAssembler:
         route_skill = normalize_skill_slug(decision.skill).casefold()
         text = _task_text(task)
         themes = _requested_themes(task, text)
-        candidates: list[SelectedKnowledge] = []
+        strict = self._match_atoms(corpus.atoms, task, route_skill, text, themes)
+        chosen = list(strict[:selected_limit])
+        seen = {item.atom.id for item in chosen}
+        remaining = selected_limit - len(chosen)
+        extra_warnings = ()
+        if remaining > 0:
+            community = self._match_atoms(
+                self.community_atoms, task, route_skill, text, themes
+            )
+            tagged: list[SelectedKnowledge] = []
+            for item in community:
+                if item.atom.id in seen:
+                    continue
+                tagged.append(
+                    SelectedKnowledge(
+                        atom=item.atom,
+                        score=item.score,
+                        why_selected=_unique(
+                            (*item.why_selected, _community_grade_tag(item.atom))
+                        ),
+                        layer=item.layer,
+                    )
+                )
+                seen.add(item.atom.id)
+                if len(tagged) >= remaining:
+                    break
+            chosen.extend(tagged)
+            extra_warnings = getattr(self._loader, "community_warnings", ())
+        return KnowledgeSelection(
+            corpus_version=corpus.corpus_version,
+            corpus_hash=corpus.corpus_hash,
+            atoms=tuple(chosen),
+            warnings=corpus.warnings + tuple(extra_warnings or ()),
+        )
 
-        for atom in corpus.atoms:
+    def _match_atoms(
+        self,
+        atoms: Iterable[KnowledgeAtomV2],
+        task: Task,
+        route_skill: str,
+        text: str,
+        themes: tuple[str, ...],
+    ) -> list[SelectedKnowledge]:
+        candidates: list[SelectedKnowledge] = []
+        for atom in atoms:
             if not _runtime_safe(atom, public_runtime=self.public_runtime):
                 continue
             industry_reason = _industry_reason(atom, task.industry)
@@ -423,9 +498,6 @@ class KnowledgeAssembler:
                     layer=_layer_of(atom),
                 )
             )
-
-        # Stable ID is the final tie-breaker, so reversing or regrouping the
-        # source JSONL cannot change which atoms win a limited selection.
         candidates.sort(
             key=lambda item: (
                 -item.score,
@@ -434,12 +506,7 @@ class KnowledgeAssembler:
                 item.atom.id,
             )
         )
-        return KnowledgeSelection(
-            corpus_version=corpus.corpus_version,
-            corpus_hash=corpus.corpus_hash,
-            atoms=tuple(candidates[:selected_limit]),
-            warnings=corpus.warnings,
-        )
+        return candidates
 
 
 def assemble_knowledge(

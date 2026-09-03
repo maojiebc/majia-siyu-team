@@ -49,7 +49,7 @@ metadata:
 
 ### 3. 生成结构化草稿与敏感信息预览（写盘前）
 
-先在内存中生成本页第 6 步的结构化草稿。只提取支撑后续接续的最少信息：主诉摘要、已确认结论、否决方向、待验证假设、下一步和必要备注。
+先在内存中生成本页第 6 步的结构化草稿。只提取支撑后续接续的最少信息：主诉摘要、经营画像、已确认结论、否决方向、待验证假设、下一步和必要备注。
 
 默认不进入草稿的内容：
 
@@ -112,6 +112,10 @@ status: {in-progress | resolved | abandoned}
 next_skill: {推荐下一步，不确定就留空}
 industry: {catering | retail | edu | ...，可为空}
 stage: {cold | growth | mature，可为空}
+business_model: {direct | franchise | mixed，可为空}
+stores: {门店数，可为空}
+org_layers: {none | regional，可为空}
+private_channel: {企微 | 个微导购 | 小程序会员 | 社群，可为空}
 content_scope: structured_conclusions
 privacy_mode: {redacted | original}
 sensitive_categories: [{只写类别，不写原始值}]
@@ -120,6 +124,14 @@ compliance_flags: []
 
 ## 客户主诉
 {按 privacy_mode 处理后的 1—2 句结构化摘要}
+
+## 经营画像
+- 行业及子类：{...}
+- 经营模式：{直营 / 加盟 / 混合}
+- 门店数：{数字或档}
+- 分公司或区域层：{有 / 无}
+- 私域主载体：{企微 / 个微导购 / 小程序会员 / 社群}
+未知项写「未记录」，不要猜。
 
 ## 已得出的结论
 - {一句话一个结论}

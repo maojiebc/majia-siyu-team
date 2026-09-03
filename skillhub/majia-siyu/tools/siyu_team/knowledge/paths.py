@@ -17,10 +17,12 @@ METHODOLOGY_AXIOMS_DOC = "knowledge/00-methodology/私域公理与消解案例�
 # 增长分层文档与原子库（与 growth_layers 共享语义；此处为权威路径常量）
 L0_DOC = "knowledge/00-methodology/L0-通用用户增长原则.md"
 L1_CATERING_DOC = "knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md"
+L1_RETAIL_DOC = "knowledge/02-industry/retail/L1-零售私域种子.md"
 GROWTH_INDEX_DOC = "knowledge/00-methodology/用户增长分层索引.md"
 PUBLIC_MANIFEST = "manifest.json"
 GROWTH_ATOMS_APPROVED = "04-atoms/growth-layers.approved.jsonl"
 GROWTH_ATOMS_DRAFT = "04-atoms/growth-layers.draft.jsonl"
+COMMUNITY_DIR = "05-community"
 
 
 @dataclass(frozen=True)

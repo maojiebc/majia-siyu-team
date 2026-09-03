@@ -1,5 +1,5 @@
 {
-  "content_sha256": "sha256:a9dbb97ef31ac283b4516ea78870b442304704ab8de9ba45d8f656c0e1dee578",
+  "content_sha256": "sha256:9217d7b93c3266c810da39ac93c9991dcd836d6fa72eb5d627efad00a30f013f",
   "contract_schema_version": "1.0",
   "industry_capabilities": {
     "catering": {
@@ -13,6 +13,7 @@
       "status": "generic_only"
     },
     "retail": {
+      "description": "零售行业册：敬请期待，当前为种子层，由社区印证逐步替换",
       "industry_book": null,
       "label": "零售",
       "status": "generic_only"
@@ -112,6 +113,20 @@
       "save_memory"
     ],
     "archive_signal_pattern": "(保存|存档|记下来|留下结论|恢复|接着上次|上次聊|之前聊到哪)",
+    "business_model_rules": [
+      {
+        "business_model": "franchise",
+        "pattern": "加盟"
+      },
+      {
+        "business_model": "direct",
+        "pattern": "直营"
+      },
+      {
+        "business_model": "mixed",
+        "pattern": "混合"
+      }
+    ],
     "channels": [
       "wechat_moments",
       "wechat_group",
@@ -167,6 +182,7 @@
     ],
     "hint_keys": [
       "audience",
+      "business_model",
       "channel",
       "client",
       "confidence",

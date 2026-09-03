@@ -2,6 +2,7 @@
 
 from .models import (
     Applicability,
+    Confirmation,
     KnowledgeAtomV2,
     KnowledgeValidationError,
     Lifecycle,
@@ -11,6 +12,7 @@ from .models import (
     Scope,
     SourceRef,
     generate_atom_id,
+    generate_community_atom_id,
     generate_source_id,
     migrate_v1_atom,
 )
@@ -26,6 +28,7 @@ from .query import KnowledgeQuery, QueryResult, query_atoms, query_knowledge
 
 __all__ = [
     "Applicability",
+    "Confirmation",
     "Corpus",
     "CorpusLoader",
     "CorpusMetadata",
@@ -45,6 +48,7 @@ __all__ = [
     "SourceRef",
     "assemble_knowledge",
     "generate_atom_id",
+    "generate_community_atom_id",
     "generate_source_id",
     "migrate_v1_atom",
     "query_atoms",
@@ -54,6 +58,7 @@ __all__ = [
 from .growth_layers import (
     L0_DOC,
     L1_CATERING_DOC,
+    L1_RETAIL_DOC,
     describe_growth_load,
     filter_atoms_by_growth_layer,
     growth_atom_id,
@@ -67,6 +72,7 @@ from .growth_layers import (
 __all__ += [
     "L0_DOC",
     "L1_CATERING_DOC",
+    "L1_RETAIL_DOC",
     "describe_growth_load",
     "filter_atoms_by_growth_layer",
     "growth_atom_id",

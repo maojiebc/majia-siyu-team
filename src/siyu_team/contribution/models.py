@@ -110,6 +110,23 @@ class ContributionCandidate:
     topic_id: str = ""
     candidate_id: str = field(default_factory=lambda: f"candidate_{uuid4().hex}")
     include_full_chat: bool = field(default=False, repr=False)
+    record_id: str = ""
+    company_hash: str = ""
+    contributor_hash: str = ""
+    contributor_id: str = field(default="", repr=False)
+    industry: str = ""
+    subindustry: str = ""
+    business_model: str = ""
+    scale_band: str = ""
+    org_layers: str = ""
+    contributor_role: str = ""
+    channels: tuple[str, ...] = ()
+    kind: str = ""
+    observed_at: str = ""
+    still_valid: str = ""
+    evidence_text: str = ""
+    created_at: str = ""
+    contributor_display_name: str = ""
 
     def __post_init__(self) -> None:
         if not isinstance(self.signal, ContributionSignal):
@@ -117,10 +134,36 @@ class ContributionCandidate:
         if not re.fullmatch(r"candidate_[0-9a-f]{32}", self.candidate_id):
             raise ContributionValidationError("candidate_id 格式非法")
         for name in (
-            "user_facts", "actions", "boundaries", "model_inferences", "existing_knowledge"
+            "user_facts",
+            "actions",
+            "boundaries",
+            "model_inferences",
+            "existing_knowledge",
+            "channels",
         ):
             object.__setattr__(self, name, _texts(getattr(self, name), name))
-        for name in ("summary", "scene", "result", "topic_id"):
+        for name in (
+            "summary",
+            "scene",
+            "result",
+            "topic_id",
+            "record_id",
+            "company_hash",
+            "contributor_hash",
+            "contributor_id",
+            "industry",
+            "subindustry",
+            "business_model",
+            "scale_band",
+            "org_layers",
+            "contributor_role",
+            "kind",
+            "observed_at",
+            "still_valid",
+            "evidence_text",
+            "created_at",
+            "contributor_display_name",
+        ):
             object.__setattr__(
                 self, name, _text(getattr(self, name), name, required=name == "summary")
             )

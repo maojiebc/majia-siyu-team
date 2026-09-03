@@ -72,6 +72,25 @@ _PATTERNS: tuple[tuple[str, re.Pattern[str], bool, str], ...] = (
 )
 
 
+_REDACT_BY_CATEGORY = {
+    "phone": "1**********",
+    "id_card": "******************",
+    "email": "***@***",
+    "credential": "***",
+    "store_identifier": "门店编号***",
+}
+
+
+def redact_pii(text: str) -> str:
+    """把扫描到的阻断项就地换成掩码；原文不得留下。"""
+    redacted = text
+    for category, pattern, blocking, _message in _PATTERNS:
+        if not blocking or category not in _REDACT_BY_CATEGORY:
+            continue
+        redacted = pattern.sub(_REDACT_BY_CATEGORY[category], redacted)
+    return redacted
+
+
 def scan_fields(fields: Iterable[tuple[str, str]]) -> PrivacyScan:
     findings: list[PrivacyFinding] = []
     for field, text in fields:

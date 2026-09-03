@@ -7,6 +7,7 @@ from siyu_team.knowledge.assembler import KnowledgeAssembler
 from siyu_team.knowledge.corpus import Corpus
 from siyu_team.knowledge.models import (
     Applicability,
+    Confirmation,
     KnowledgeAtomV2,
     Lifecycle,
     Metric,
@@ -253,6 +254,56 @@ class KnowledgeAssemblerTests(unittest.TestCase):
         task, decision = _diagnosis("")
         with self.assertRaises(ValueError):
             KnowledgeAssembler(self.corpus).assemble(task, decision, limit=-1)
+
+    def test_retail_seed_layer_and_community_grade_tag(self) -> None:
+        retail = _atom(
+            40,
+            locator="L1-RETAIL-SEED",
+            theme="repurchase_recall",
+            layer="growth_l1_retail",
+            industry="retail",
+        )
+        community = _atom(
+            41,
+            locator="COMMUNITY-C",
+            theme="repurchase_recall",
+            layer="growth_l0",
+        )
+        quality = Quality(
+            evidence_grade="C",
+            confidence="medium",
+            review_status="approved",
+            reviewer="community-intake",
+            reviewed_at="2026-08-01",
+            confirmations=(
+                Confirmation("a" * 64, "b" * 64, "2026-08-01"),
+                Confirmation("c" * 64, "d" * 64, "2026-08-02"),
+            ),
+        )
+        community = KnowledgeAtomV2(
+            **{**community.__dict__, "quality": quality}
+        )
+        task, decision = _diagnosis("retail")
+        selection = KnowledgeAssembler(
+            _corpus((self.l0_repurchase, retail)),
+            community_atoms=(community,),
+            limit=12,
+        ).assemble(task, decision)
+        locators = {item.atom.source.locator for item in selection.atoms}
+        self.assertIn("L0-RETENTION", locators)
+        self.assertIn("L1-RETAIL-SEED", locators)
+        self.assertIn("COMMUNITY-C", locators)
+        community_row = next(
+            item for item in selection.atoms if item.atom.source.locator == "COMMUNITY-C"
+        )
+        self.assertTrue(
+            any("社区C级" in reason for reason in community_row.why_selected)
+        )
+        self.assertEqual(community_row.layer, "l0")
+        retail_row = next(
+            item for item in selection.atoms if item.atom.source.locator == "L1-RETAIL-SEED"
+        )
+        self.assertEqual(retail_row.layer, "l1_retail")
 
 
 class KnowledgeQueryTests(unittest.TestCase):

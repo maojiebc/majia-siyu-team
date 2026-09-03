@@ -20,7 +20,11 @@ metadata:
 5. **沉默盘是机制问题，不是文案问题**：长期低于基线时先查分层、预期与承接机制。
 6. **合规是前置，不是事后**：一句违规能抵消长期运营，生成端就要拦截。
 
-所有判断都要能追溯到至少一条公理。增长类问题：优先用任务计划里的 `growth_atoms`（按业态加载的 L0/L1 精简判断句）；没有计划时读 `knowledge/00-methodology/L0-通用用户增长原则.md`，餐饮/零售可再读共享的 `knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`，但零售仍不声称有独立行业册。需要更多案例时读取 [`../../../../knowledge/00-methodology/私域公理与消解案例库.md`](../../../../knowledge/00-methodology/私域公理与消解案例库.md)。
+所有判断都要能追溯到至少一条公理。增长类问题：优先用任务计划里的 `growth_atoms`（按业态加载的 L0/L1 精简判断句）；没有计划时读 `knowledge/00-methodology/L0-通用用户增长原则.md`，餐饮/零售可再读共享的 `knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`，零售再读种子层 `knowledge/02-industry/retail/L1-零售私域种子.md`。引用社区原子时写明等级：社区C级 / 单源D级 / 维护者A级。需要更多案例时读取 [`../../../../knowledge/00-methodology/私域公理与消解案例库.md`](../../../../knowledge/00-methodology/私域公理与消解案例库.md)。
+
+## Step 0：收齐经营画像五问
+
+问诊先对齐行业及子类、直营/加盟/混合、门店数、有无区域层、私域主载体。对话里已有的不要重问。五项说明见 `knowledge/00-methodology/经营画像与执行边界.md`。
 
 ## 动态外部事实边界
 

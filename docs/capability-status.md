@@ -22,7 +22,7 @@
 | 客户档案隐私确认 | 仅提示词实现 | `siyu-save/SKILL.md`、保存隐私契约测试 | 默认结构化最小保存、预览后明示选择；尚无 Python 写入器强制，也不是加密存储 |
 | SkillHub 单入口包 | 已实现 | bundle `--check`、生成路由契约、公开知识副本与默认查询回归 | 包内不包含可执行 Python Runtime，固定 Prompt-only |
 | 餐饮行业知识目录 | 已实现 | `knowledge/02-industry/catering/` | 仅餐饮具有行业包 |
-| 零售/教培通用回答 | 已实现 | `generic_only` 路由回归 | 零售可复用跨业态 L1，但两者都不得伪造独立行业册 |
+| 零售/教培通用回答 | 已实现 | `generic_only` 路由回归 | 零售行业册：敬请期待，当前为种子层，由社区印证逐步替换；教培不得伪造独立行业册 |
 | 公开知识 Runtime 装配 | 已实现 | `CorpusLoader`、`KnowledgeAssembler`、Runtime 与安装态回归 | approved-only 且默认最多 12 条；只证明工程装配，不证明答案效果 |
 | Pilot 知识装配 | 已实现 | Pilot 与 Runtime 共用 `KnowledgeAssembler`；mapping 对照回归 | mapping 只是期望夹具；Dry Run 不是 H1/H2/H3 结果 |
 | Judge 质量评分 | 仅 Python 实现 | `siyu-eval judge`、严格 `JudgeReport` 与主编排条件流程 | 仍需宿主启动独立 Judge 并回填完整来源；缺失时明确为未评分 |

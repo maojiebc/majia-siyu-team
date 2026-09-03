@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from datetime import date
 import hashlib
 import json
+import logging
 from pathlib import Path
 import re
 from typing import Any, Iterable, Mapping, Sequence
@@ -22,6 +23,7 @@ from .models import (
     KnowledgeValidationError,
 )
 from .paths import (
+    COMMUNITY_DIR,
     GROWTH_ATOMS_APPROVED,
     PUBLIC_MANIFEST,
     KnowledgePathResolver,
@@ -46,6 +48,31 @@ _METRIC_NOT_APPLICABLE_PREFIXES = (
     "指标不适用：",
     "验证指标不适用：",
 )
+
+
+def _revoked_atom_ids(directories: Sequence[Path]) -> set[str]:
+    found: set[str] = set()
+    for directory in directories:
+        path = directory / "revoked.jsonl"
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for raw in text.splitlines():
+            if not raw.strip():
+                continue
+            try:
+                payload = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(payload, Mapping):
+                continue
+            atom_id = str(payload.get("id") or "").strip()
+            if atom_id.startswith("ka_"):
+                found.add(atom_id)
+    return found
 
 
 def _required_text(value: Any, name: str) -> str:
@@ -226,6 +253,7 @@ class CorpusLoader:
         self.resolver = resolver or KnowledgePathResolver()
         self.today = today or date.today()
         self.lenient = lenient
+        self.community_warnings: tuple[str, ...] = ()
 
     def load(
         self,
@@ -628,6 +656,99 @@ class CorpusLoader:
             text.strip().casefold().startswith(_METRIC_NOT_APPLICABLE_PREFIXES)
             for text in values
         )
+
+    def load_community(
+        self,
+        root: str | Path | None = None,
+    ) -> tuple[KnowledgeAtomV2, ...]:
+        """读取 ``05-community/*.jsonl``。单行失败则跳过并记录，不拖垮严格正式集。"""
+        directories = self._community_dirs(root)
+        atoms: list[KnowledgeAtomV2] = []
+        warnings: list[str] = []
+        seen: set[str] = set()
+        revoked_ids = _revoked_atom_ids(directories)
+        logger = logging.getLogger(__name__)
+        for directory in directories:
+            for path in sorted(directory.glob("*.jsonl")):
+                if path.name == "revoked.jsonl":
+                    continue
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except OSError as exc:
+                    warning = f"community_skipped:{path.name}:read:{exc}"
+                    warnings.append(warning)
+                    logger.warning(warning)
+                    continue
+                for line_no, raw in enumerate(text.splitlines(), 1):
+                    line = raw.strip()
+                    if not line:
+                        continue
+                    try:
+                        parsed = json.loads(line)
+                    except json.JSONDecodeError as exc:
+                        warning = (
+                            f"community_skipped:{path.name}:{line_no}:json:{exc.msg}"
+                        )
+                        warnings.append(warning)
+                        logger.warning(warning)
+                        continue
+                    if not isinstance(parsed, Mapping):
+                        warning = f"community_skipped:{path.name}:{line_no}:not_object"
+                        warnings.append(warning)
+                        logger.warning(warning)
+                        continue
+                    try:
+                        atom = KnowledgeAtomV2.from_dict(parsed)
+                    except (KnowledgeValidationError, TypeError, ValueError) as exc:
+                        warning = (
+                            f"community_skipped:{path.name}:{line_no}:validation:{exc}"
+                        )
+                        warnings.append(warning)
+                        logger.warning(warning)
+                        continue
+                    if atom.id in revoked_ids:
+                        warning = f"community_skipped:{path.name}:{line_no}:revoked:{atom.id}"
+                        warnings.append(warning)
+                        logger.warning(warning)
+                        continue
+                    if atom.id in seen:
+                        warning = f"community_skipped:{path.name}:{line_no}:duplicate:{atom.id}"
+                        warnings.append(warning)
+                        logger.warning(warning)
+                        continue
+                    if atom.privacy.contains_pii or atom.privacy.contains_client_secret:
+                        warning = f"community_skipped:{path.name}:{line_no}:privacy"
+                        warnings.append(warning)
+                        logger.warning(warning)
+                        continue
+                    valid_from = date.fromisoformat(atom.lifecycle.valid_from)
+                    if valid_from > self.today:
+                        continue
+                    if atom.lifecycle.valid_until:
+                        valid_until = date.fromisoformat(atom.lifecycle.valid_until)
+                        if valid_until < self.today:
+                            continue
+                    seen.add(atom.id)
+                    atoms.append(atom)
+        self.community_warnings = tuple(warnings)
+        return tuple(atoms)
+
+    def _community_dirs(self, root: str | Path | None) -> tuple[Path, ...]:
+        if root is not None:
+            directory = Path(root).expanduser().resolve(strict=False)
+            if directory.name != COMMUNITY_DIR:
+                directory = directory / COMMUNITY_DIR
+            return (directory,) if directory.is_dir() else ()
+        found: list[Path] = []
+        seen: set[str] = set()
+        for candidate in self.resolver.candidates():
+            directory = candidate / COMMUNITY_DIR
+            key = str(directory)
+            if key in seen or not directory.is_dir():
+                continue
+            seen.add(key)
+            found.append(directory)
+        return tuple(found)
 
 
 __all__ = ["Corpus", "CorpusLoader", "CorpusMetadata"]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from siyu_team.contribution.privacy import scan_fields
+from siyu_team.contribution.privacy import redact_pii, scan_fields
 
 
 class ContributionPrivacyTests(unittest.TestCase):
@@ -24,6 +24,16 @@ class ContributionPrivacyTests(unittest.TestCase):
         scan = scan_fields((("result", "活动后毛利率 35%，需要确认授权。"),))
         self.assertTrue(scan.safe)
         self.assertTrue(scan.warnings)
+
+    def test_redact_pii_masks_phone_email_and_store_id(self) -> None:
+        text = "联系 13800138000，邮箱 user@example.com，门店编号 ZL-001"
+        redacted = redact_pii(text)
+        self.assertNotIn("13800138000", redacted)
+        self.assertNotIn("user@example.com", redacted)
+        self.assertNotIn("ZL-001", redacted)
+        self.assertIn("1**********", redacted)
+        self.assertIn("***@***", redacted)
+        self.assertTrue(scan_fields((("fact", redacted),)).safe)
 
     def test_normal_operational_fact_is_safe(self) -> None:
         scan = scan_fields((("fact", "高峰期把四步操作压缩成一步后执行更稳定。"),))

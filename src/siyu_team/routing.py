@@ -30,6 +30,9 @@ INDUSTRY_CAPABILITIES = {
 INDUSTRY_BOOKS = {
     "catering": "knowledge/02-industry/catering/",
 }
+INDUSTRY_NOTES = {
+    "retail": "零售行业册：敬请期待，当前为种子层，由社区印证逐步替换",
+}
 STAGES = {
     "cold": "冷启动（0 起步 / 有微信没体系）",
     "growth": "扩张（有体系要提效）",
@@ -124,6 +127,11 @@ def route_contract_payload() -> dict[str, Any]:
                 "label": INDUSTRIES[industry],
                 "status": status,
                 "industry_book": INDUSTRY_BOOKS.get(industry),
+                **(
+                    {"description": INDUSTRY_NOTES[industry]}
+                    if industry in INDUSTRY_NOTES
+                    else {}
+                ),
             }
             for industry, status in INDUSTRY_CAPABILITIES.items()
         },

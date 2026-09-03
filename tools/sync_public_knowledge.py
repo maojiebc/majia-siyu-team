@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "knowledge"
 PACKAGE_ROOT = ROOT / "src/siyu_team/knowledge/data"
 BUNDLE_ROOT = ROOT / "skillhub/majia-siyu/modules/_knowledge"
-PUBLIC_DIRS = ("00-methodology", "01-wechat-official", "02-industry", "04-atoms")
+PUBLIC_DIRS = ("00-methodology", "01-wechat-official", "02-industry", "04-atoms", "05-community")
 _BARE_KNOWLEDGE_RE = re.compile(
-    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms)"
+    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms|05-community)"
 )
 
 

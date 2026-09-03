@@ -75,6 +75,14 @@ PILOT_THEME_BY_LOCATOR: dict[str, str] = {
     "L1-14": "repurchase_recall",
 }
 
+# 只在判断句本身明确指向修饰维时覆盖；其余保持 any。
+_SCOPE_MODIFIERS: dict[str, dict[str, object]] = {
+    "L1-C01": {
+        "business_model": "franchise",
+        "execution_boundary": "hq_tools_incentives",
+    },
+}
+
 
 def _parse_sections(text: str) -> list[dict[str, str]]:
     matches = list(SECTION_RE.finditer(text))
@@ -164,6 +172,7 @@ def build_atom(
     boundary = fields.get("边界", fields.get("失效边界", ""))
     why = fields.get("原始依据", fields.get("来源", ""))
     atom_type = _type_of(locator + title)
+    modifiers = _SCOPE_MODIFIERS.get(locator, {})
     preconditions = []
     if why:
         preconditions.append(f"依据：{why[:160]}")
@@ -226,7 +235,14 @@ def build_atom(
         scope=Scope(
             visibility="public",
             industry=industry,
-            business_model="franchise" if industry == "catering" else "",
+            business_model=str(modifiers.get("business_model", "any")),
+            scale_band=(
+                tuple(str(item) for item in modifiers["scale_band"])
+                if "scale_band" in modifiers
+                and isinstance(modifiers["scale_band"], (list, tuple))
+                else ("any",)
+            ),
+            org_layers=str(modifiers.get("org_layers", "any")),
             channels=("wecom_friend", "wecom_group", "instore") if industry else (),
             scenarios=("user_growth", pilot_theme),
         ),
@@ -236,6 +252,7 @@ def build_atom(
             metrics=(metric_by_theme[pilot_theme],),
             failure_modes=tuple(failure_modes),
             counterexamples=tuple(counterexamples),
+            execution_boundary=str(modifiers.get("execution_boundary", "any")),
         ),
         quality=quality,
         lifecycle=Lifecycle(valid_from=observed_at),

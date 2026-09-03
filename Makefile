@@ -1,4 +1,4 @@
-.PHONY: compliance judge eval validate pilot atoms links contracts workbuddy test check report
+.PHONY: compliance judge eval validate pilot atoms links contracts workbuddy test check report bump
 
 # 静态合规门：只报告规则命中，不产生质量分或徽章。
 compliance:
@@ -58,10 +58,15 @@ workbuddy:
 test:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m unittest discover -s tests -v
 
-# 总质量门：测试、结构、原子、发布版本、全库 footer/措辞/体积
-check: test validate pilot atoms links contracts
+# 总质量门：测试、结构、原子、发布版本、全库 footer/措辞/体积（pilot 为 opt-in，见 make pilot）
+check: test validate atoms links contracts
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_versions.py
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_consistency.py
+
+# 统一 bump 所有声明 VERSION 的 tracked 文件
+bump:
+	@test -n "$(VERSION)" || (echo "用法: make bump VERSION=x.y.z"; exit 1)
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/bump_version.py $(VERSION)
 
 # 渲染最近一次主持收口报告
 report:

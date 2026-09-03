@@ -1,0 +1,127 @@
+name: community-intake
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [community-intake]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: community-intake
+  cancel-in-progress: false
+
+jobs:
+  intake:
+    name: Daily community intake
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      LARK_APP_ID: ${{ secrets.LARK_APP_ID }}
+      LARK_APP_SECRET: ${{ secrets.LARK_APP_SECRET }}
+      LARK_BASE_APP_TOKEN: ${{ secrets.LARK_BASE_APP_TOKEN }}
+      LARK_TABLE_SUBMISSIONS: ${{ secrets.LARK_TABLE_SUBMISSIONS }}
+      LARK_TABLE_CONFIRMATIONS: ${{ secrets.LARK_TABLE_CONFIRMATIONS }}
+      LARK_PUBLIC_BASE_TOKEN: ${{ secrets.LARK_PUBLIC_BASE_TOKEN }}
+      LARK_PUBLIC_TABLE: ${{ secrets.LARK_PUBLIC_TABLE }}
+      SIYU_HASH_SALT: ${{ secrets.SIYU_HASH_SALT }}
+      SIYU_MAINTAINER_IDS: ${{ secrets.SIYU_MAINTAINER_IDS }}
+      SIYU_LLM_API_KEY: ${{ secrets.SIYU_LLM_API_KEY }}
+      SIYU_INTAKE_MODE: ${{ vars.SIYU_INTAKE_MODE || secrets.SIYU_INTAKE_MODE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Skip when unconfigured
+        id: cfg
+        run: |
+          if [ -z "${LARK_APP_ID:-}" ] || [ "${#SIYU_HASH_SALT}" -lt 16 ]; then
+            echo "notice: LARK_APP_ID or SIYU_HASH_SALT unset or shorter than 16, skip community intake"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.cfg.outputs.skip != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        if: steps.cfg.outputs.skip != 'true'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Pull, validate, write community corpus
+        if: steps.cfg.outputs.skip != 'true'
+        run: python tools/community_intake.py
+
+      - name: Sync public knowledge copies
+        if: steps.cfg.outputs.skip != 'true'
+        run: python tools/sync_public_knowledge.py
+
+      - name: Build SkillHub bundle
+        if: steps.cfg.outputs.skip != 'true'
+        run: python tools/build_skillhub_bundle.py
+
+      - name: Repository gate
+        if: steps.cfg.outputs.skip != 'true'
+        run: make check
+
+      - name: Commit or open PR
+        if: steps.cfg.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git add -A
+          if git diff --cached --quiet; then
+            echo "notice: no community intake changes"
+            exit 0
+          fi
+          allowed='^(knowledge/05-community/|knowledge/02-industry/benchmarks.community.md|src/siyu_team/knowledge/data/|skillhub/majia-siyu/modules/_knowledge/)'
+          extra=$(git diff --cached --name-only | grep -Ev "$allowed" || true)
+          date_stamp=$(date -u +%F)
+          added=$(git diff --cached --numstat -- knowledge/05-community/*.jsonl | awk '{s+=$1} END {print s+0}')
+          message="community: intake ${date_stamp}, +${added} atoms"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "$message"
+
+          open_pr() {
+            echo "notice: opening PR instead of pushing main"
+            branch="community-intake/${date_stamp}"
+            git checkout -b "$branch"
+            git push -u origin HEAD
+            gh pr create --title "$message" --body "自动 intake 改动超出社区白名单或无法推送到 main，请人工核对。"
+          }
+
+          if [ -n "$extra" ]; then
+            echo "notice: diff outside community whitelist, opening PR"
+            echo "$extra"
+            open_pr
+            exit 0
+          fi
+
+          pushed=0
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD; then
+              pushed=1
+              break
+            fi
+            echo "notice: push attempt ${attempt} failed"
+          done
+          if [ "$pushed" -ne 1 ]; then
+            echo "notice: push failed after 3 retries, opening PR"
+            open_pr
+          fi
