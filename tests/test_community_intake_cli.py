@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from siyu_team.knowledge.models import KnowledgeAtomV2
 
@@ -12,6 +14,14 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/community/sample_records.json"
 WORKFLOW = ROOT / ".github/workflows/community-intake.yml"
 SALT = "community-intake-test-salt"
+
+
+def _scrubbed_env() -> dict[str, str]:
+    return {
+        key: value
+        for key, value in os.environ.items()
+        if not key.startswith(("SIYU_", "LARK_"))
+    }
 
 
 def _load_cli():
@@ -27,6 +37,13 @@ class CommunityIntakeCliTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.cli = _load_cli()
+
+    def setUp(self) -> None:
+        self._env_patch = patch.dict(os.environ, _scrubbed_env(), clear=True)
+        self._env_patch.start()
+
+    def tearDown(self) -> None:
+        self._env_patch.stop()
 
     def test_salt_for_tests_required_in_fixture_mode(self) -> None:
         code = self.cli.main(

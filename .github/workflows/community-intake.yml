@@ -23,23 +23,15 @@ jobs:
     env:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       PYTHONDONTWRITEBYTECODE: "1"
-      LARK_APP_ID: ${{ secrets.LARK_APP_ID }}
-      LARK_APP_SECRET: ${{ secrets.LARK_APP_SECRET }}
-      LARK_BASE_APP_TOKEN: ${{ secrets.LARK_BASE_APP_TOKEN }}
-      LARK_TABLE_SUBMISSIONS: ${{ secrets.LARK_TABLE_SUBMISSIONS }}
-      LARK_TABLE_CONFIRMATIONS: ${{ secrets.LARK_TABLE_CONFIRMATIONS }}
-      LARK_PUBLIC_BASE_TOKEN: ${{ secrets.LARK_PUBLIC_BASE_TOKEN }}
-      LARK_PUBLIC_TABLE: ${{ secrets.LARK_PUBLIC_TABLE }}
-      SIYU_HASH_SALT: ${{ secrets.SIYU_HASH_SALT }}
-      SIYU_MAINTAINER_IDS: ${{ secrets.SIYU_MAINTAINER_IDS }}
-      SIYU_LLM_API_KEY: ${{ secrets.SIYU_LLM_API_KEY }}
-      SIYU_INTAKE_MODE: ${{ vars.SIYU_INTAKE_MODE || secrets.SIYU_INTAKE_MODE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Skip when unconfigured
         id: cfg
+        env:
+          LARK_APP_ID: ${{ secrets.LARK_APP_ID }}
+          SIYU_HASH_SALT: ${{ secrets.SIYU_HASH_SALT }}
         run: |
           if [ -z "${LARK_APP_ID:-}" ] || [ "${#SIYU_HASH_SALT}" -lt 16 ]; then
             echo "notice: LARK_APP_ID or SIYU_HASH_SALT unset or shorter than 16, skip community intake"
@@ -63,6 +55,18 @@ jobs:
 
       - name: Pull, validate, write community corpus
         if: steps.cfg.outputs.skip != 'true'
+        env:
+          LARK_APP_ID: ${{ secrets.LARK_APP_ID }}
+          LARK_APP_SECRET: ${{ secrets.LARK_APP_SECRET }}
+          LARK_BASE_APP_TOKEN: ${{ secrets.LARK_BASE_APP_TOKEN }}
+          LARK_TABLE_SUBMISSIONS: ${{ secrets.LARK_TABLE_SUBMISSIONS }}
+          LARK_TABLE_CONFIRMATIONS: ${{ secrets.LARK_TABLE_CONFIRMATIONS }}
+          LARK_PUBLIC_BASE_TOKEN: ${{ secrets.LARK_PUBLIC_BASE_TOKEN }}
+          LARK_PUBLIC_TABLE: ${{ secrets.LARK_PUBLIC_TABLE }}
+          SIYU_HASH_SALT: ${{ secrets.SIYU_HASH_SALT }}
+          SIYU_MAINTAINER_IDS: ${{ secrets.SIYU_MAINTAINER_IDS }}
+          SIYU_LLM_API_KEY: ${{ secrets.SIYU_LLM_API_KEY }}
+          SIYU_INTAKE_MODE: ${{ vars.SIYU_INTAKE_MODE || secrets.SIYU_INTAKE_MODE }}
         run: python tools/community_intake.py
 
       - name: Sync public knowledge copies
