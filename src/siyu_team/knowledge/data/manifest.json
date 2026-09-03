@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "corpus_version": "0.4.0",
   "release_batch": "2026-09-03-v1.4.3-workbuddy-adapter",
-  "corpus_hash": "sha256:b415e13ab62e28afba1b9e4ebedf8ee5aa24f7c710568dc5e8bc3ad6bc330802",
+  "corpus_hash": "sha256:8e480dec09d63ffae7a8f2037f6f28324d7c34764397ebd04e8fc4c7cc29cc00",
   "atom_count": 35,
   "atom_schema_version": "2.0",
   "atom_schema": "04-atoms/schema/atom-v2.schema.json",
@@ -12,7 +12,7 @@
       "path": "04-atoms/growth-layers.approved.jsonl",
       "corpus_version": "0.4.0",
       "release_batch": "2026-09-03-v1.4.3-workbuddy-adapter",
-      "sha256": "sha256:b415e13ab62e28afba1b9e4ebedf8ee5aa24f7c710568dc5e8bc3ad6bc330802",
+      "sha256": "sha256:8e480dec09d63ffae7a8f2037f6f28324d7c34764397ebd04e8fc4c7cc29cc00",
       "atom_count": 35,
       "schema_version": "2.0"
     }
@@ -23,6 +23,7 @@
     "00-methodology/私域公理与消解案例库.md",
     "00-methodology/L0-通用用户增长原则.md",
     "00-methodology/用户增长分层索引.md",
+    "00-methodology/经营画像与执行边界.md",
     "02-industry/catering/L1-餐饮零售用增Know-how.md"
   ],
   "growth_layers": {

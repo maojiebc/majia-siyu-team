@@ -12,6 +12,14 @@ from .models import (
 )
 from .preview import build_preview
 from .signals import detect_contribution_signal
+from .intake import (
+    candidate_to_atom,
+    dedupe,
+    flag_conflicts,
+    record_to_candidate,
+    render_gift,
+    run_intake,
+)
 
 __all__ = [
     "AuthorizationScope",
@@ -23,5 +31,11 @@ __all__ = [
     "ContributionSubmission",
     "ContributionValidationError",
     "build_preview",
+    "candidate_to_atom",
+    "dedupe",
     "detect_contribution_signal",
+    "flag_conflicts",
+    "record_to_candidate",
+    "render_gift",
+    "run_intake",
 ]

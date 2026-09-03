@@ -65,6 +65,14 @@ class TestParseTask(unittest.TestCase):
         self.assertEqual(task.industry, "catering")
         self.assertEqual(task.stage, "cold")
 
+    def test_business_model_inference(self) -> None:
+        task = parse_task("给加盟店写本周朋友圈")
+        self.assertEqual(task.business_model, "franchise")
+        task = parse_task("直营门店群发怎么写")
+        self.assertEqual(task.business_model, "direct")
+        task = parse_task("混合体系怎么搭私域")
+        self.assertEqual(task.business_model, "mixed")
+
     def test_unknown_fallback(self) -> None:
         """无明确意图 → UNKNOWN。"""
         task = parse_task("你好")

@@ -1,6 +1,6 @@
 ---
 description: "私域专家团团长：调研诊断客户私域现状 → 按行业/阶段路由 → 并行派公关/产品/广告/合规四官 → 团长主持收口出可落地 playbook"
-argument-hint: "<客户名/品类> [--industry catering|retail|edu] [--stage cold|growth|mature]"
+argument-hint: "<客户名/品类> [--industry catering|retail|edu] [--stage cold|growth|mature] [--model direct|franchise|mixed] [--stores N]"
 ---
 
 # 私域专家团 · 团长编排（siyu-onboard）
@@ -31,10 +31,10 @@ You MUST follow these rules exactly. Violating any of them is a failure.
    - `status` 为 `in_progress` 或 `paused`：显示 `current_step` 与 `revision`，问用户 **1. 续跑 / 2. 新建 run / 3. 退出**；不得覆盖旧 run。
    - `status=="complete"`：问是否新建 run；旧 run 原样保留。
    - 只有旧 `.siyu-team/state.json` 时：将它**只读复制迁移**到一个新 run，写入 `migrated_from`，原文件不得修改或删除。
-2. **解析 `$ARGUMENTS`**：抽出 `$CLIENT`、`--industry`、`--stage`。
+2. **解析 `$ARGUMENTS`**：抽出 `$CLIENT`、`--industry`、`--stage`、`--model`、`--stores`。`--model` 取值 `direct`（直营）/`franchise`（加盟）/`mixed`（混合）；`--stores` 为门店数，写入画像的门店档。
 3. **初始化或绑定 run**：新开时生成不可复用的 `$RUN_ID`，创建 `$RUN_DIR=.siyu-team/runs/$RUN_ID`、`$RUN_DIR/outputs`、`$RUN_DIR/traces`，并原子更新 `.siyu-team/current`。Python 模式使用真实 `StateStore.initialize()`；Prompt-only 必须写同一 schema，并明确标记 `prompt_only_state_lock_not_code_enforced`。目录已存在就停止，绝不覆盖。
 4. **确定执行模式并建立结构化计划**：先读取主入口的 `references/route-contract.json`。
-   - 能执行 `siyu-plan --contract-info` 且哈希匹配：执行真实 `siyu-plan "$ARGUMENTS" --industry ... --stage ... --trace-dir "$RUN_DIR/traces"`，把 JSON 标准输出写入 `$RUN_DIR/task.json`；其 `runtime_mode` 必须为 `python`。默认 trace level 为 `metadata`，只有用户明确要求并理解本地明文风险后才能使用 `redacted` 或 `full`。
+   - 能执行 `siyu-plan --contract-info` 且哈希匹配：执行真实 `siyu-plan "$ARGUMENTS" --industry ... --stage ... --model ... --trace-dir "$RUN_DIR/traces"`，把 JSON 标准输出写入 `$RUN_DIR/task.json`；其 `runtime_mode` 必须为 `python`。默认 trace level 为 `metadata`，只有用户明确要求并理解本地明文风险后才能使用 `redacted` 或 `full`。
    - CLI 不可用或哈希不匹配：按同一生成契约建立符合 `schemas/execution-plan-v1.schema.json` 的最小计划，写入 `$RUN_DIR/task.json`，并标记 `runtime_mode: prompt_only` 与相应 warning。此模式不声称 trace、上下文隔离、锁或知识装配已由代码强制。
    - `decision.skill != "siyu-onboard"`：停止本命令，按 RouteDecision 转给对应单步能力。
    - `needs_clarification=true`：只在 Step 0 补 `required_fields`，不得提前创建或派发四官上下文。
@@ -55,16 +55,17 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 未命中动态事实时跳过本门。内部知识、Get 笔记和 BI 只用于客户自身现状与方法论分析，不能替代本门。
 
 ## Step 0 · 调研诊断（Interactive，团长亲自做）
-用 `AskUserQuestion` 一次问一个，收齐：
-- 品类（餐饮/零售/教培/其他）
-- 阶段（冷启动/扩张/成熟）
-- 现有私域规模（好友数/群数/到店或客流）
-- 变现模式（堂食/外卖/电商/课程…）
-- 当前最核心的痛点（加不上人/不互动/群死了/不复购/不裂变…）
-- 能给的真实数据（有就给，没有就估）
+用 `AskUserQuestion` 一次问一个。先收齐**经营画像五问**（见 `knowledge/00-methodology/经营画像与执行边界.md`），已从 `--industry` / `--model` / `--stores` 或对话里拿到的不要重问：
+- 行业及子类（餐饮/零售及细分）
+- 直营 / 加盟 / 混合
+- 门店数（`1` / `2-10` / `11-50` / `51-300` / `301-1000` / `1001-5000` / `5000+`）
+- 有无分公司或区域层
+- 私域主载体（企微 / 个微导购 / 小程序会员 / 社群）
+
+五问收齐后再补：阶段（若无 `--stage`：冷启动/扩张/成熟）、当前最核心痛点、能给的真实数据。
 
 （若用户授权，可调 `connectors/getnote.py` 抓行业素材、`connectors/bi_platform.py` 拉真实漏斗验证口径，结果并入。）
-→ 写 `$RUN_DIR/outputs/00-intake.md`，再以 revision CAS 把本轮 `state.json.current_step` 写为 `1`，登记产物与已完成步骤 `0`
+→ 写 `$RUN_DIR/outputs/00-intake.md`（必须含经营画像五项），再以 revision CAS 把本轮 `state.json.current_step` 写为 `1`，登记产物与已完成步骤 `0`
 
 ## Step 1 · 按行业×阶段路由（规则路由，不花 token）
 读本轮 `outputs/00-intake.md`，把调研字段映射进 Task context。Python 模式重新执行真实 `siyu-plan`；Prompt-only 继续按同一生成契约重建计划并保留降级标记。只有 RouteDecision 不再缺字段时才更新 `$RUN_DIR/task.json`；仅当契约给出非空 `industry_book` 时才加载该行业册。

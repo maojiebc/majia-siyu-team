@@ -1,0 +1,15 @@
+{
+  "files": {
+    "seeds.retail.jsonl": {
+      "atom_count": 8,
+      "sha256": "sha256:d6eecf46fa693b46fa7c7e8905c3ed8510aeac4b635985b26d9613e93709ad0f"
+    }
+  },
+  "last_run": "2026-09-03T00:00:00Z",
+  "metrics": {
+    "median_hours_submit_to_publish": null,
+    "needs_manual": 0,
+    "promoted_c": 0,
+    "submissions_total": 0
+  }
+}

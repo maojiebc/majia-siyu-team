@@ -26,6 +26,7 @@ from .paths import (
     KnowledgePathResolver,
     L0_DOC,
     L1_CATERING_DOC,
+    L1_RETAIL_DOC,
 )
 
 # 单次上下文注入的原子数上限：约 40 条 × ~150 token ≈ 6000 token，
@@ -34,7 +35,8 @@ MAX_ATOMS_PER_CONTEXT = 40
 
 L0_TOPIC = "growth_l0"
 L1_CATERING_TOPIC = "growth_l1_catering"
-LAYER_TOPICS = frozenset({L0_TOPIC, L1_CATERING_TOPIC})
+L1_RETAIL_TOPIC = "growth_l1_retail"
+LAYER_TOPICS = frozenset({L0_TOPIC, L1_CATERING_TOPIC, L1_RETAIL_TOPIC})
 
 L1_INDUSTRIES = frozenset({"catering", "retail"})
 
@@ -57,6 +59,8 @@ def select_growth_doc_refs(
     normalized = (industry or "").strip().lower()
     if normalized in L1_INDUSTRIES:
         refs.append(L1_CATERING_DOC)
+    if normalized == "retail":
+        refs.append(L1_RETAIL_DOC)
     if include_index:
         refs.append(GROWTH_INDEX_DOC)
     return tuple(refs)
@@ -67,6 +71,8 @@ def select_growth_topics(industry: str = "") -> tuple[str, ...]:
     topics = [L0_TOPIC]
     if (industry or "").strip().lower() in L1_INDUSTRIES:
         topics.append(L1_CATERING_TOPIC)
+    if (industry or "").strip().lower() == "retail":
+        topics.append(L1_RETAIL_TOPIC)
     return tuple(topics)
 
 
@@ -204,6 +210,8 @@ def describe_growth_load(industry: str = "") -> str:
     normalized = (industry or "").strip().lower()
     if not normalized:
         return "未声明业态：只加载通用用户增长原则（L0），不加载餐饮门店专包（L1）。"
+    if normalized == "retail":
+        return "业态=retail：零售行业册：敬请期待，当前为种子层，由社区印证逐步替换。加载通用原则（L0）+ 餐饮零售共享 L1 + 零售种子层。"
     if normalized in L1_INDUSTRIES:
         return f"业态={normalized}：加载通用原则（L0）+ 餐饮零售门店专包（L1）。"
     return f"业态={normalized}：尚无专属 L1，只加载通用用户增长原则（L0）。"
@@ -226,7 +234,9 @@ def format_growth_atoms_for_context(
     rows: list[dict] = []
     for atom in atoms[: max(0, max_atoms)]:
         layer = "l0"
-        if L1_CATERING_TOPIC in atom.topics:
+        if L1_RETAIL_TOPIC in atom.topics:
+            layer = "l1_retail"
+        elif L1_CATERING_TOPIC in atom.topics:
             layer = "l1_catering"
         elif L0_TOPIC in atom.topics:
             layer = "l0"

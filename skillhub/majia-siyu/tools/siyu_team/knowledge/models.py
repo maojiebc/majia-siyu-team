@@ -16,14 +16,62 @@ from typing import Any, Mapping, Sequence
 
 SCHEMA_VERSION = "2.0"
 ATOM_TYPES = frozenset(
-    {"principle", "method", "case", "anti-pattern", "insight", "tool", "compliance"}
+    {
+        "principle",
+        "method",
+        "case",
+        "anti-pattern",
+        "insight",
+        "tool",
+        "compliance",
+        "platform_workaround",
+        "hook_pattern",
+        "layout_pattern",
+        "timing",
+        "benchmark",
+        "vendor_experience",
+        "rule_change",
+    }
 )
 SOURCE_TYPES = frozenset(
-    {"official", "internal_case", "public_case", "expert_judgment", "legacy"}
+    {
+        "official",
+        "internal_case",
+        "public_case",
+        "expert_judgment",
+        "legacy",
+        "community",
+        "seed",
+    }
 )
 VISIBILITIES = frozenset({"public", "expert_private", "client_private"})
-EVIDENCE_GRADES = frozenset({"A1", "A2", "B1", "B2", "C1", "C2", "D"})
+BUSINESS_MODELS = frozenset({"direct", "franchise", "mixed", "any"})
+SCALE_BANDS = frozenset(
+    {"1", "2-10", "11-50", "51-300", "301-1000", "1001-5000", "5000+", "any"}
+)
+ORG_LAYERS = frozenset({"none", "regional", "any"})
+CONTRIBUTOR_ROLES = frozenset(
+    {"hq", "regional", "franchisee", "store", "vendor_or_consultant", "unknown"}
+)
+CHANNELS = frozenset(
+    {
+        "wecom",
+        "personal_wechat",
+        "wechat_group",
+        "miniprogram_member",
+        "official_account",
+        "douyin_kuaishou_dm",
+        "xiaohongshu",
+        "other",
+    }
+)
+EXECUTION_BOUNDARIES = frozenset(
+    {"hq_mandate", "hq_tools_incentives", "owner_decides", "any"}
+)
+EVIDENCE_GRADES = frozenset({"A", "A1", "A2", "B", "B1", "B2", "C", "C1", "C2", "D"})
+PLATFORM_RULE_RISKS = frozenset({"none", "low", "medium", "high"})
 CONFIDENCE_LEVELS = frozenset({"high", "medium", "low"})
+_HASH64 = re.compile(r"[0-9a-f]{64}")
 REVIEW_STATUSES = frozenset(
     {"draft", "in_review", "approved", "superseded", "retired", "rejected"}
 )
@@ -94,6 +142,33 @@ def _enum(value: Any, name: str, allowed: frozenset[str]) -> str:
     return cleaned
 
 
+def _enum_or_default(
+    value: Any, name: str, allowed: frozenset[str], default: str
+) -> str:
+    cleaned = _clean_text(value, name).lower()
+    if not cleaned:
+        return default
+    if cleaned not in allowed:
+        raise KnowledgeValidationError(
+            f"{name} 必须是：{', '.join(sorted(allowed))}"
+        )
+    return cleaned
+
+
+def _scale_band(value: Any) -> tuple[str, ...]:
+    if value is None:
+        return ("any",)
+    items = _tuple_of_text(value, "scope.scale_band")
+    if not items:
+        return ("any",)
+    unknown = [item for item in items if item not in SCALE_BANDS]
+    if unknown:
+        raise KnowledgeValidationError(
+            "scope.scale_band 必须是：" + ", ".join(sorted(SCALE_BANDS))
+        )
+    return items
+
+
 def _normalize_source_identity(source_identity: str | Path) -> str:
     raw = str(source_identity).strip()
     if not raw:
@@ -119,6 +194,15 @@ def generate_atom_id(source_id: str, locator: str, local_index: int) -> str:
         raise KnowledgeValidationError("local_index 必须是非负整数")
     normalized_locator = " ".join(locator.strip().split())
     payload = f"{source_id}\n{normalized_locator}\n{local_index}"
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+    return f"ka_{digest}"
+
+
+def generate_community_atom_id(statement: str, company_hash: str) -> str:
+    """稳定 ID：归一化判断句 + company_hash。"""
+    normalized = " ".join(_clean_text(statement, "statement", required=True).split())
+    cleaned_hash = _clean_text(company_hash, "company_hash", required=True)
+    payload = f"{normalized}\n{cleaned_hash}"
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
     return f"ka_{digest}"
 
@@ -161,6 +245,8 @@ class SourceRef:
     path: str
     locator: str
     observed_at: str
+    contributor_role: str = "unknown"
+    contributor_display_name: str = ""
 
     def __post_init__(self) -> None:
         if not _SOURCE_ID.fullmatch(self.source_id):
@@ -175,16 +261,37 @@ class SourceRef:
         object.__setattr__(
             self, "observed_at", _iso_date(self.observed_at, "source.observed_at", allow_empty=False)
         )
+        object.__setattr__(
+            self,
+            "contributor_role",
+            _enum_or_default(
+                self.contributor_role,
+                "source.contributor_role",
+                CONTRIBUTOR_ROLES,
+                "unknown",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "contributor_display_name",
+            _clean_text(
+                self.contributor_display_name, "source.contributor_display_name"
+            ),
+        )
 
     def to_dict(self) -> dict[str, str]:
-        return {
+        payload = {
             "source_id": self.source_id,
             "source_type": self.source_type,
             "label": self.label,
             "path": self.path,
             "locator": self.locator,
             "observed_at": self.observed_at,
+            "contributor_role": self.contributor_role,
         }
+        if self.contributor_display_name:
+            payload["contributor_display_name"] = self.contributor_display_name
+        return payload
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SourceRef":
@@ -192,6 +299,7 @@ class SourceRef:
             data,
             "source",
             {"source_id", "source_type", "label", "path", "locator", "observed_at"},
+            {"contributor_role", "contributor_display_name"},
         )
         return cls(**{key: str(value) for key, value in data.items()})
 
@@ -202,7 +310,9 @@ class Scope:
     client_id: str = ""
     industry: str = ""
     subindustry: str = ""
-    business_model: str = ""
+    business_model: str = "any"
+    scale_band: tuple[str, ...] = ("any",)
+    org_layers: str = "any"
     channels: tuple[str, ...] = ()
     lifecycle_stages: tuple[str, ...] = ()
     roles: tuple[str, ...] = ()
@@ -212,10 +322,28 @@ class Scope:
         object.__setattr__(
             self, "visibility", _enum(self.visibility, "scope.visibility", VISIBILITIES)
         )
-        for name in ("client_id", "industry", "subindustry", "business_model"):
+        for name in ("client_id", "industry", "subindustry"):
             object.__setattr__(
                 self, name, _clean_text(getattr(self, name), f"scope.{name}").lower()
             )
+        object.__setattr__(
+            self,
+            "business_model",
+            _enum_or_default(
+                self.business_model,
+                "scope.business_model",
+                BUSINESS_MODELS,
+                "any",
+            ),
+        )
+        object.__setattr__(self, "scale_band", _scale_band(self.scale_band))
+        object.__setattr__(
+            self,
+            "org_layers",
+            _enum_or_default(
+                self.org_layers, "scope.org_layers", ORG_LAYERS, "any"
+            ),
+        )
         for name in ("channels", "lifecycle_stages", "roles", "scenarios"):
             object.__setattr__(
                 self, name, _tuple_of_text(getattr(self, name), f"scope.{name}")
@@ -232,6 +360,8 @@ class Scope:
             "industry": self.industry,
             "subindustry": self.subindustry,
             "business_model": self.business_model,
+            "scale_band": list(self.scale_band),
+            "org_layers": self.org_layers,
             "channels": list(self.channels),
             "lifecycle_stages": list(self.lifecycle_stages),
             "roles": list(self.roles),
@@ -240,17 +370,19 @@ class Scope:
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "Scope":
-        fields = {
+        required = {
             "visibility", "client_id", "industry", "subindustry", "business_model",
             "channels", "lifecycle_stages", "roles", "scenarios",
         }
-        _check_keys(data, "scope", fields)
+        _check_keys(data, "scope", required, {"scale_band", "org_layers"})
         return cls(
             visibility=str(data["visibility"]),
             client_id=str(data["client_id"]),
             industry=str(data["industry"]),
             subindustry=str(data["subindustry"]),
-            business_model=str(data["business_model"]),
+            business_model=str(data.get("business_model", "any")),
+            scale_band=_scale_band(data.get("scale_band")),
+            org_layers=str(data.get("org_layers", "any")),
             channels=_tuple_of_text(data["channels"], "scope.channels"),
             lifecycle_stages=_tuple_of_text(data["lifecycle_stages"], "scope.lifecycle_stages"),
             roles=_tuple_of_text(data["roles"], "scope.roles"),
@@ -265,6 +397,7 @@ class Applicability:
     metrics: tuple[Metric, ...] = ()
     failure_modes: tuple[str, ...] = ()
     counterexamples: tuple[str, ...] = ()
+    execution_boundary: str = "any"
 
     def __post_init__(self) -> None:
         for name in ("preconditions", "recommended_action", "failure_modes", "counterexamples"):
@@ -277,6 +410,16 @@ class Applicability:
                 raise KnowledgeValidationError("applicability.metrics 必须包含 Metric")
             converted.append(metric)
         object.__setattr__(self, "metrics", tuple(converted))
+        object.__setattr__(
+            self,
+            "execution_boundary",
+            _enum_or_default(
+                self.execution_boundary,
+                "applicability.execution_boundary",
+                EXECUTION_BOUNDARIES,
+                "any",
+            ),
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -285,12 +428,19 @@ class Applicability:
             "metrics": [metric.to_dict() for metric in self.metrics],
             "failure_modes": list(self.failure_modes),
             "counterexamples": list(self.counterexamples),
+            "execution_boundary": self.execution_boundary,
         }
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "Applicability":
-        fields = {"preconditions", "recommended_action", "metrics", "failure_modes", "counterexamples"}
-        _check_keys(data, "applicability", fields)
+        fields = {
+            "preconditions",
+            "recommended_action",
+            "metrics",
+            "failure_modes",
+            "counterexamples",
+        }
+        _check_keys(data, "applicability", fields, {"execution_boundary"})
         metrics = data["metrics"]
         if isinstance(metrics, str) or not isinstance(metrics, Sequence):
             raise KnowledgeValidationError("applicability.metrics 必须是对象数组")
@@ -300,7 +450,87 @@ class Applicability:
             metrics=tuple(Metric.from_dict(_mapping(item, "metric")) for item in metrics),
             failure_modes=_tuple_of_text(data["failure_modes"], "applicability.failure_modes"),
             counterexamples=_tuple_of_text(data["counterexamples"], "applicability.counterexamples"),
+            execution_boundary=str(data.get("execution_boundary", "any")),
         )
+
+
+@dataclass(frozen=True)
+class Confirmation:
+    contributor_hash: str
+    company_hash: str
+    confirmed_at: str
+    display_name: str = ""
+
+    def __post_init__(self) -> None:
+        contributor = _clean_text(
+            self.contributor_hash, "quality.confirmations.contributor_hash", required=True
+        )
+        company = _clean_text(
+            self.company_hash, "quality.confirmations.company_hash", required=True
+        )
+        if not _HASH64.fullmatch(contributor):
+            raise KnowledgeValidationError(
+                "quality.confirmations.contributor_hash 必须是 64 位小写十六进制"
+            )
+        if not _HASH64.fullmatch(company):
+            raise KnowledgeValidationError(
+                "quality.confirmations.company_hash 必须是 64 位小写十六进制"
+            )
+        object.__setattr__(self, "contributor_hash", contributor)
+        object.__setattr__(self, "company_hash", company)
+        object.__setattr__(
+            self,
+            "confirmed_at",
+            _iso_date(
+                self.confirmed_at,
+                "quality.confirmations.confirmed_at",
+                allow_empty=False,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "display_name",
+            _clean_text(self.display_name, "quality.confirmations.display_name"),
+        )
+
+    def to_dict(self) -> dict[str, str]:
+        payload = {
+            "contributor_hash": self.contributor_hash,
+            "company_hash": self.company_hash,
+            "confirmed_at": self.confirmed_at,
+        }
+        if self.display_name:
+            payload["display_name"] = self.display_name
+        return payload
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "Confirmation":
+        _check_keys(
+            data,
+            "quality.confirmations[]",
+            {"contributor_hash", "company_hash", "confirmed_at"},
+            {"display_name"},
+        )
+        return cls(
+            contributor_hash=str(data["contributor_hash"]),
+            company_hash=str(data["company_hash"]),
+            confirmed_at=str(data["confirmed_at"]),
+            display_name=str(data.get("display_name") or ""),
+        )
+
+
+def _confirmations(value: Any) -> tuple[Confirmation, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, str) or not isinstance(value, Sequence):
+        raise KnowledgeValidationError("quality.confirmations 必须是对象数组")
+    converted: list[Confirmation] = []
+    for item in value:
+        if isinstance(item, Confirmation):
+            converted.append(item)
+        else:
+            converted.append(Confirmation.from_dict(_mapping(item, "quality.confirmations[]")))
+    return tuple(converted)
 
 
 @dataclass(frozen=True)
@@ -310,6 +540,9 @@ class Quality:
     review_status: str
     reviewer: str = ""
     reviewed_at: str = ""
+    confirmations: tuple[Confirmation, ...] = ()
+    platform_rule_risk: str = "none"
+    review_notes: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -325,23 +558,58 @@ class Quality:
         object.__setattr__(
             self, "reviewed_at", _iso_date(self.reviewed_at, "quality.reviewed_at")
         )
+        object.__setattr__(self, "confirmations", _confirmations(self.confirmations))
+        object.__setattr__(
+            self,
+            "platform_rule_risk",
+            _enum_or_default(
+                self.platform_rule_risk,
+                "quality.platform_rule_risk",
+                PLATFORM_RULE_RISKS,
+                "none",
+            ),
+        )
+        object.__setattr__(
+            self, "review_notes", _clean_text(self.review_notes, "quality.review_notes")
+        )
         if self.review_status == "approved" and (not self.reviewer or not self.reviewed_at):
             raise KnowledgeValidationError("approved 知识必须有 reviewer 和 reviewed_at")
 
-    def to_dict(self) -> dict[str, str]:
-        return {
+    def to_dict(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {
             "evidence_grade": self.evidence_grade,
             "confidence": self.confidence,
             "review_status": self.review_status,
             "reviewer": self.reviewer,
             "reviewed_at": self.reviewed_at,
         }
+        if self.confirmations:
+            payload["confirmations"] = [item.to_dict() for item in self.confirmations]
+        if self.platform_rule_risk != "none":
+            payload["platform_rule_risk"] = self.platform_rule_risk
+        if self.review_notes:
+            payload["review_notes"] = self.review_notes
+        return payload
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "Quality":
         fields = {"evidence_grade", "confidence", "review_status", "reviewer", "reviewed_at"}
-        _check_keys(data, "quality", fields)
-        return cls(**{key: str(value) for key, value in data.items()})
+        _check_keys(
+            data,
+            "quality",
+            fields,
+            {"confirmations", "platform_rule_risk", "review_notes"},
+        )
+        return cls(
+            evidence_grade=str(data["evidence_grade"]),
+            confidence=str(data["confidence"]),
+            review_status=str(data["review_status"]),
+            reviewer=str(data["reviewer"]),
+            reviewed_at=str(data["reviewed_at"]),
+            confirmations=_confirmations(data.get("confirmations")),
+            platform_rule_risk=str(data.get("platform_rule_risk") or "none"),
+            review_notes=str(data.get("review_notes") or ""),
+        )
 
 
 @dataclass(frozen=True)

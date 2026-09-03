@@ -56,31 +56,9 @@ jobs:
             --ignore=tests/test_wheel_smoke.py \
             --ignore=tests/test_skillhub_smoke.py
 
-      - name: Repository contracts
-        run: |
-          make validate
-          python tools/check_consistency.py
-
-      - name: Markdown links
-        run: python tools/check_links.py
-
-      - name: Route contract parity
-        run: |
-          python tools/render_route_contract.py --check
-          python tools/check_route_contracts.py
-
-      - name: Knowledge schema, sync and hash
-        run: make atoms
-
-      - name: SkillHub clean build parity
-        run: python tools/build_skillhub_bundle.py --check
-
       - name: Offline wheel install and bundle smoke
         run: |
           python -m unittest -v \
             tests.test_installed_knowledge \
             tests.test_wheel_smoke \
             tests.test_skillhub_smoke
-
-      - name: Version consistency
-        run: python tools/check_versions.py

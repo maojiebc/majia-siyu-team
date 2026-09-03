@@ -418,5 +418,60 @@ class CorpusFixtureConstructionTests(unittest.TestCase):
             Corpus.from_atoms((atom, atom))
 
 
+class CommunityCorpusTests(unittest.TestCase):
+    def test_load_community_skips_bad_lines_without_raising(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            community = root / "05-community"
+            community.mkdir()
+            good = build_atom()
+            (community / "inbox.jsonl").write_text(
+                "\n".join(
+                    [
+                        "{not json",
+                        good.to_json(),
+                        json.dumps({"schema_version": "2.0", "id": "bad"}),
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            loader = CorpusLoader(today=TODAY)
+            atoms = loader.load_community(root)
+            self.assertEqual(atoms, (good,))
+            self.assertTrue(loader.community_warnings)
+
+    def test_load_community_skips_revoked_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            community = root / "05-community"
+            community.mkdir()
+            kept = build_atom()
+            dropped = build_atom()
+            dropped = KnowledgeAtomV2.from_dict(
+                {**dropped.to_dict(), "id": "ka_ffffffffffffffff"}
+            )
+            (community / "inbox.jsonl").write_text(
+                kept.to_json() + "\n" + dropped.to_json() + "\n",
+                encoding="utf-8",
+            )
+            (community / "revoked.jsonl").write_text(
+                json.dumps(
+                    {
+                        "id": dropped.id,
+                        "revoked_at": "2026-09-03",
+                        "reason": "cli",
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            loader = CorpusLoader(today=TODAY)
+            atoms = loader.load_community(root)
+            self.assertEqual(atoms, (kept,))
+            self.assertTrue(any("revoked" in item for item in loader.community_warnings))
+
+
 if __name__ == "__main__":
     unittest.main()

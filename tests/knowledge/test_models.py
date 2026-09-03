@@ -97,6 +97,96 @@ class KnowledgeModelTests(unittest.TestCase):
         with self.assertRaises(KnowledgeValidationError):
             KnowledgeAtomV2.from_dict(data)
 
+    def test_optional_modifiers_default_and_missing_fields_stay_valid(self) -> None:
+        atom = build_atom()
+        self.assertEqual(atom.scope.business_model, "franchise")
+        self.assertEqual(atom.scope.scale_band, ("any",))
+        self.assertEqual(atom.scope.org_layers, "any")
+        self.assertEqual(atom.applicability.execution_boundary, "any")
+
+        payload = atom.to_dict()
+        payload["scope"].pop("scale_band")
+        payload["scope"].pop("org_layers")
+        payload["applicability"].pop("execution_boundary")
+        payload["scope"]["business_model"] = ""
+        restored = KnowledgeAtomV2.from_dict(payload)
+        self.assertEqual(restored.scope.business_model, "any")
+        self.assertEqual(restored.scope.scale_band, ("any",))
+        self.assertEqual(restored.scope.org_layers, "any")
+        self.assertEqual(restored.applicability.execution_boundary, "any")
+
+        payload["scope"]["business_model"] = "franchise"
+        payload["scope"]["scale_band"] = ["1", "2-10"]
+        payload["scope"]["org_layers"] = "regional"
+        payload["applicability"]["execution_boundary"] = "hq_tools_incentives"
+        scoped = KnowledgeAtomV2.from_dict(payload)
+        self.assertEqual(scoped.scope.scale_band, ("1", "2-10"))
+        self.assertEqual(scoped.scope.org_layers, "regional")
+        self.assertEqual(scoped.applicability.execution_boundary, "hq_tools_incentives")
+
+    def test_community_extensions_are_optional_and_round_trip(self) -> None:
+        payload = build_atom().to_dict()
+        payload["type"] = "platform_workaround"
+        payload["source"]["source_type"] = "community"
+        payload["quality"]["evidence_grade"] = "C"
+        payload["quality"]["confirmations"] = [
+            {
+                "contributor_hash": "a" * 64,
+                "company_hash": "b" * 64,
+                "confirmed_at": "2026-09-01",
+            }
+        ]
+        payload["quality"]["platform_rule_risk"] = "medium"
+        payload["quality"]["review_notes"] = "类别未知，内测宽松收录"
+        atom = KnowledgeAtomV2.from_dict(payload)
+        self.assertEqual(atom.type, "platform_workaround")
+        self.assertEqual(atom.quality.evidence_grade, "C")
+        self.assertEqual(atom.quality.platform_rule_risk, "medium")
+        self.assertEqual(atom.quality.review_notes, "类别未知，内测宽松收录")
+        self.assertEqual(len(atom.quality.confirmations), 1)
+        restored = KnowledgeAtomV2.from_json(atom.to_json())
+        self.assertEqual(restored, atom)
+
+    def test_invalid_modifier_enums_fail_closed(self) -> None:
+        payload = build_atom().to_dict()
+        payload["scope"]["business_model"] = "joint_venture"
+        with self.assertRaises(KnowledgeValidationError):
+            KnowledgeAtomV2.from_dict(payload)
+        payload = build_atom().to_dict()
+        payload["scope"]["scale_band"] = ["0-3"]
+        with self.assertRaises(KnowledgeValidationError):
+            KnowledgeAtomV2.from_dict(payload)
+        payload = build_atom().to_dict()
+        payload["scope"]["scale_band"] = ["300+"]
+        with self.assertRaises(KnowledgeValidationError):
+            KnowledgeAtomV2.from_dict(payload)
+        payload = build_atom().to_dict()
+        payload["scope"]["scale_band"] = ["5000+", "301-1000"]
+        payload["scope"]["channels"] = ["wecom", "miniprogram_member"]
+        payload["source"]["contributor_role"] = "hq"
+        expanded = KnowledgeAtomV2.from_dict(payload)
+        self.assertEqual(expanded.scope.scale_band, ("5000+", "301-1000"))
+        self.assertEqual(expanded.scope.channels, ("wecom", "miniprogram_member"))
+        self.assertEqual(expanded.source.contributor_role, "hq")
+        payload = build_atom().to_dict()
+        payload["source"].pop("contributor_role")
+        restored = KnowledgeAtomV2.from_dict(payload)
+        self.assertEqual(restored.source.contributor_role, "unknown")
+        payload = build_atom().to_dict()
+        payload["source"]["contributor_display_name"] = "江南茶社小林"
+        payload["quality"]["confirmations"] = [
+            {
+                "contributor_hash": "a" * 64,
+                "company_hash": "b" * 64,
+                "confirmed_at": "2026-08-01",
+                "display_name": "江南茶社小林",
+            }
+        ]
+        named = KnowledgeAtomV2.from_dict(payload)
+        self.assertEqual(named.source.contributor_display_name, "江南茶社小林")
+        self.assertEqual(named.quality.confirmations[0].display_name, "江南茶社小林")
+        self.assertNotIn("contributor_display_name", build_atom().to_dict()["source"])
+
     def test_v1_migration_is_draft_and_not_exportable(self) -> None:
         legacy = {
             "id": "2026Q3_001",

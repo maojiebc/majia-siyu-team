@@ -1,5 +1,7 @@
 # H1/H2/H3 预注册协议
 
+> **状态：冻结（Frozen since v1.5）** — Pilot 工具链保留供参考，不进入发布门；H2/H3 指标改从社区共建流水线日志读取。
+
 ## H1 知识价值
 
 - 30 题：`add_wechat`、`activity_increment`、`repurchase_recall` 各 10 题。

@@ -13,7 +13,11 @@
     "id": {"type": "string", "pattern": "^ka_[0-9a-f]{16}$"},
     "statement": {"type": "string", "minLength": 1},
     "type": {
-      "enum": ["principle", "method", "case", "anti-pattern", "insight", "tool", "compliance"]
+      "enum": [
+        "principle", "method", "case", "anti-pattern", "insight", "tool", "compliance",
+        "platform_workaround", "hook_pattern", "layout_pattern", "timing",
+        "benchmark", "vendor_experience", "rule_change"
+      ]
     },
     "topics": {"$ref": "#/$defs/uniqueStrings"},
     "skills": {"$ref": "#/$defs/uniqueStrings"},
@@ -23,11 +27,21 @@
       "required": ["source_id", "source_type", "label", "path", "locator", "observed_at"],
       "properties": {
         "source_id": {"type": "string", "pattern": "^src_[0-9a-f]{12}$"},
-        "source_type": {"enum": ["official", "internal_case", "public_case", "expert_judgment", "legacy"]},
+        "source_type": {
+          "enum": [
+            "official", "internal_case", "public_case", "expert_judgment",
+            "legacy", "community", "seed"
+          ]
+        },
         "label": {"type": "string", "minLength": 1},
         "path": {"type": "string", "minLength": 1},
         "locator": {"type": "string", "minLength": 1},
-        "observed_at": {"type": "string", "format": "date"}
+        "observed_at": {"type": "string", "format": "date"},
+        "contributor_role": {
+          "enum": ["hq", "regional", "franchisee", "store", "vendor_or_consultant", "unknown"],
+          "default": "unknown"
+        },
+        "contributor_display_name": {"type": "string", "default": ""}
       }
     },
     "scope": {
@@ -39,8 +53,39 @@
         "client_id": {"type": "string"},
         "industry": {"type": "string"},
         "subindustry": {"type": "string"},
-        "business_model": {"type": "string"},
-        "channels": {"$ref": "#/$defs/uniqueStrings"},
+        "business_model": {
+          "type": "string",
+          "enum": ["direct", "franchise", "mixed", "any"],
+          "default": "any"
+        },
+        "scale_band": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "default": ["any"],
+          "items": {
+            "enum": ["1", "2-10", "11-50", "51-300", "301-1000", "1001-5000", "5000+", "any"]
+          }
+        },
+        "org_layers": {
+          "enum": ["none", "regional", "any"],
+          "default": "any"
+        },
+        "channels": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "anyOf": [
+              {
+                "enum": [
+                  "wecom", "personal_wechat", "wechat_group", "miniprogram_member",
+                  "official_account", "douyin_kuaishou_dm", "xiaohongshu", "other"
+                ]
+              },
+              {"type": "string", "minLength": 1}
+            ]
+          }
+        },
         "lifecycle_stages": {"$ref": "#/$defs/uniqueStrings"},
         "roles": {"$ref": "#/$defs/uniqueStrings"},
         "scenarios": {"$ref": "#/$defs/uniqueStrings"}
@@ -74,7 +119,11 @@
           }
         },
         "failure_modes": {"$ref": "#/$defs/uniqueStrings"},
-        "counterexamples": {"$ref": "#/$defs/uniqueStrings"}
+        "counterexamples": {"$ref": "#/$defs/uniqueStrings"},
+        "execution_boundary": {
+          "enum": ["hq_mandate", "hq_tools_incentives", "owner_decides", "any"],
+          "default": "any"
+        }
       }
     },
     "quality": {
@@ -82,11 +131,29 @@
       "additionalProperties": false,
       "required": ["evidence_grade", "confidence", "review_status", "reviewer", "reviewed_at"],
       "properties": {
-        "evidence_grade": {"enum": ["A1", "A2", "B1", "B2", "C1", "C2", "D"]},
+        "evidence_grade": {
+          "enum": ["A", "A1", "A2", "B", "B1", "B2", "C", "C1", "C2", "D"]
+        },
         "confidence": {"enum": ["high", "medium", "low"]},
         "review_status": {"enum": ["draft", "in_review", "approved", "superseded", "retired", "rejected"]},
         "reviewer": {"type": "string"},
-        "reviewed_at": {"type": "string"}
+        "reviewed_at": {"type": "string"},
+        "confirmations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contributor_hash", "company_hash", "confirmed_at"],
+            "properties": {
+              "contributor_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "company_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "confirmed_at": {"type": "string", "format": "date"},
+              "display_name": {"type": "string"}
+            }
+          }
+        },
+        "platform_rule_risk": {"enum": ["none", "low", "medium", "high"]},
+        "review_notes": {"type": "string"}
       }
     },
     "lifecycle": {

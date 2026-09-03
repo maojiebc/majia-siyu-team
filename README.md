@@ -75,7 +75,7 @@
 |---|---|---|
 | 入口 | 每次重新描述任务 | 一个 `/siyu`，干完自动导航下一步 |
 | 合规 | 发完再审，或不管 | **写的时候就扫**，红线就地打回 |
-| 行业方法 | 通用模板 | 餐饮 3322 配比、造 IP、偷着打折等内置打法 |
+| 行业方法 | 通用模板 | 餐饮有行业册；零售行业册：敬请期待，当前为种子层，由社区印证逐步替换 |
 | 外部事实 | 模型记忆瞎填 | 厂商 / 报价 / 政策必须**本次检索留证** |
 | 结构问题 | 继续堆文案 | 先问诊消解；真结构问题才升级全盘诊断 |
 | 跨对话 | 聊完就散 | 本地存档 / 续聊 / 出报告 |
@@ -197,7 +197,7 @@ flowchart LR
 4. **诊断层** —— 结构问题才进全盘诊断；四位专家彼此看不见对方意见，总协调只评推理质量，合规可一票否决  
 5. **底座** —— 本地状态、脱敏追踪、分层知识契约、连接器预留（线上提交 / 检索尚未默认打开）
 
-当前执行事实：[`docs/architecture-current.md`](docs/architecture-current.md) · [`docs/capability-status.md`](docs/capability-status.md) · [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md) · [`docs/framework.svg`](docs/framework.svg) · [`docs/skill-link-map.mmd`](docs/skill-link-map.mmd)（17 个 skill 的路由与原子绑定关系图） · [`docs/标杆移植说明.md`](docs/标杆移植说明.md)
+当前执行事实：[`docs/architecture-current.md`](docs/architecture-current.md) · [`docs/capability-status.md`](docs/capability-status.md) · [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md) · [`docs/framework.svg`](docs/framework.svg) · [`docs/skill-link-map.mmd`](docs/skill-link-map.mmd)（17 个 skill 的路由与原子绑定关系图） · [`docs/标杆移植说明.md`](docs/标杆移植说明.md)。Python Runtime（`src/siyu_team/`）与 `docs/pilot/` 自 v1.5 起冻结，不进入发布门。
 
 ## 同行知识共建（邀请制）
 
@@ -219,7 +219,7 @@ flowchart LR
 ## 开发与验证
 
 ```bash
-make check          # test + validate + pilot + 版本/一致性
+make check          # test + validate + 版本/一致性（pilot 见 make pilot）
 make test
 make validate
 make pilot

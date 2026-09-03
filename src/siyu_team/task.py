@@ -198,6 +198,11 @@ _STAGE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("growth", re.compile(r"(扩张|已有.{0,6}体系.{0,8}提效|整盘提效)")),
     ("mature", re.compile(r"(成熟|规模化.{0,6}(复制|裂变)|体系复制)")),
 )
+_BUSINESS_MODEL_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("franchise", re.compile(r"加盟")),
+    ("direct", re.compile(r"直营")),
+    ("mixed", re.compile(r"混合")),
+)
 
 _HIGH_RISK = re.compile(
     r"(批量.{0,4}(加好友|群发)|手机号|身份证|定位|外挂|虚拟定位|"
@@ -260,6 +265,7 @@ class Task:
     risk: RiskLevel = RiskLevel.LOW
     industry: str = ""
     stage: str = ""
+    business_model: str = ""
     client: str = ""
     audience: str = ""
     constraints: tuple[str, ...] = ()
@@ -284,6 +290,7 @@ class Task:
         object.__setattr__(self, "source_text", text)
         object.__setattr__(self, "industry", self.industry.strip().lower())
         object.__setattr__(self, "stage", self.stage.strip().lower())
+        object.__setattr__(self, "business_model", self.business_model.strip().lower())
         object.__setattr__(self, "client", self.client.strip())
         object.__setattr__(self, "audience", self.audience.strip())
         object.__setattr__(self, "constraints", tuple(self.constraints))
@@ -309,6 +316,7 @@ class Task:
             "risk": self.risk.value,
             "industry": self.industry,
             "stage": self.stage,
+            "business_model": self.business_model,
             "client": self.client,
             "audience": self.audience,
             "constraints": list(self.constraints),
@@ -336,6 +344,7 @@ class Task:
             risk=_enum_value(RiskLevel, data.get("risk", "low"), "risk"),
             industry=str(data.get("industry", "")),
             stage=str(data.get("stage", "")),
+            business_model=str(data.get("business_model", "")),
             client=str(data.get("client", "")),
             audience=str(data.get("audience", "")),
             constraints=tuple(str(item) for item in constraints),
@@ -459,6 +468,13 @@ def _infer_stage(text: str) -> str:
     return ""
 
 
+def _infer_business_model(text: str) -> str:
+    for model, pattern in _BUSINESS_MODEL_RULES:
+        if pattern.search(text):
+            return model
+    return ""
+
+
 def _infer_channel(kind: TaskKind, text: str) -> Channel:
     if kind is TaskKind.MOMENTS_COPY:
         return Channel.WECHAT_MOMENTS
@@ -507,6 +523,7 @@ def _infer_risk(text: str) -> RiskLevel:
 _HINT_KEYS = frozenset(
     {
         "kind", "source_text", "channel", "goal", "risk", "industry", "stage",
+        "business_model",
         "client", "audience", "constraints", "context", "need_compliance_check",
         "confidence", "task_id", "schema_version",
     }
@@ -550,6 +567,10 @@ def task_routing_contract() -> dict[str, Any]:
         "stage_rules": [
             {"stage": stage, "pattern": pattern.pattern}
             for stage, pattern in _STAGE_RULES
+        ],
+        "business_model_rules": [
+            {"business_model": model, "pattern": pattern.pattern}
+            for model, pattern in _BUSINESS_MODEL_RULES
         ],
         "overrides": {
             "verified_market_snapshot_excludes": TaskKind.MARKET_RESEARCH.value,
@@ -618,6 +639,7 @@ def parse_task(text: str, hints: Mapping[str, Any] | None = None) -> Task:
         "risk": inferred_risk.value,
         "industry": _infer_industry(clean_text),
         "stage": _infer_stage(clean_text),
+        "business_model": _infer_business_model(clean_text),
     }
     payload.update(supplied)
     payload["source_text"] = clean_text

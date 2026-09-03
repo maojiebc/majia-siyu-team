@@ -29,6 +29,7 @@ KNOWLEDGE_PUBLIC_DIRS = (
     "01-wechat-official",
     "02-industry",
     "04-atoms",
+    "05-community",
 )
 # 随包分发的原子工具（零依赖，在分发态也执行严格 v2 契约）。
 BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
@@ -49,7 +50,7 @@ EXPERT_REFERENCE_ESCAPE = (
     "../../references/",
 )
 BARE_KNOWLEDGE_RE = re.compile(
-    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms)"
+    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms|05-community)"
 )
 EXECUTION_SCRIPT_RE = re.compile(
     r"plugins/siyu-execution/skills/([^/]+)/scripts/"
@@ -121,7 +122,7 @@ def copy_modules(output: Path, modules: list[Path]) -> dict[str, str]:
 
 
 def copy_knowledge(output: Path) -> int:
-    """公开知识层随包走：modules/_knowledge/{00,01,02,04}+manifest。
+    """公开知识层随包走：modules/_knowledge/{00,01,02,04,05}+manifest。
 
     resolver（knowledge/paths.py）已给这个槽位留了发现优先级；
     03-majia-sop 显式排除——本机构建时该目录含真实 SOP。
