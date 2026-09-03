@@ -1,22 +1,26 @@
 {
   "files": {
     "inbox.jsonl": {
-      "atom_count": 1,
-      "sha256": "sha256:05083b6b80de85a2d9d011facc3bebef5e524c9f26807aab036fa3b4bd4d6f74"
+      "atom_count": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "maintainer.jsonl": {
       "atom_count": 1,
       "sha256": "sha256:358a164c09b7c8b6999bcf25751dc1d47fb60d3cfa31e0920e84edc175172f6a"
+    },
+    "revoked.jsonl": {
+      "atom_count": 1,
+      "sha256": "sha256:644d9a3f3501c358bb77811fc8ebc487de1c4420939bf3cada25c0305a41f649"
     },
     "seeds.retail.jsonl": {
       "atom_count": 8,
       "sha256": "sha256:d6eecf46fa693b46fa7c7e8905c3ed8510aeac4b635985b26d9613e93709ad0f"
     }
   },
-  "last_run": "2026-09-03T15:24:55Z",
+  "last_run": "2026-09-03T15:26:11Z",
   "metrics": {
     "confirmations_unresolved": 0,
-    "median_hours_submit_to_publish": 23.41,
+    "median_hours_submit_to_publish": 23.44,
     "needs_manual": 0,
     "promoted_c": 0,
     "submissions_total": 2
