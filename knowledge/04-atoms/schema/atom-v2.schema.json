@@ -135,7 +135,7 @@
           "enum": ["A", "A1", "A2", "B", "B1", "B2", "C", "C1", "C2", "D"]
         },
         "confidence": {"enum": ["high", "medium", "low"]},
-        "review_status": {"enum": ["draft", "in_review", "approved", "superseded", "retired", "rejected"]},
+        "review_status": {"enum": ["draft", "pending", "in_review", "approved", "superseded", "retired", "rejected"]},
         "reviewer": {"type": "string"},
         "reviewed_at": {"type": "string"},
         "confirmations": {
@@ -153,7 +153,8 @@
           }
         },
         "platform_rule_risk": {"enum": ["none", "low", "medium", "high"]},
-        "review_notes": {"type": "string"}
+        "review_notes": {"type": "string"},
+        "suggested_grade": {"enum": ["A", "A1", "A2", "B", "B1", "B2", "C", "C1", "C2", "D"]}
       }
     },
     "lifecycle": {

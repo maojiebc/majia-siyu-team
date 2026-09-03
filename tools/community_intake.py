@@ -19,33 +19,45 @@ from siyu_team.connectors.base import ConnectorNotConfigured  # noqa: E402
 from siyu_team.contribution.intake import (  # noqa: E402
     REASON_CLI,
     HashSaltError,
+    RejectedAtom,
     RevokedAtom,
     hash_salt,
+    independent_confirmation_count,
     intake_mode,
+    load_rejected_entries,
     load_revoked_entries,
     maybe_enrich,
+    merge_rejected,
     merge_revoked,
     run_intake,
+    write_rejected_jsonl,
     write_revoked_jsonl,
     writeback_fields_changed,
 )
 from siyu_team.knowledge.models import KnowledgeAtomV2, KnowledgeValidationError  # noqa: E402
 
 COMMUNITY_REL = Path("05-community")
-INBOX = COMMUNITY_REL / "inbox.jsonl"
-CONFIRMED = COMMUNITY_REL / "confirmed.jsonl"
-MAINTAINER = COMMUNITY_REL / "maintainer.jsonl"
+PENDING = COMMUNITY_REL / "pending.jsonl"
+APPROVED = COMMUNITY_REL / "approved.jsonl"
 SEEDS = COMMUNITY_REL / "seeds.retail.jsonl"
 REVOKED = COMMUNITY_REL / "revoked.jsonl"
+REJECTED = COMMUNITY_REL / "rejected.jsonl"
 MANIFEST = COMMUNITY_REL / "manifest.json"
-WRITEBACK_FIELDS = ("状态", "原子ID", "回礼")
+LEGACY_ATOM_FILES = (
+    COMMUNITY_REL / "inbox.jsonl",
+    COMMUNITY_REL / "confirmed.jsonl",
+    COMMUNITY_REL / "maintainer.jsonl",
+)
+WRITEBACK_FIELDS = ("状态", "原子ID", "回礼", "建议等级", "印证数")
 PUBLIC_BASE_ENV = "LARK_PUBLIC_BASE_TOKEN"
 PUBLIC_TABLE_ENV = "LARK_PUBLIC_TABLE"
 MANIFEST_METRIC_KEYS = (
     "submissions_total",
-    "promoted_c",
+    "pending_total",
+    "approved_total",
+    "rejected_total",
     "needs_manual",
-    "median_hours_submit_to_publish",
+    "median_hours_submit_to_approve",
     "confirmations_unresolved",
 )
 
@@ -138,28 +150,24 @@ def _load_fixture(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]
 
 def _existing_pipeline_atoms(community_root: Path) -> list[KnowledgeAtomV2]:
     atoms: list[KnowledgeAtomV2] = []
-    for relative in (INBOX, CONFIRMED, MAINTAINER, SEEDS):
+    for relative in (PENDING, APPROVED, SEEDS, *LEGACY_ATOM_FILES):
         atoms.extend(_read_jsonl(community_root.parent / relative))
     return atoms
 
 
 def _partition(atoms: Sequence[KnowledgeAtomV2]) -> dict[str, list[KnowledgeAtomV2]]:
     buckets: dict[str, list[KnowledgeAtomV2]] = {
-        "D": [],
-        "C": [],
-        "maintainer": [],
+        "pending": [],
+        "approved": [],
         "seed": [],
     }
     for atom in atoms:
-        grade = atom.quality.evidence_grade
-        if grade in {"A", "B"}:
-            buckets["maintainer"].append(atom)
-        elif grade == "C":
-            buckets["C"].append(atom)
-        elif atom.source.source_type == "seed":
+        if atom.source.source_type == "seed":
             buckets["seed"].append(atom)
+        elif atom.quality.review_status == "approved":
+            buckets["approved"].append(atom)
         else:
-            buckets["D"].append(atom)
+            buckets["pending"].append(atom)
     return buckets
 
 
@@ -316,15 +324,15 @@ def _write_community_state(
     previous_buckets: Mapping[str, Sequence[KnowledgeAtomV2]],
     atoms: Sequence[KnowledgeAtomV2],
     revoked_entries: Sequence[RevokedAtom],
+    rejected_entries: Sequence[RejectedAtom] = (),
     metrics: Mapping[str, Any],
     last_run: str,
 ) -> None:
     buckets = _partition(atoms)
     file_meta: dict[str, tuple[int, str]] = {}
     targets = (
-        (INBOX.name, "D", knowledge_root / INBOX),
-        (CONFIRMED.name, "C", knowledge_root / CONFIRMED),
-        (MAINTAINER.name, "maintainer", knowledge_root / MAINTAINER),
+        (PENDING.name, "pending", knowledge_root / PENDING),
+        (APPROVED.name, "approved", knowledge_root / APPROVED),
         (SEEDS.name, "seed", knowledge_root / SEEDS),
     )
     for name, key, path in targets:
@@ -340,6 +348,16 @@ def _write_community_state(
             revoked_payload.count(b"\n") if revoked_payload else 0,
             _sha256_bytes(revoked_payload) if revoked_payload else _sha256_bytes(b""),
         )
+    rejected_payload = write_rejected_jsonl(knowledge_root / REJECTED, rejected_entries)
+    if rejected_payload or (knowledge_root / REJECTED).is_file():
+        file_meta[REJECTED.name] = (
+            rejected_payload.count(b"\n") if rejected_payload else 0,
+            _sha256_bytes(rejected_payload) if rejected_payload else _sha256_bytes(b""),
+        )
+    for stale in LEGACY_ATOM_FILES:
+        stale_path = knowledge_root / stale
+        if stale_path.is_file():
+            stale_path.unlink()
     _write_manifest(
         knowledge_root / MANIFEST,
         files=file_meta,
@@ -378,9 +396,11 @@ def _revoke_local(args: argparse.Namespace) -> int:
     last_run = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     metrics = {
         "submissions_total": 0,
-        "promoted_c": 0,
+        "pending_total": 0,
+        "approved_total": 0,
+        "rejected_total": 0,
         "needs_manual": 0,
-        "median_hours_submit_to_publish": None,
+        "median_hours_submit_to_approve": None,
         "confirmations_unresolved": 0,
         "revoked": 1,
     }
@@ -390,6 +410,7 @@ def _revoke_local(args: argparse.Namespace) -> int:
             previous_buckets=previous_buckets,
             atoms=kept,
             revoked_entries=merged_revoked,
+            rejected_entries=load_rejected_entries(knowledge_root / REJECTED),
             metrics=metrics,
             last_run=last_run,
         )
@@ -456,6 +477,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     community_root = knowledge_root / COMMUNITY_REL
     existing = _existing_pipeline_atoms(community_root)
     previous_revoked = load_revoked_entries(knowledge_root / REVOKED)
+    previous_rejected = load_rejected_entries(knowledge_root / REJECTED)
     previous_buckets = _partition(existing)
     try:
         benchmark_index = _render_mod().load_benchmark_index(knowledge_root)
@@ -473,18 +495,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         mode=intake_mode(),
         revoked_ids=tuple(item.id for item in previous_revoked if item.id),
         revoked_record_ids=tuple(item.record_id for item in previous_revoked if item.record_id),
+        rejected_ids=tuple(item.id for item in previous_rejected if item.id),
+        rejected_record_ids=tuple(item.record_id for item in previous_rejected if item.record_id),
     )
     enriched = tuple(maybe_enrich(atom) for atom in result.atoms)
     summary = {
         "submissions_total": result.metrics["submissions_total"],
-        "promoted_c": result.metrics["promoted_c"],
-        "grade_d": result.metrics["grade_d"],
-        "grade_a": result.metrics["grade_a"],
+        "pending_total": result.metrics["pending_total"],
+        "approved_total": result.metrics["approved_total"],
+        "rejected_total": result.metrics["rejected_total"],
         "needs_manual": result.metrics["needs_manual"],
         "confirmations_unresolved": result.metrics["confirmations_unresolved"],
-        "rejected": result.metrics["rejected"],
-        "median_hours_submit_to_publish": result.metrics[
-            "median_hours_submit_to_publish"
+        "median_hours_submit_to_approve": result.metrics[
+            "median_hours_submit_to_approve"
         ],
         "writebacks": [
             {
@@ -508,7 +531,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     merged_revoked = merge_revoked(previous_revoked, result.revoked)
+    reopened = set(result.reopened)
+    merged_rejected = tuple(
+        item
+        for item in merge_rejected(previous_rejected, result.rejected)
+        if item.id not in reopened and item.record_id not in reopened
+    )
     blocked_ids = {item.id for item in merged_revoked if item.id}
+    blocked_ids.update(item.id for item in merged_rejected if item.id)
     merged = [
         atom
         for atom in _merge_by_id(existing, (*enriched, *result.existing_updated))
@@ -519,6 +549,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         previous_buckets=previous_buckets,
         atoms=merged,
         revoked_entries=merged_revoked,
+        rejected_entries=merged_rejected,
         metrics=result.metrics,
         last_run=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     )
@@ -539,17 +570,30 @@ def main(argv: Sequence[str] | None = None) -> int:
             continue
         atom_id = item.atom_id_for_writeback()
         original = records_by_id.get(item.record_id, {})
-        if not writeback_fields_changed(original, item.status, atom_id, item.gift):
+        suggested = ""
+        confirm_count = None
+        if item.atom is not None:
+            suggested = item.atom.quality.suggested_grade
+            confirm_count = independent_confirmation_count(item.atom)
+        if not writeback_fields_changed(
+            original,
+            item.status,
+            atom_id,
+            item.gift,
+            suggested,
+            confirm_count,
+        ):
             continue
-        client.update_record(
-            table_id,
-            item.record_id,
-            {
-                WRITEBACK_FIELDS[0]: item.status,
-                WRITEBACK_FIELDS[1]: atom_id,
-                WRITEBACK_FIELDS[2]: item.gift,
-            },
-        )
+        payload: dict[str, Any] = {
+            WRITEBACK_FIELDS[0]: item.status,
+            WRITEBACK_FIELDS[1]: atom_id,
+            WRITEBACK_FIELDS[2]: item.gift,
+        }
+        if suggested:
+            payload[WRITEBACK_FIELDS[3]] = suggested
+        if confirm_count is not None:
+            payload[WRITEBACK_FIELDS[4]] = confirm_count
+        client.update_record(table_id, item.record_id, payload)
     return 0
 
 

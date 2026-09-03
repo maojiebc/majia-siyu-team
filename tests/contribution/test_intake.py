@@ -16,10 +16,10 @@ from siyu_team.contribution.intake import (
     NOTE_PII_DISPLAY_NAME,
     NOTE_PII_REDACTED,
     NOTE_UNKNOWN_KIND,
-    STATUS_A,
-    STATUS_C,
-    STATUS_D,
+    STATUS_APPROVED,
     STATUS_MANUAL,
+    STATUS_PENDING,
+    STATUS_REJECTED_REVIEW,
     STATUS_REVOKED,
     HashSaltError,
     _as_link,
@@ -85,18 +85,18 @@ class CommunityIntakeTests(unittest.TestCase):
             mode=MODE_STRICT,
         )
         self.assertEqual(result.metrics["submissions_total"], 7)
-        self.assertEqual(result.metrics["promoted_c"], 1)
-        self.assertEqual(result.metrics["grade_d"], 2)
+        self.assertEqual(result.metrics["approved_total"], 2)
+        self.assertGreaterEqual(result.metrics["pending_total"], 1)
         self.assertEqual(result.metrics["needs_manual"], 3)
         self.assertEqual(result.metrics["confirmations_unresolved"], 0)
         statuses = {item.record_id: item.status for item in result.decisions}
-        self.assertEqual(statuses["rec_s1"], STATUS_C)
-        self.assertEqual(statuses["rec_s2"], STATUS_C)
-        self.assertEqual(statuses["rec_s3"], STATUS_D)
+        self.assertEqual(statuses["rec_s1"], STATUS_APPROVED)
+        self.assertEqual(statuses["rec_s2"], STATUS_APPROVED)
+        self.assertEqual(statuses["rec_s3"], STATUS_PENDING)
         self.assertEqual(statuses["rec_s4"], STATUS_MANUAL)
         self.assertEqual(statuses["rec_s5"], STATUS_MANUAL)
         self.assertEqual(statuses["rec_s6"], STATUS_MANUAL)
-        self.assertEqual(statuses["rec_s7"], STATUS_D)
+        self.assertEqual(statuses["rec_s7"], STATUS_PENDING)
         large = next(item.atom for item in result.decisions if item.record_id == "rec_s7")
         assert large is not None
         self.assertEqual(large.scope.scale_band, ("5000+",))
@@ -248,6 +248,7 @@ class CommunityIntakeTests(unittest.TestCase):
         self.assertIn("类型：数字基线", text)
         self.assertIn("业态/模式/规模：餐饮 / 加盟 / 11-50", text)
         self.assertIn("证据等级：单源D级", text)
+        self.assertIn("评审：待审，通过后进入下一版 skill", text)
         self.assertIn("平台规则风险：无", text)
         self.assertIn("想撤回，告诉发起人即可。", text)
         self.assertIn("餐饮 × 11-50", text)
@@ -285,7 +286,9 @@ class CommunityIntakeTests(unittest.TestCase):
             salt=SALT,
         )
         atom = candidate_to_atom(candidate, (), {"m9224@163.com"})
+        self.assertEqual(atom.quality.suggested_grade, "A")
         self.assertEqual(atom.quality.evidence_grade, "A")
+        self.assertEqual(atom.quality.review_status, "pending")
         self.assertNotIn("m9224@163.com", atom.to_json())
 
     def test_self_confirmation_is_ignored(self) -> None:
@@ -310,9 +313,11 @@ class CommunityIntakeTests(unittest.TestCase):
             }
         }
         result = run_intake((record,), (confirmation,), salt=SALT)
-        self.assertEqual(result.metrics["grade_d"], 1)
-        self.assertEqual(result.metrics["promoted_c"], 0)
-        self.assertEqual(result.decisions[0].status, STATUS_D)
+        self.assertEqual(result.metrics["pending_total"], 1)
+        self.assertEqual(result.metrics["approved_total"], 0)
+        self.assertEqual(result.decisions[0].status, STATUS_PENDING)
+        assert result.decisions[0].atom is not None
+        self.assertEqual(result.decisions[0].atom.quality.suggested_grade, "D")
 
     def test_two_submissions_same_company_stay_d(self) -> None:
         statement = "同一家公司交两遍不能升 C。"
@@ -343,9 +348,10 @@ class CommunityIntakeTests(unittest.TestCase):
             },
         }
         result = run_intake((first, second), (), salt=SALT)
-        self.assertEqual(result.metrics["promoted_c"], 0)
-        self.assertEqual(result.metrics["grade_d"], 1)
-        self.assertEqual({item.status for item in result.decisions}, {STATUS_D})
+        self.assertEqual(result.metrics["approved_total"], 0)
+        self.assertEqual(result.metrics["pending_total"], 2)
+        self.assertEqual({item.status for item in result.decisions}, {STATUS_PENDING})
+        assert result.atoms[0].quality.suggested_grade == "D"
 
     def test_confirmation_link_prefers_record_id(self) -> None:
         parsed = parse_confirmation_row(
@@ -371,7 +377,7 @@ class CommunityIntakeTests(unittest.TestCase):
             "rec_bound",
         )
 
-    def test_sticky_ab_grades_are_not_recomputed(self) -> None:
+    def test_reviewer_grade_is_authoritative(self) -> None:
         record = {
             "record_id": "rec_b",
             "fields": {
@@ -379,42 +385,25 @@ class CommunityIntakeTests(unittest.TestCase):
                 "经营模式": "直营",
                 "门店数": "1",
                 "这条属于": "方法",
-                "一件有效的事（或没用的事）": "维护者手改成 B 后不能被重算回 D。",
+                "一件有效的事（或没用的事）": "评审员定 B，机器建议仍是 D。",
                 "发现时间": "2026-08-01",
                 "现在还有效吗": "是",
                 "公司/品牌": "甲店",
+                "评审结论": "通过",
+                "评审等级": "B",
+                "评审人": [{"name": "李四"}],
+                "评审批注": "我核对过",
             },
         }
-        atom = candidate_to_atom(record_to_candidate(record, salt=SALT), (), ())
-        sticky = candidate_to_atom(record_to_candidate(record, salt=SALT), (), ())
-        from siyu_team.knowledge.models import Quality
-
-        sticky_quality = Quality(
-            evidence_grade="B",
-            confidence=sticky.quality.confidence,
-            review_status=sticky.quality.review_status,
-            reviewer="maintainer",
-            reviewed_at=sticky.quality.reviewed_at,
-            confirmations=sticky.quality.confirmations,
-            platform_rule_risk=sticky.quality.platform_rule_risk,
-        )
-        sticky = type(sticky)(
-            id=sticky.id,
-            statement=sticky.statement,
-            type=sticky.type,
-            topics=sticky.topics,
-            skills=sticky.skills,
-            source=sticky.source,
-            scope=sticky.scope,
-            applicability=sticky.applicability,
-            quality=sticky_quality,
-            lifecycle=sticky.lifecycle,
-            privacy=sticky.privacy,
-        )
-        result = run_intake((record,), (), (sticky,), salt=SALT)
-        self.assertEqual(result.atoms[0].quality.evidence_grade, "B")
-        self.assertEqual(result.decisions[0].status, STATUS_A)
-        self.assertEqual(atom.quality.evidence_grade, "D")
+        result = run_intake((record,), (), salt=SALT)
+        atom = result.decisions[0].atom
+        assert atom is not None
+        self.assertEqual(result.decisions[0].status, STATUS_APPROVED)
+        self.assertEqual(atom.quality.evidence_grade, "B")
+        self.assertEqual(atom.quality.suggested_grade, "D")
+        self.assertEqual(atom.quality.reviewer, "李四")
+        self.assertEqual(atom.quality.review_notes, "我核对过")
+        self.assertIn("评审：已通过（B级）", result.decisions[0].gift)
 
     def test_bitable_ms_epoch_uses_shanghai(self) -> None:
         instant = datetime(2026, 8, 1, 0, 30, tzinfo=ZoneInfo("Asia/Shanghai"))
@@ -565,7 +554,7 @@ class CommunityIntakeTests(unittest.TestCase):
             writeback_fields_changed(record, "已收录D", "ka_deadbeefdeadbee", "【同行案例卡】")
         )
         self.assertTrue(
-            writeback_fields_changed(record, "已晋级C", "ka_deadbeefdeadbee", "【同行案例卡】")
+            writeback_fields_changed(record, "已通过", "ka_deadbeefdeadbee", "【同行案例卡】")
         )
 
     def test_seed_confirmation_stays_in_dedupe_pool(self) -> None:
@@ -642,7 +631,8 @@ class CommunityIntakeTests(unittest.TestCase):
                 }
             },
         ), salt=SALT)
-        self.assertEqual(result.metrics["promoted_c"], 1)
+        self.assertEqual(result.metrics["pending_total"], 1)
+        self.assertEqual(result.decisions[0].atom.quality.suggested_grade, "C")
         self.assertEqual(result.metrics["confirmations_unresolved"], 0)
 
     def test_confirmation_matches_pasted_atom_id(self) -> None:
@@ -675,7 +665,9 @@ class CommunityIntakeTests(unittest.TestCase):
             ),
             salt=SALT,
         )
-        self.assertEqual(result.metrics["promoted_c"], 1)
+        self.assertEqual(result.metrics["pending_total"], 1)
+        assert result.decisions[0].atom is not None
+        self.assertEqual(result.decisions[0].atom.quality.suggested_grade, "C")
         self.assertEqual(result.metrics["confirmations_unresolved"], 0)
         parsed = parse_confirmation_row(
             {
@@ -791,8 +783,8 @@ class CommunityIntakeTests(unittest.TestCase):
             salt=SALT,
         )
         self.assertEqual(result.metrics["confirmations_unresolved"], 2)
-        self.assertEqual(result.metrics["grade_d"], 1)
-        self.assertEqual(result.decisions[0].status, STATUS_D)
+        self.assertEqual(result.metrics["pending_total"], 1)
+        self.assertEqual(result.decisions[0].status, STATUS_PENDING)
 
     def test_fixture_lenient_redacts_pii_and_accepts_unknown_kind(self) -> None:
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -804,9 +796,9 @@ class CommunityIntakeTests(unittest.TestCase):
         )
         statuses = {item.record_id: item.status for item in result.decisions}
         self.assertEqual(result.metrics["needs_manual"], 0)
-        self.assertEqual(statuses["rec_s4"], STATUS_D)
-        self.assertEqual(statuses["rec_s5"], STATUS_D)
-        self.assertEqual(statuses["rec_s6"], STATUS_D)
+        self.assertEqual(statuses["rec_s4"], STATUS_PENDING)
+        self.assertEqual(statuses["rec_s5"], STATUS_PENDING)
+        self.assertEqual(statuses["rec_s6"], STATUS_PENDING)
         pii = next(item.atom for item in result.decisions if item.record_id == "rec_s4")
         assert pii is not None
         self.assertNotIn("13800138000", pii.statement)
@@ -886,7 +878,7 @@ class CommunityIntakeTests(unittest.TestCase):
         self.assertEqual(third.decisions[0].status, STATUS_REVOKED)
         self.assertEqual(third.atoms, ())
         self.assertEqual(third.metrics["confirmations_unresolved"], 0)
-        self.assertEqual(third.metrics["promoted_c"], 0)
+        self.assertEqual(third.metrics["approved_total"], 0)
 
     def test_display_name_maps_and_stays_unhashed(self) -> None:
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -919,7 +911,7 @@ class CommunityIntakeTests(unittest.TestCase):
             },
         }
         result = run_intake((record,), (), salt=SALT, mode=MODE_LENIENT)
-        self.assertEqual(result.decisions[0].status, STATUS_D)
+        self.assertEqual(result.decisions[0].status, STATUS_PENDING)
         atom = result.decisions[0].atom
         assert atom is not None
         self.assertEqual(atom.source.contributor_display_name, "")
@@ -939,7 +931,7 @@ class CommunityIntakeTests(unittest.TestCase):
         emailed = run_intake((email,), (), salt=SALT, mode=MODE_LENIENT)
         emailed_atom = emailed.decisions[0].atom
         assert emailed_atom is not None
-        self.assertEqual(emailed.decisions[0].status, STATUS_D)
+        self.assertEqual(emailed.decisions[0].status, STATUS_PENDING)
         self.assertEqual(emailed_atom.source.contributor_display_name, "")
         self.assertIn(NOTE_PII_DISPLAY_NAME, emailed_atom.quality.review_notes)
         self.assertNotIn("xiaolin@example.com", emailed_atom.to_json())
@@ -1008,6 +1000,90 @@ class CommunityIntakeTests(unittest.TestCase):
         )
         assert named is not None
         self.assertEqual(named.confirmation.display_name, "路人甲")
+
+    def test_review_pass_moves_pending_to_approved_without_duplicate(self) -> None:
+        fields = {
+            "业态": "餐饮",
+            "经营模式": "直营",
+            "门店数": "1",
+            "这条属于": "方法",
+            "一件有效的事（或没用的事）": "评审通过后同一原子只出现一次。",
+            "发现时间": "2026-08-01",
+            "现在还有效吗": "是",
+            "公司/品牌": "甲店",
+        }
+        first = run_intake(({"record_id": "rec_gate", "fields": fields},), (), salt=SALT)
+        self.assertEqual(first.decisions[0].status, STATUS_PENDING)
+        self.assertEqual(len(first.atoms), 1)
+        atom_id = first.atoms[0].id
+        passed = {
+            "record_id": "rec_gate",
+            "fields": {
+                **fields,
+                "评审结论": "通过",
+                "评审等级": "C",
+                "评审人": "评审员",
+            },
+        }
+        second = run_intake((passed,), (), first.atoms, salt=SALT)
+        self.assertEqual(second.decisions[0].status, STATUS_APPROVED)
+        self.assertEqual(len(second.atoms), 1)
+        self.assertEqual(second.atoms[0].id, atom_id)
+        self.assertEqual(second.atoms[0].quality.evidence_grade, "C")
+        self.assertEqual(second.atoms[0].quality.review_status, "approved")
+        self.assertEqual(second.atoms[0].quality.reviewer, "评审员")
+
+    def test_review_reject_after_pass_blocks_reingest_until_reopened(self) -> None:
+        fields = {
+            "业态": "餐饮",
+            "经营模式": "直营",
+            "门店数": "1",
+            "这条属于": "方法",
+            "一件有效的事（或没用的事）": "通过之后改驳回要出库且不再重收。",
+            "发现时间": "2026-08-01",
+            "现在还有效吗": "是",
+            "公司/品牌": "甲店",
+            "评审结论": "通过",
+            "评审等级": "B",
+        }
+        first = run_intake(({"record_id": "rec_flip", "fields": fields},), (), salt=SALT)
+        self.assertEqual(first.decisions[0].status, STATUS_APPROVED)
+        atom_id = first.atoms[0].id
+        rejected_record = {
+            "record_id": "rec_flip",
+            "fields": {**fields, "评审结论": "驳回", "评审批注": "数字对不上"},
+        }
+        second = run_intake((rejected_record,), (), first.atoms, salt=SALT)
+        self.assertEqual(second.decisions[0].status, STATUS_REJECTED_REVIEW)
+        self.assertEqual(second.atoms, ())
+        self.assertEqual(len(second.rejected), 1)
+        self.assertEqual(second.rejected[0].id, atom_id)
+        self.assertEqual(second.rejected[0].reason, "数字对不上")
+        third = run_intake(
+            (rejected_record,),
+            (),
+            first.atoms,
+            salt=SALT,
+            rejected_ids=(atom_id,),
+            rejected_record_ids=("rec_flip",),
+        )
+        self.assertEqual(third.decisions[0].status, STATUS_REJECTED_REVIEW)
+        self.assertEqual(third.atoms, ())
+        reopened = {
+            "record_id": "rec_flip",
+            "fields": {**fields, "评审结论": "通过", "评审等级": "D"},
+        }
+        fourth = run_intake(
+            (reopened,),
+            (),
+            (),
+            salt=SALT,
+            rejected_ids=(atom_id,),
+            rejected_record_ids=("rec_flip",),
+        )
+        self.assertEqual(fourth.decisions[0].status, STATUS_APPROVED)
+        self.assertEqual(fourth.atoms[0].id, atom_id)
+        self.assertIn(atom_id, fourth.reopened)
 
 
 if __name__ == "__main__":

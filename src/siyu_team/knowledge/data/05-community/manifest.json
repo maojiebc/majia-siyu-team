@@ -1,12 +1,16 @@
 {
   "files": {
-    "inbox.jsonl": {
+    "approved.jsonl": {
+      "atom_count": 1,
+      "sha256": "sha256:5972e6c30c3955f73e4b9bbfbfc26b41fe44bb7aa48277d273c9f43c648aa8a6"
+    },
+    "pending.jsonl": {
       "atom_count": 0,
       "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
-    "maintainer.jsonl": {
-      "atom_count": 1,
-      "sha256": "sha256:358a164c09b7c8b6999bcf25751dc1d47fb60d3cfa31e0920e84edc175172f6a"
+    "rejected.jsonl": {
+      "atom_count": 0,
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "revoked.jsonl": {
       "atom_count": 1,
@@ -19,10 +23,12 @@
   },
   "last_run": "2026-09-03T15:26:11Z",
   "metrics": {
+    "approved_total": 1,
     "confirmations_unresolved": 0,
-    "median_hours_submit_to_publish": 23.44,
+    "median_hours_submit_to_approve": 23.44,
     "needs_manual": 0,
-    "promoted_c": 0,
+    "pending_total": 0,
+    "rejected_total": 0,
     "submissions_total": 2
   }
 }

@@ -73,7 +73,7 @@ PLATFORM_RULE_RISKS = frozenset({"none", "low", "medium", "high"})
 CONFIDENCE_LEVELS = frozenset({"high", "medium", "low"})
 _HASH64 = re.compile(r"[0-9a-f]{64}")
 REVIEW_STATUSES = frozenset(
-    {"draft", "in_review", "approved", "superseded", "retired", "rejected"}
+    {"draft", "pending", "in_review", "approved", "superseded", "retired", "rejected"}
 )
 _ATOM_ID = re.compile(r"ka_[0-9a-f]{16}")
 _SOURCE_ID = re.compile(r"src_[0-9a-f]{12}")
@@ -543,6 +543,7 @@ class Quality:
     confirmations: tuple[Confirmation, ...] = ()
     platform_rule_risk: str = "none"
     review_notes: str = ""
+    suggested_grade: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -572,6 +573,14 @@ class Quality:
         object.__setattr__(
             self, "review_notes", _clean_text(self.review_notes, "quality.review_notes")
         )
+        if self.suggested_grade:
+            object.__setattr__(
+                self,
+                "suggested_grade",
+                _enum(self.suggested_grade, "quality.suggested_grade", EVIDENCE_GRADES),
+            )
+        else:
+            object.__setattr__(self, "suggested_grade", "")
         if self.review_status == "approved" and (not self.reviewer or not self.reviewed_at):
             raise KnowledgeValidationError("approved 知识必须有 reviewer 和 reviewed_at")
 
@@ -589,6 +598,8 @@ class Quality:
             payload["platform_rule_risk"] = self.platform_rule_risk
         if self.review_notes:
             payload["review_notes"] = self.review_notes
+        if self.suggested_grade:
+            payload["suggested_grade"] = self.suggested_grade
         return payload
 
     @classmethod
@@ -598,7 +609,7 @@ class Quality:
             data,
             "quality",
             fields,
-            {"confirmations", "platform_rule_risk", "review_notes"},
+            {"confirmations", "platform_rule_risk", "review_notes", "suggested_grade"},
         )
         return cls(
             evidence_grade=str(data["evidence_grade"]),
@@ -609,6 +620,7 @@ class Quality:
             confirmations=_confirmations(data.get("confirmations")),
             platform_rule_risk=str(data.get("platform_rule_risk") or "none"),
             review_notes=str(data.get("review_notes") or ""),
+            suggested_grade=str(data.get("suggested_grade") or ""),
         )
 
 

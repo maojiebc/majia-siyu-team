@@ -76,6 +76,12 @@ class RenderContributorsTests(unittest.TestCase):
             name="江南茶社小林",
             extra=(_confirm("北城面馆", "北城店员", "2026-08-20", "路人"),),
         )
+        named_c_payload = named_c.to_dict()
+        named_c_payload["quality"]["review_status"] = "approved"
+        named_c_payload["quality"]["evidence_grade"] = "C"
+        named_c_payload["quality"]["reviewer"] = "maintainer"
+        named_c_payload["quality"]["reviewed_at"] = "2026-08-20"
+        named_c = KnowledgeAtomV2.from_dict(named_c_payload)
         named_d = _atom(
             "rec_named2",
             "同一署名的第二条仍算这个人。",
@@ -91,10 +97,10 @@ class RenderContributorsTests(unittest.TestCase):
             text,
         )
         self.assertIn(
-            "江南茶社小林 · 2 条（A 0 / C 1 / D 1）· 印证 1 次 · 最近 2026-08-20",
+            "江南茶社小林 · 通过 1（A 0 / B 0 / C 1 / D 0）· 待审 1 · 印证 1",
             text,
         )
-        self.assertIn(f"{ANON_LABEL} · 2 位 · 2 条", text)
+        self.assertIn(f"{ANON_LABEL} · 2 位 · 通过 0 · 待审 2", text)
         self.assertNotIn("company_hash", text)
         self.assertNotIn(named_c.quality.confirmations[0].company_hash, text)
         self.assertNotIn(named_c.quality.confirmations[0].contributor_hash, text)
@@ -126,7 +132,7 @@ class RenderContributorsTests(unittest.TestCase):
             root = Path(tmp)
             community = root / "05-community"
             community.mkdir()
-            (community / "confirmed.jsonl").write_text(
+            (community / "pending.jsonl").write_text(
                 named.to_json() + "\n", encoding="utf-8"
             )
             (community / "seeds.retail.jsonl").write_text(
@@ -134,7 +140,10 @@ class RenderContributorsTests(unittest.TestCase):
             )
             path = self.mod.render_contributors(root)
             first = path.read_bytes()
-            self.assertIn("小林 · 1 条（A 0 / C 0 / D 1）".encode("utf-8"), first)
+            self.assertIn(
+                "小林 · 通过 0（A 0 / B 0 / C 0 / D 0）· 待审 1 · 印证 0".encode("utf-8"),
+                first,
+            )
             self.assertNotIn("种子不该上墙".encode("utf-8"), first)
             self.assertNotIn(ANON_LABEL.encode("utf-8"), first)
             self.mod.render_contributors(root)
@@ -144,8 +153,14 @@ class RenderContributorsTests(unittest.TestCase):
         atom = _atom("rec_b", "维护者手改的B级仍算A档。", "丙店", name="维护者")
         payload = atom.to_dict()
         payload["quality"]["evidence_grade"] = "B"
+        payload["quality"]["review_status"] = "approved"
+        payload["quality"]["reviewer"] = "maintainer"
+        payload["quality"]["reviewed_at"] = "2026-08-01"
         text = self.mod.render_markdown([KnowledgeAtomV2.from_dict(payload)])
-        self.assertIn("维护者 · 1 条（A 1 / C 0 / D 0）· 印证 0 次 · 最近 2026-08-01", text)
+        self.assertIn(
+            "维护者 · 通过 1（A 0 / B 1 / C 0 / D 0）· 待审 0 · 印证 0",
+            text,
+        )
 
 
 if __name__ == "__main__":

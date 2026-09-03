@@ -50,28 +50,29 @@ _METRIC_NOT_APPLICABLE_PREFIXES = (
 )
 
 
-def _revoked_atom_ids(directories: Sequence[Path]) -> set[str]:
+def _blocked_atom_ids(directories: Sequence[Path]) -> set[str]:
     found: set[str] = set()
     for directory in directories:
-        path = directory / "revoked.jsonl"
-        if not path.is_file():
-            continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except OSError:
-            continue
-        for raw in text.splitlines():
-            if not raw.strip():
+        for name in ("revoked.jsonl", "rejected.jsonl"):
+            path = directory / name
+            if not path.is_file():
                 continue
             try:
-                payload = json.loads(raw)
-            except json.JSONDecodeError:
+                text = path.read_text(encoding="utf-8")
+            except OSError:
                 continue
-            if not isinstance(payload, Mapping):
-                continue
-            atom_id = str(payload.get("id") or "").strip()
-            if atom_id.startswith("ka_"):
-                found.add(atom_id)
+            for raw in text.splitlines():
+                if not raw.strip():
+                    continue
+                try:
+                    payload = json.loads(raw)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(payload, Mapping):
+                    continue
+                atom_id = str(payload.get("id") or "").strip()
+                if atom_id.startswith("ka_"):
+                    found.add(atom_id)
     return found
 
 
@@ -661,16 +662,16 @@ class CorpusLoader:
         self,
         root: str | Path | None = None,
     ) -> tuple[KnowledgeAtomV2, ...]:
-        """读取 ``05-community/*.jsonl``。单行失败则跳过并记录，不拖垮严格正式集。"""
+        """只读已评审通过的社区原子和种子；pending 不装配。"""
         directories = self._community_dirs(root)
         atoms: list[KnowledgeAtomV2] = []
         warnings: list[str] = []
         seen: set[str] = set()
-        revoked_ids = _revoked_atom_ids(directories)
+        revoked_ids = _blocked_atom_ids(directories)
         logger = logging.getLogger(__name__)
         for directory in directories:
             for path in sorted(directory.glob("*.jsonl")):
-                if path.name == "revoked.jsonl":
+                if path.name not in {"approved.jsonl", "seeds.retail.jsonl"}:
                     continue
                 try:
                     text = path.read_text(encoding="utf-8")

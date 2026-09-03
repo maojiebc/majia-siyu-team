@@ -49,6 +49,8 @@ def _all_atoms(knowledge_root: Path) -> list[KnowledgeAtomV2]:
     community = knowledge_root / "05-community"
     if community.is_dir():
         for path in sorted(community.glob("*.jsonl")):
+            if path.name in {"pending.jsonl", "rejected.jsonl", "revoked.jsonl"}:
+                continue
             atoms.extend(_read_jsonl(path))
     return atoms
 
