@@ -2,6 +2,16 @@
 
 本项目遵循 [keep-a-changelog](https://keepachangelog.com/) 与 SemVer。
 
+## [1.4.3] - 2026-09-03
+### 新增
+- 增加 WorkBuddy 专家团发布适配层：以现有仓库为唯一真源，维护平台专用专家团清单、五个 Agent 外壳与头像。
+- 增加 `tools/build_workbuddy_bundle.py` 与 `make workbuddy`，生成自包含的 `dist/workbuddy/majia-siyu.zip`；同时提供 `--check` 对账模式并接入 `make check`。
+- 增加 6 项 WorkBuddy 发布包回归测试，覆盖单顶层目录、平台字段、Agent frontmatter、头像规格、公开知识边界、缓存与符号链接排除。
+
+### 说明
+- 本次只增加新的发布渠道适配与质量门，不改变现有运行接口和 17 个能力的业务行为。
+- WorkBuddy 当前公开 API 不提供专家包上传、提交审核或发布接口，平台上传与审核仍需人工完成。
+
 ## [1.4.2] - 2026-08-09
 ### 稳定化
 - 入口、Python Runtime 与分发契约合一：主入口只调用真实 `siyu-plan`，路由契约可生成并校验哈希；Markdown 坏链、源码态与 SkillHub 单入口包的路由漂移进入硬门。

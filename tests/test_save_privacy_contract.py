@@ -14,7 +14,7 @@ class SavePrivacyContractTests(unittest.TestCase):
         cls.text = SAVE_SKILL.read_text(encoding="utf-8")
 
     def test_skill_declares_release_version(self) -> None:
-        self.assertIn('version: "1.4.2"', self.text)
+        self.assertIn('version: "1.4.3"', self.text)
 
     def test_default_scope_is_structured_conclusions_not_full_chat(self) -> None:
         self.assertIn("默认只保存结构化结论，不复制完整对话", self.text)

@@ -1,0 +1,152 @@
+{
+  "name": "majia-siyu",
+  "description": "A five-role expert team for private-domain operations, content growth, conversion and compliance",
+  "author": {
+    "name": "超级马甲 / maojiebc",
+    "email": "74524515+maojiebc@users.noreply.github.com"
+  },
+  "agents": [
+    "./agents/majia-siyu-team-lead.md",
+    "./agents/private-pr-officer.md",
+    "./agents/content-product-officer.md",
+    "./agents/ops-ad-officer.md",
+    "./agents/compliance-critic.md"
+  ],
+  "skills": [
+    "./skills/majia-siyu"
+  ],
+  "expertType": "team",
+  "agentName": "majia-siyu-team-lead",
+  "teamInfo": {
+    "leadAgent": "majia-siyu-team-lead",
+    "memberAgents": [
+      "private-pr-officer",
+      "content-product-officer",
+      "ops-ad-officer",
+      "compliance-critic"
+    ]
+  },
+  "displayName": {
+    "en": "Majia Private Domain Expert Team",
+    "zh": "私域专家团 · 马甲实战版"
+  },
+  "profession": {
+    "en": "Majia Private Domain Expert Team",
+    "zh": "私域专家团 · 马甲实战版"
+  },
+  "displayDescription": {
+    "en": "A lead coordinates specialists in public relations, content, growth, and compliance to diagnose private-domain operations and produce actionable plans.",
+    "zh": "由团长协调公关、内容、增长与合规四位专家，完成私域诊断、执行方案、话术设计、风险复核，并给出可落地行动清单。"
+  },
+  "avatar": "avatars/team.png",
+  "categoryId": "05-MarketingGrowth",
+  "defaultInitPrompt": {
+    "en": "Diagnose my private-domain operation and give me the next action checklist",
+    "zh": "帮我诊断目前的私域经营问题，并给出下一步行动清单"
+  },
+  "plugin": "majia-siyu",
+  "tags": [
+    {
+      "en": "Private Domain",
+      "zh": "私域运营"
+    },
+    {
+      "en": "Content Growth",
+      "zh": "内容增长"
+    },
+    {
+      "en": "Compliance",
+      "zh": "合规风控"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "en": "Diagnose my private-domain operation and give me the next action checklist",
+      "zh": "帮我诊断目前的私域经营问题，并给出下一步行动清单"
+    },
+    {
+      "en": "Design one week of Moments posts, broadcasts, and welcome messages",
+      "zh": "帮我设计一周朋友圈、群发和欢迎语方案"
+    },
+    {
+      "en": "Review the conversion logic and compliance risks in this plan",
+      "zh": "帮我检查这套私域方案的转化逻辑与合规风险"
+    }
+  ],
+  "members": [
+    {
+      "id": "majia-siyu-team-lead",
+      "name": {
+        "en": "Majia",
+        "zh": "团长"
+      },
+      "profession": {
+        "en": "Team Lead and Orchestrator",
+        "zh": "私域诊断与团队主理人"
+      },
+      "avatar": "avatars/majia-siyu-team-lead.png",
+      "role": "lead"
+    },
+    {
+      "id": "private-pr-officer",
+      "name": {
+        "en": "Reputation Officer",
+        "zh": "公关官"
+      },
+      "profession": {
+        "en": "Trust and Reputation Specialist",
+        "zh": "信任与口碑专家"
+      },
+      "avatar": "avatars/private-pr-officer.png",
+      "role": "member"
+    },
+    {
+      "id": "content-product-officer",
+      "name": {
+        "en": "Content Officer",
+        "zh": "产品官"
+      },
+      "profession": {
+        "en": "Content Product Specialist",
+        "zh": "内容产品专家"
+      },
+      "avatar": "avatars/content-product-officer.png",
+      "role": "member"
+    },
+    {
+      "id": "ops-ad-officer",
+      "name": {
+        "en": "Growth Officer",
+        "zh": "广告官"
+      },
+      "profession": {
+        "en": "Growth and Conversion Specialist",
+        "zh": "增长与转化专家"
+      },
+      "avatar": "avatars/ops-ad-officer.png",
+      "role": "member"
+    },
+    {
+      "id": "compliance-critic",
+      "name": {
+        "en": "Compliance Officer",
+        "zh": "合规官"
+      },
+      "profession": {
+        "en": "Compliance and Quality Specialist",
+        "zh": "合规与质量专家"
+      },
+      "avatar": "avatars/compliance-critic.png",
+      "role": "member"
+    }
+  ],
+  "homepage": "https://github.com/maojiebc/majia-siyu-team",
+  "license": "MIT",
+  "keywords": [
+    "private-domain",
+    "wechat",
+    "operations",
+    "growth",
+    "compliance"
+  ]
+}

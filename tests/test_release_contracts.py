@@ -18,7 +18,7 @@ class VersionReleaseContractTests(unittest.TestCase):
     def test_repository_distribution_versions_are_aligned(self) -> None:
         version, install_units, skill_count, errors = check_versions.check(ROOT)
 
-        self.assertEqual(version, "1.4.2")
+        self.assertEqual(version, "1.4.3")
         self.assertEqual(install_units, 11)
         self.assertEqual(skill_count, 34)
         self.assertEqual(errors, [])
@@ -47,7 +47,7 @@ class VersionReleaseContractTests(unittest.TestCase):
                     errors: list[str] = []
 
                     count = check_versions._check_marketplace(
-                        root, rel, "1.4.2", errors
+                        root, rel, "1.4.3", errors
                     )
 
                     self.assertEqual(count, 1)

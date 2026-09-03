@@ -1,6 +1,6 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.4.2-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.3-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.4.2 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.4.3 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
 </p>
 
 > **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
@@ -159,9 +159,9 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 
 ## Version history
 
+- **v1.4.3** — Added the WorkBuddy expert-team distribution adapter, reproducible ZIP builder, and six package-contract tests; platform upload and review remain manual.
 - **v1.4.2** — Stabilization: aligned the entry point with the background execution and distribution contracts; made public-knowledge assembly strict; separated static compliance gates from independent scoring; hardened prompt, privacy, session, and installed-artifact boundaries. H1/H2/H3 still await real pilot results.
 - **v1.4.1** — Dual-track atom toolchain (v2 query/validate + `make atoms` gate); skills-binding wiring; configurable officer roster; bundle ships public knowledge layer + query tools; CLI smoke tests.
-- **v1.3.0** — Background execution hardening: scored kind routing, weighted compliance penalties, path constants, external host prompt, trace cleanup, and regression tests.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md) · [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases).
 

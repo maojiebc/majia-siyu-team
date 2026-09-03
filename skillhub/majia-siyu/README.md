@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.4.2-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.4.3-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-majia--siyu--team-171515.svg)](https://github.com/maojiebc/majia-siyu-team)
 
@@ -10,7 +10,7 @@
 
 私域经营动作全景图（统一入口 → 当前一步 → 执行 / 问诊 / 升级全盘诊断；动态事实先检索留证；知识 Pilot 仅离线验证）：
 
-![majia-siyu v1.4.2 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.4.3 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 完整框架 SVG 与源码说明见 [GitHub docs/framework.svg](https://github.com/maojiebc/majia-siyu-team/blob/main/docs/framework.svg)。
 
@@ -62,9 +62,9 @@ skillhub install siyu
 
 ## 📋 版本记录
 
+- **v1.4.3** — 新增 WorkBuddy 专家团发布适配层、可复现 ZIP 构建器与发布包契约测试；平台上传与审核仍由人工完成。
 - **v1.4.2** — 入口与后台执行、分发契约对齐；公开知识严格装配；合规、隐私、会话和安装态边界加固。H1/H2/H3 仍待真实试验评估。
 - **v1.4.1** — 会员动作的数据依据互指姊妹篇 majia-huiyuan。
-- **v1.4.0** — 公开知识检索与校验工具、能力绑定、专家名单配置及安装包查询工具补齐。
 
 完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
 

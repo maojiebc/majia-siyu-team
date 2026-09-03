@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "corpus_version": "0.4.0",
-  "release_batch": "2026-08-09-v1.4.2-stabilization",
+  "release_batch": "2026-09-03-v1.4.3-workbuddy-adapter",
   "corpus_hash": "sha256:b415e13ab62e28afba1b9e4ebedf8ee5aa24f7c710568dc5e8bc3ad6bc330802",
   "atom_count": 35,
   "atom_schema_version": "2.0",
@@ -11,7 +11,7 @@
       "name": "growth-layers",
       "path": "04-atoms/growth-layers.approved.jsonl",
       "corpus_version": "0.4.0",
-      "release_batch": "2026-08-09-v1.4.2-stabilization",
+      "release_batch": "2026-09-03-v1.4.3-workbuddy-adapter",
       "sha256": "sha256:b415e13ab62e28afba1b9e4ebedf8ee5aa24f7c710568dc5e8bc3ad6bc330802",
       "atom_count": 35,
       "schema_version": "2.0"

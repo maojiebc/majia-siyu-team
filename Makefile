@@ -1,4 +1,4 @@
-.PHONY: compliance judge eval validate pilot atoms links contracts test check report
+.PHONY: compliance judge eval validate pilot atoms links contracts workbuddy test check report
 
 # 静态合规门：只报告规则命中，不产生质量分或徽章。
 compliance:
@@ -47,7 +47,12 @@ links:
 contracts:
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/render_route_contract.py --check
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/build_skillhub_bundle.py --check
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/build_workbuddy_bundle.py --check
 	PYTHONDONTWRITEBYTECODE=1 python3 tools/check_route_contracts.py
+
+# 生成 WorkBuddy 专家团上传目录与 ZIP（只写入已忽略的 dist/）。
+workbuddy:
+	PYTHONDONTWRITEBYTECODE=1 python3 tools/build_workbuddy_bundle.py
 
 # Runtime 与状态层回归测试（stdlib unittest，零额外依赖）
 test:
