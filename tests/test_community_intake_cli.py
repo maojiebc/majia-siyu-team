@@ -112,9 +112,27 @@ class CommunityIntakeCliTests(unittest.TestCase):
             (community / "seeds.retail.jsonl").write_bytes(
                 (src / "seeds.retail.jsonl").read_bytes()
             )
-            (community / "manifest.json").write_bytes((src / "manifest.json").read_bytes())
-            before = (community / "manifest.json").read_bytes()
             seed_before = (community / "seeds.retail.jsonl").read_bytes()
+            # 先用同样的 files/metrics 写一次基线 manifest，避免依赖仓库里真实
+            # manifest 的当前状态（线上 Action 写入真实原子后会变化）。
+            baseline_files = {
+                "seeds.retail.jsonl": (
+                    seed_before.count(b"\n"),
+                    self.cli._sha256_bytes(seed_before),
+                )
+            }
+            self.cli._write_manifest(
+                community / "manifest.json",
+                files=baseline_files,
+                metrics={
+                    "submissions_total": 0,
+                    "promoted_c": 0,
+                    "needs_manual": 0,
+                    "median_hours_submit_to_publish": None,
+                },
+                last_run="2000-01-01T00:00:00Z",
+            )
+            before = (community / "manifest.json").read_bytes()
             existing = self.cli._existing_pipeline_atoms(community)
             previous = self.cli._partition(existing)
             merged = self.cli._merge_by_id(existing, ())
