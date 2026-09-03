@@ -16,6 +16,7 @@ SOURCE_ROOT = ROOT / "knowledge"
 PACKAGE_ROOT = ROOT / "src/siyu_team/knowledge/data"
 BUNDLE_ROOT = ROOT / "skillhub/majia-siyu/modules/_knowledge"
 PUBLIC_DIRS = ("00-methodology", "01-wechat-official", "02-industry", "04-atoms", "05-community")
+COMMUNITY_UNSHIPPED = frozenset({"pending.jsonl", "rejected.jsonl"})
 _BARE_KNOWLEDGE_RE = re.compile(
     r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms|05-community)"
 )
@@ -127,6 +128,8 @@ def expected_files() -> dict[Path, bytes]:
             raise ValueError(f"公开知识目录缺失：{source}")
         for path in source.rglob("*"):
             if path.is_file() and not path.name.startswith("."):
+                if directory == "05-community" and path.name in COMMUNITY_UNSHIPPED:
+                    continue
                 files[path.relative_to(SOURCE_ROOT)] = path.read_bytes()
     if any("03-majia-sop" in path.parts for path in files):
         raise ValueError("私有护城河目录不得进入公开知识生成物")

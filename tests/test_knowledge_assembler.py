@@ -297,7 +297,7 @@ class KnowledgeAssemblerTests(unittest.TestCase):
             item for item in selection.atoms if item.atom.source.locator == "COMMUNITY-C"
         )
         self.assertTrue(
-            any("社区C级" in reason for reason in community_row.why_selected)
+            any("社区·评审通过·C级" in reason for reason in community_row.why_selected)
         )
         self.assertEqual(community_row.layer, "l0")
         retail_row = next(

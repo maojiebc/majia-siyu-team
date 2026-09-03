@@ -69,39 +69,26 @@ class CommunityIntakeCliTests(unittest.TestCase):
         )
         self.assertEqual(code, 0)
 
-    def test_partition_puts_b_with_maintainer(self) -> None:
+    def test_partition_puts_approved_community_apart_from_pending(self) -> None:
         seed_line = (
             ROOT / "knowledge/05-community/seeds.retail.jsonl"
         ).read_text(encoding="utf-8").splitlines()[0]
-        atom = KnowledgeAtomV2.from_json(seed_line)
-        quality = atom.quality
-        from siyu_team.knowledge.models import Quality
-
-        b_atom = KnowledgeAtomV2(
-            id=atom.id,
-            statement=atom.statement,
-            type=atom.type,
-            topics=atom.topics,
-            skills=atom.skills,
-            source=atom.source,
-            scope=atom.scope,
-            applicability=atom.applicability,
-            quality=Quality(
-                evidence_grade="B",
-                confidence=quality.confidence,
-                review_status=quality.review_status,
-                reviewer="maintainer",
-                reviewed_at=quality.reviewed_at,
-                confirmations=quality.confirmations,
-                platform_rule_risk=quality.platform_rule_risk,
-            ),
-            lifecycle=atom.lifecycle,
-            privacy=atom.privacy,
-        )
-        buckets = self.cli._partition((b_atom,))
-        self.assertEqual(buckets["maintainer"], [b_atom])
-        self.assertEqual(buckets["D"], [])
-        self.assertEqual(buckets["seed"], [])
+        seed = KnowledgeAtomV2.from_json(seed_line)
+        approved_payload = seed.to_dict()
+        approved_payload["source"]["source_type"] = "community"
+        approved_payload["quality"]["review_status"] = "approved"
+        approved_payload["quality"]["evidence_grade"] = "B"
+        approved_payload["quality"]["reviewer"] = "maintainer"
+        approved = KnowledgeAtomV2.from_dict(approved_payload)
+        pending_payload = seed.to_dict()
+        pending_payload["id"] = "ka_aaaaaaaaaaaaaaaa"
+        pending_payload["source"]["source_type"] = "community"
+        pending_payload["quality"]["review_status"] = "pending"
+        pending = KnowledgeAtomV2.from_dict(pending_payload)
+        buckets = self.cli._partition((approved, pending, seed))
+        self.assertEqual(buckets["approved"], [approved])
+        self.assertEqual(buckets["pending"], [pending])
+        self.assertEqual(buckets["seed"], [seed])
 
     def test_zero_record_run_keeps_manifest_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -126,9 +113,11 @@ class CommunityIntakeCliTests(unittest.TestCase):
                 files=baseline_files,
                 metrics={
                     "submissions_total": 0,
-                    "promoted_c": 0,
+                    "pending_total": 0,
+                    "approved_total": 0,
+                    "rejected_total": 0,
                     "needs_manual": 0,
-                    "median_hours_submit_to_publish": None,
+                    "median_hours_submit_to_approve": None,
                 },
                 last_run="2000-01-01T00:00:00Z",
             )
@@ -138,9 +127,8 @@ class CommunityIntakeCliTests(unittest.TestCase):
             merged = self.cli._merge_by_id(existing, ())
             buckets = self.cli._partition(merged)
             for name, key, path in (
-                ("inbox.jsonl", "D", community / "inbox.jsonl"),
-                ("confirmed.jsonl", "C", community / "confirmed.jsonl"),
-                ("maintainer.jsonl", "maintainer", community / "maintainer.jsonl"),
+                ("pending.jsonl", "pending", community / "pending.jsonl"),
+                ("approved.jsonl", "approved", community / "approved.jsonl"),
                 ("seeds.retail.jsonl", "seed", community / "seeds.retail.jsonl"),
             ):
                 del name
@@ -156,16 +144,30 @@ class CommunityIntakeCliTests(unittest.TestCase):
                 files=files,
                 metrics={
                     "submissions_total": 0,
-                    "promoted_c": 0,
+                    "pending_total": 0,
+                    "approved_total": 0,
+                    "rejected_total": 0,
                     "needs_manual": 0,
-                    "median_hours_submit_to_publish": None,
+                    "median_hours_submit_to_approve": None,
                 },
                 last_run="2099-01-01T00:00:00Z",
             )
             self.assertFalse(changed)
             self.assertEqual((community / "manifest.json").read_bytes(), before)
             self.assertEqual((community / "seeds.retail.jsonl").read_bytes(), seed_before)
+            self.assertFalse((community / "pending.jsonl").exists())
             self.assertFalse((community / "inbox.jsonl").exists())
+
+    def test_sync_skips_pending_and_rejected(self) -> None:
+        path = ROOT / "tools/sync_public_knowledge.py"
+        spec = importlib.util.spec_from_file_location("siyu_sync_public_knowledge", path)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        names = {str(item) for item in module.expected_files()}
+        self.assertTrue(any(name.endswith("05-community/approved.jsonl") for name in names))
+        self.assertFalse(any(name.endswith("05-community/pending.jsonl") for name in names))
+        self.assertFalse(any(name.endswith("05-community/rejected.jsonl") for name in names))
 
     def test_workflow_skips_missing_salt_and_retries_push(self) -> None:
         text = WORKFLOW.read_text(encoding="utf-8")

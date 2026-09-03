@@ -18,18 +18,18 @@ H1 继续走既有 30 题盲测。H2/H3 **改为读管线日志**，不再靠人
 ## H2（从 `knowledge/05-community/manifest.json` 读）
 
 - `metrics.submissions_total`：本期投稿数
-- `metrics.promoted_c`：升 C 的原子数（两家公司印证）
+- `metrics.approved_total` / `metrics.pending_total`：人审通过数 / 待审数
 - 回礼列是否写回：看飞书「回礼」有没有案例卡
 
 门槛仍建议：邀请的人里过半有投稿，且有人第二次再交。数字以 manifest 为准。
 
 ## H3（同一份 metrics）
 
-- `metrics.median_hours_submit_to_publish`：提交到入库的小时数中位数
+- `metrics.median_hours_submit_to_approve`：提交到评审通过的小时数中位数（H3）
 - `metrics.needs_manual`：卡在隐私扫描、需要人看一眼的条数
-- 维护者只处理「需人工」和 A/B 升级
+- 评审员在飞书待批阅视图批「通过+等级」或「驳回+一句批注」
 
-目标：维护者每周花在这上面的时间接近零；中位数小时数由每日定时任务决定，通常小于 24。
+目标：单条批阅 1–2 分钟；中位数时延由评审节奏决定，不再等于「等到自动升 C」。
 
 ## 当前边界
 

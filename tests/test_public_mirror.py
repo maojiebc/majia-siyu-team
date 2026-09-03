@@ -7,8 +7,10 @@ from siyu_team.connectors.lark import LarkBitable, LarkConfig
 from siyu_team.contribution.intake import (
     ANON_LABEL,
     GIFT_REVOKED,
-    STATUS_D,
+    STATUS_APPROVED,
     STATUS_MANUAL,
+    STATUS_PENDING,
+    STATUS_REJECTED_REVIEW,
     STATUS_REVOKED,
     IntakeDecision,
     candidate_to_atom,
@@ -84,7 +86,7 @@ def _accepted() -> tuple[IntakeDecision, dict[str, Any]]:
     record = _record()
     atom = candidate_to_atom(record_to_candidate(record, salt=SALT), (), ())
     return (
-        IntakeDecision(record["record_id"], STATUS_D, atom, render_gift(atom), None),
+        IntakeDecision(record["record_id"], STATUS_PENDING, atom, render_gift(atom), None),
         record,
     )
 
@@ -98,7 +100,8 @@ class PublicMirrorTests(unittest.TestCase):
         self.assertEqual(fields["判断"], "公开镜像只写脱敏后的判断句。")
         self.assertEqual(fields["数字/证据"], "加微率 12%→19%")
         self.assertEqual(fields["对外显示名"], ANON_LABEL)
-        self.assertEqual(fields["等级"], "单源D级")
+        self.assertEqual(fields["状态"], STATUS_PENDING)
+        self.assertEqual(fields["等级"], "待审（建议D）")
         self.assertEqual(fields["印证数"], 0)
         self.assertEqual(fields["业态"], "餐饮·正餐")
         for name in PUBLIC_FORBIDDEN_FIELDS:
@@ -198,6 +201,62 @@ class PublicMirrorTests(unittest.TestCase):
             body for _method, url, body in transport.calls if body and "batch_delete" in url
         )
         self.assertEqual(delete, {"records": ["pub_old"]})
+
+    def test_rejected_deletes_public_row(self) -> None:
+        record = _record()
+        decision = IntakeDecision(
+            "rec_pub",
+            STATUS_REJECTED_REVIEW,
+            None,
+            "",
+            None,
+            writeback_atom_id="ka_deadbeefdeadbee",
+        )
+        transport = FakeTransport()
+        transport.push(200, {"code": 0, "tenant_access_token": "tok-1"})
+        transport.push(
+            200,
+            {
+                "code": 0,
+                "data": {
+                    "items": [
+                        {
+                            "record_id": "pub_old",
+                            "fields": {PUBLIC_SOURCE_FIELD: "rec_pub", "判断": "旧文"},
+                        }
+                    ],
+                    "has_more": False,
+                },
+            },
+        )
+        transport.push(200, {"code": 0, "data": {"records": ["pub_old"]}})
+        client = LarkBitable(_config(), transport=transport, sleeper=lambda _: None)
+        plan = mirror_public_table(
+            decisions=(decision,),
+            submissions=(record,),
+            client=client,
+            table_id="tbl_public",
+        )
+        self.assertEqual(plan.deletes, ("pub_old",))
+
+    def test_approved_public_grade_uses_reviewer_letter(self) -> None:
+        from siyu_team.knowledge.models import KnowledgeAtomV2
+
+        record = _record()
+        atom = candidate_to_atom(record_to_candidate(record, salt=SALT), (), ())
+        payload = atom.to_dict()
+        payload["quality"]["review_status"] = "approved"
+        payload["quality"]["evidence_grade"] = "C"
+        payload["quality"]["reviewer"] = "评审员"
+        payload["quality"]["reviewed_at"] = "2026-09-03"
+        atom = KnowledgeAtomV2.from_dict(payload)
+        decision = IntakeDecision(
+            record["record_id"], STATUS_APPROVED, atom, render_gift(atom), None
+        )
+        fields = build_public_fields(decision, record)
+        assert fields is not None
+        self.assertEqual(fields["状态"], STATUS_APPROVED)
+        self.assertEqual(fields["等级"], "评审通过·C级")
 
     def test_manual_deletes_if_previously_mirrored(self) -> None:
         record = _record()

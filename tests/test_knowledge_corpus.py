@@ -425,7 +425,7 @@ class CommunityCorpusTests(unittest.TestCase):
             community = root / "05-community"
             community.mkdir()
             good = build_atom()
-            (community / "inbox.jsonl").write_text(
+            (community / "approved.jsonl").write_text(
                 "\n".join(
                     [
                         "{not json",
@@ -451,7 +451,7 @@ class CommunityCorpusTests(unittest.TestCase):
             dropped = KnowledgeAtomV2.from_dict(
                 {**dropped.to_dict(), "id": "ka_ffffffffffffffff"}
             )
-            (community / "inbox.jsonl").write_text(
+            (community / "approved.jsonl").write_text(
                 kept.to_json() + "\n" + dropped.to_json() + "\n",
                 encoding="utf-8",
             )
@@ -471,6 +471,43 @@ class CommunityCorpusTests(unittest.TestCase):
             atoms = loader.load_community(root)
             self.assertEqual(atoms, (kept,))
             self.assertTrue(any("revoked" in item for item in loader.community_warnings))
+
+    def test_load_community_skips_pending_and_rejected_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            community = root / "05-community"
+            community.mkdir()
+            shipped = build_atom()
+            hidden = build_atom(1)
+            blocked = build_atom(2)
+            blocked = KnowledgeAtomV2.from_dict(
+                {**blocked.to_dict(), "id": "ka_bbbbbbbbbbbbbbbb"}
+            )
+            (community / "approved.jsonl").write_text(
+                shipped.to_json() + "\n" + blocked.to_json() + "\n",
+                encoding="utf-8",
+            )
+            (community / "pending.jsonl").write_text(
+                hidden.to_json() + "\n", encoding="utf-8"
+            )
+            (community / "rejected.jsonl").write_text(
+                json.dumps(
+                    {
+                        "id": blocked.id,
+                        "record_id": "rec_rej",
+                        "rejected_at": "2026-09-03",
+                        "reviewer": "评审员",
+                        "reason": "数字对不上",
+                    },
+                    ensure_ascii=False,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            loader = CorpusLoader(today=TODAY)
+            atoms = loader.load_community(root)
+            self.assertEqual(atoms, (shipped,))
+            self.assertNotIn(hidden, atoms)
 
 
 if __name__ == "__main__":

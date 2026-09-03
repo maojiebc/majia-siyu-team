@@ -302,12 +302,15 @@ def _relevance(
 
 def _community_grade_tag(atom: KnowledgeAtomV2) -> str:
     grade = atom.quality.evidence_grade
-    companies = len({item.company_hash for item in atom.quality.confirmations})
-    if grade == "A":
-        return "维护者A级"
-    if grade == "C":
-        return f"社区C级·{companies}家印证"
-    return "单源D级"
+    if grade.startswith("A"):
+        letter = "A"
+    elif grade.startswith("B"):
+        letter = "B"
+    elif grade.startswith("C"):
+        letter = "C"
+    else:
+        letter = "D"
+    return f"社区·评审通过·{letter}级"
 
 
 def _applicability_summary(atom: KnowledgeAtomV2) -> dict[str, Any]:

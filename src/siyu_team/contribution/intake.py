@@ -37,14 +37,17 @@ INTAKE_MODE_ENV = "SIYU_INTAKE_MODE"
 MODE_LENIENT = "lenient"
 MODE_STRICT = "strict"
 MIN_SALT_LEN = 16
-INTAKE_REVIEWER = "community-intake"
-STATUS_D = "已收录D"
-STATUS_C = "已晋级C"
-STATUS_A = "A级"
+STATUS_PENDING = "待审"
+STATUS_APPROVED = "已通过"
+STATUS_REJECTED_REVIEW = "已驳回"
 STATUS_MANUAL = "需人工"
 STATUS_REJECTED = "已拒"
 STATUS_REVOKED = "撤销"
 GIFT_REVOKED = "已撤销"
+REVIEW_PENDING = "待审"
+REVIEW_PASS = "通过"
+REVIEW_REJECT = "驳回"
+REVIEW_GRADES = frozenset({"A", "B", "C", "D"})
 NOTE_UNKNOWN_KIND = "类别未知，内测宽松收录"
 NOTE_DATE_FALLBACK = "发现时间无法解析，改用创建时间"
 NOTE_PII_REDACTED = "已脱敏：原文含个人信息，未入库"
@@ -53,11 +56,12 @@ ANON_LABEL = "匿名同行"
 PUBLIC_DASHBOARD_URL = (
     "https://supermjbc.feishu.cn/share/base/dashboard/shrcnqmdXTKecILgQsKXMGfN4Oe"
 )
-PUBLIC_MIRROR_STATUSES = frozenset({STATUS_D, STATUS_C, STATUS_A})
-PUBLIC_REMOVE_STATUSES = frozenset({STATUS_REVOKED, STATUS_REJECTED, STATUS_MANUAL})
+PUBLIC_MIRROR_STATUSES = frozenset({STATUS_PENDING, STATUS_APPROVED})
+PUBLIC_REMOVE_STATUSES = frozenset(
+    {STATUS_REVOKED, STATUS_REJECTED, STATUS_REJECTED_REVIEW, STATUS_MANUAL}
+)
 REASON_FEISHU = "feishu_status"
 REASON_CLI = "cli"
-STICKY_GRADES = frozenset({"A", "B"})
 SHANGHAI = ZoneInfo("Asia/Shanghai")
 COMPANY_SUFFIXES = (
     "股份有限公司",
@@ -571,6 +575,100 @@ def write_revoked_jsonl(path: Any, entries: Sequence[RevokedAtom]) -> bytes:
     return encoded
 
 
+@dataclass(frozen=True)
+class RejectedAtom:
+    id: str
+    rejected_at: str
+    reviewer: str
+    reason: str
+    record_id: str = ""
+
+    def to_dict(self) -> dict[str, str]:
+        payload = {
+            "id": self.id,
+            "rejected_at": self.rejected_at,
+            "reviewer": self.reviewer,
+            "reason": self.reason,
+        }
+        if self.record_id:
+            payload["record_id"] = self.record_id
+        return payload
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> "RejectedAtom | None":
+        atom_id = str(data.get("id") or "").strip()
+        if atom_id and not atom_id.startswith("ka_"):
+            atom_id = normalize_atom_ref(atom_id)
+        record_id = str(data.get("record_id") or "").strip()
+        if not atom_id and not record_id:
+            return None
+        when = parse_observed_date(str(data.get("rejected_at") or "")) or date.today().isoformat()
+        return cls(
+            id=atom_id,
+            rejected_at=when,
+            reviewer=str(data.get("reviewer") or "").strip(),
+            reason=str(data.get("reason") or "").strip(),
+            record_id=record_id,
+        )
+
+
+def load_rejected_entries(path: Any) -> tuple[RejectedAtom, ...]:
+    from pathlib import Path
+
+    target = Path(path)
+    if not target.is_file():
+        return ()
+    found: list[RejectedAtom] = []
+    seen: set[tuple[str, str]] = set()
+    for raw in target.read_text(encoding="utf-8").splitlines():
+        if not raw.strip():
+            continue
+        try:
+            payload = json.loads(raw)
+        except (TypeError, ValueError):
+            continue
+        if not isinstance(payload, Mapping):
+            continue
+        item = RejectedAtom.from_dict(payload)
+        if item is None or (item.id, item.record_id) in seen:
+            continue
+        seen.add((item.id, item.record_id))
+        found.append(item)
+    return tuple(found)
+
+
+def merge_rejected(
+    existing: Sequence[RejectedAtom],
+    incoming: Sequence[RejectedAtom],
+) -> tuple[RejectedAtom, ...]:
+    by_key: dict[tuple[str, str], RejectedAtom] = {}
+    for item in (*existing, *incoming):
+        key = (item.id, item.record_id)
+        if key not in by_key:
+            by_key[key] = item
+    return tuple(by_key.values())
+
+
+def write_rejected_jsonl(path: Any, entries: Sequence[RejectedAtom]) -> bytes:
+    from pathlib import Path
+
+    target = Path(path)
+    ordered = sorted(entries, key=lambda item: (item.id, item.record_id, item.rejected_at))
+    encoded = (
+        ("\n".join(json.dumps(item.to_dict(), ensure_ascii=False) for item in ordered) + "\n")
+        .encode("utf-8")
+        if ordered
+        else b""
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.is_file() and target.read_bytes() == encoded:
+        return encoded
+    if not encoded and not target.is_file():
+        return b""
+    target.write_bytes(encoded)
+    return encoded
+
+
 def resolve_revoke_target(
     record: Mapping[str, Any],
     *,
@@ -899,6 +997,31 @@ def filter_independent_confirmations(
     return tuple(kept)
 
 
+def suggest_grade(
+    company_hash: str,
+    confirmations: Sequence[Confirmation],
+    *,
+    contributor_hash: str = "",
+    contributor_id: str = "",
+    maintainer_id_set: Iterable[str] | None = None,
+) -> str:
+    """机器建议，不是发布等级。A=维护者，C=至少两家独立公司印证，否则 D。"""
+    maintainers = frozenset(maintainer_id_set or ())
+    if contributor_id.strip().casefold() in maintainers:
+        return "A"
+    independent = filter_independent_confirmations(
+        company_hash, contributor_hash, confirmations
+    )
+    companies = {
+        hash_
+        for hash_ in (company_hash, *(item.company_hash for item in independent))
+        if hash_
+    }
+    if len(companies) >= 2:
+        return "C"
+    return "D"
+
+
 def evaluate_grade(
     company_hash: str,
     confirmations: Sequence[Confirmation],
@@ -908,23 +1031,14 @@ def evaluate_grade(
     maintainer_id_set: Iterable[str] | None = None,
     sticky_grade: str = "",
 ) -> str:
-    if sticky_grade in STICKY_GRADES:
-        return sticky_grade
-    maintainers = frozenset(maintainer_id_set or ())
-    if contributor_id.strip().casefold() in maintainers:
-        return "A"
-    independent = filter_independent_confirmations(
-        company_hash, contributor_hash, confirmations
+    del sticky_grade
+    return suggest_grade(
+        company_hash,
+        confirmations,
+        contributor_hash=contributor_hash,
+        contributor_id=contributor_id,
+        maintainer_id_set=maintainer_id_set,
     )
-    companies = {hash_ for hash_ in (company_hash, *(item.company_hash for item in independent)) if hash_}
-    contributors = {
-        hash_
-        for hash_ in (contributor_hash, *(item.contributor_hash for item in independent))
-        if hash_
-    }
-    if len(companies) >= 2 and len(contributors) >= 2:
-        return "C"
-    return "D"
 
 
 def candidate_to_atom(
@@ -969,7 +1083,7 @@ def candidate_to_atom(
         confirm_list,
     )
     merged = (original, *independent)
-    grade = evaluate_grade(
+    suggested = suggest_grade(
         candidate.company_hash,
         merged,
         contributor_hash=original.contributor_hash,
@@ -1029,14 +1143,13 @@ def candidate_to_atom(
             ),
         ),
         quality=Quality(
-            evidence_grade=grade,
-            confidence=_confidence(grade),
-            review_status="approved",
-            reviewer=INTAKE_REVIEWER if grade != "A" else "maintainer",
-            reviewed_at=(today or date.today()).isoformat(),
+            evidence_grade=suggested,
+            confidence=_confidence(suggested),
+            review_status="pending",
             confirmations=merged,
             platform_rule_risk=risk,
             review_notes=review_notes,
+            suggested_grade=suggested,
         ),
         lifecycle=Lifecycle(
             valid_from=observed,
@@ -1092,6 +1205,7 @@ def _with_confirmations(
     *,
     maintainer: bool = False,
 ) -> KnowledgeAtomV2:
+    del maintainer
     origin_company, origin_contributor = _origin_hashes(atom)
     existing_rest = atom.quality.confirmations[1:] if atom.quality.confirmations else ()
     independent = filter_independent_confirmations(
@@ -1103,16 +1217,16 @@ def _with_confirmations(
         merged = [atom.quality.confirmations[0], *independent]
     else:
         merged = list(independent)
-    sticky = atom.quality.evidence_grade if atom.quality.evidence_grade in STICKY_GRADES else ""
-    if maintainer:
-        grade = "A"
-    else:
-        grade = evaluate_grade(
-            origin_company,
-            tuple(merged),
-            contributor_hash=origin_contributor,
-            sticky_grade=sticky,
-        )
+    suggested = suggest_grade(
+        origin_company,
+        tuple(merged),
+        contributor_hash=origin_contributor,
+    )
+    grade = (
+        atom.quality.evidence_grade
+        if atom.quality.review_status == "approved"
+        else suggested
+    )
     quality = Quality(
         evidence_grade=grade,
         confidence=_confidence(grade),
@@ -1122,6 +1236,7 @@ def _with_confirmations(
         confirmations=tuple(merged),
         platform_rule_risk=atom.quality.platform_rule_risk,
         review_notes=atom.quality.review_notes,
+        suggested_grade=suggested,
     )
     lifecycle = atom.lifecycle
     if atom.type in VALID_TYPES_WITH_TTL:
@@ -1274,6 +1389,118 @@ def grade_label(atom: KnowledgeAtomV2) -> str:
     return "单源D级"
 
 
+def _replace_quality(atom: KnowledgeAtomV2, quality: Quality) -> KnowledgeAtomV2:
+    return KnowledgeAtomV2(
+        id=atom.id,
+        statement=atom.statement,
+        type=atom.type,
+        topics=atom.topics,
+        skills=atom.skills,
+        source=atom.source,
+        scope=atom.scope,
+        applicability=atom.applicability,
+        quality=quality,
+        lifecycle=atom.lifecycle,
+        privacy=atom.privacy,
+    )
+
+
+def parse_reviewer_name(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, Mapping):
+        return _as_text(value.get("name") or value.get("text") or value)
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        names = [parse_reviewer_name(item) for item in value]
+        return "、".join(part for part in names if part)
+    return _as_text(value)
+
+
+def parse_review_conclusion(record: Mapping[str, Any]) -> str:
+    text = _get(_fields_of(record), "评审结论")
+    if text == REVIEW_PASS:
+        return REVIEW_PASS
+    if text == REVIEW_REJECT:
+        return REVIEW_REJECT
+    return REVIEW_PENDING
+
+
+def parse_review_grade(record: Mapping[str, Any]) -> str:
+    text = _get(_fields_of(record), "评审等级")
+    return text if text in REVIEW_GRADES else ""
+
+
+def record_modified_date(record: Mapping[str, Any], fallback: date) -> str:
+    for key in ("last_modified_time", "modified_time", "updated_time", "last_modified"):
+        if key in record:
+            parsed = parse_observed_date(_as_text(record[key]))
+            if parsed:
+                return parsed
+    fields = _fields_of(record)
+    for name in ("最后修改时间", "修改时间"):
+        parsed = parse_observed_date(_get(fields, name))
+        if parsed:
+            return parsed
+    return fallback.isoformat()
+
+
+def apply_human_review(
+    atom: KnowledgeAtomV2,
+    record: Mapping[str, Any],
+    *,
+    today: date | None = None,
+) -> tuple[KnowledgeAtomV2 | None, str, RejectedAtom | None]:
+    used_today = today or date.today()
+    conclusion = parse_review_conclusion(record)
+    fields = _fields_of(record)
+    reviewer = parse_reviewer_name(fields.get("评审人")) or "maintainer"
+    notes = _get(fields, "评审批注")
+    when = record_modified_date(record, used_today)
+    record_id = _record_id(record)
+    if conclusion == REVIEW_REJECT:
+        return (
+            None,
+            STATUS_REJECTED_REVIEW,
+            RejectedAtom(
+                id=atom.id,
+                rejected_at=when,
+                reviewer=reviewer,
+                reason=notes,
+                record_id=record_id,
+            ),
+        )
+    if conclusion == REVIEW_PASS:
+        grade = parse_review_grade(record) or atom.quality.suggested_grade or "D"
+        quality = Quality(
+            evidence_grade=grade,
+            confidence=_confidence(grade),
+            review_status="approved",
+            reviewer=reviewer,
+            reviewed_at=when,
+            confirmations=atom.quality.confirmations,
+            platform_rule_risk=atom.quality.platform_rule_risk,
+            review_notes=notes or atom.quality.review_notes,
+            suggested_grade=atom.quality.suggested_grade,
+        )
+        return _replace_quality(atom, quality), STATUS_APPROVED, None
+    return atom, STATUS_PENDING, None
+
+
+def review_line(atom: KnowledgeAtomV2) -> str:
+    if atom.quality.review_status == "approved":
+        return f"评审：已通过（{atom.quality.evidence_grade}级）"
+    return "评审：待审，通过后进入下一版 skill"
+
+
+def public_mirror_grade(atom: KnowledgeAtomV2, status: str) -> str:
+    suggested = atom.quality.suggested_grade or atom.quality.evidence_grade
+    if status == STATUS_PENDING:
+        return f"待审（建议{suggested}）"
+    if status == STATUS_APPROVED:
+        return f"评审通过·{atom.quality.evidence_grade}级"
+    return grade_label(atom)
+
+
 def render_gift(atom: KnowledgeAtomV2, benchmark_summary: str = "") -> str:
     grade_line = grade_label(atom)
     type_label = TYPE_LABELS.get(atom.type, "方法")
@@ -1295,6 +1522,7 @@ def render_gift(atom: KnowledgeAtomV2, benchmark_summary: str = "") -> str:
         ),
         f"证据：{atom.applicability.metrics[0].definition if atom.applicability.metrics else '未提供数字'}",
         f"证据等级：{grade_line}",
+        review_line(atom),
         f"平台规则风险：{risk_line}",
     ]
     if atom.lifecycle.valid_until:
@@ -1343,15 +1571,20 @@ def writeback_fields_changed(
     status: str,
     atom_id: str,
     gift: str,
+    suggested_grade: str = "",
+    confirm_count: int | None = None,
 ) -> bool:
-    """只有 状态/原子ID/回礼 真的变了才回写。"""
+    """只有 状态/原子ID/回礼/建议等级/印证数 真的变了才回写。"""
     fields = _fields_of(record)
     current = (
         _as_text(fields.get("状态")),
         _as_text(fields.get("原子ID")),
         _as_text(fields.get("回礼")),
+        _as_text(fields.get("建议等级")),
+        _as_text(fields.get("印证数")),
     )
-    return current != (status, atom_id, gift)
+    wanted_count = "" if confirm_count is None else str(confirm_count)
+    return current != (status, atom_id, gift, suggested_grade, wanted_count)
 
 
 @dataclass(frozen=True)
@@ -1376,6 +1609,8 @@ class IntakeRun:
     existing_updated: tuple[KnowledgeAtomV2, ...]
     metrics: Mapping[str, Any]
     revoked: tuple[RevokedAtom, ...] = ()
+    rejected: tuple[RejectedAtom, ...] = ()
+    reopened: tuple[str, ...] = ()
 
 
 def _created_hours(created_at: str, now: datetime) -> float | None:
@@ -1407,12 +1642,17 @@ def run_intake(
     mode: str | None = None,
     revoked_ids: Iterable[str] = (),
     revoked_record_ids: Iterable[str] = (),
+    rejected_ids: Iterable[str] = (),
+    rejected_record_ids: Iterable[str] = (),
 ) -> IntakeRun:
     used_today = today or date.today()
     used_now = now or datetime.now(timezone.utc)
     used_mode = intake_mode(override=mode or "")
     blocked_ids = {item for item in revoked_ids if item}
     blocked_records = {item for item in revoked_record_ids if item}
+    blocked_rejected_ids = {item for item in rejected_ids if item}
+    blocked_rejected_records = {item for item in rejected_record_ids if item}
+    records_by_id = {_record_id(record): record for record in records if _record_id(record)}
     maintainers = frozenset(maintainer_id_set if maintainer_id_set is not None else maintainer_ids())
     parsed_confirmations = [
         parse_confirmation_row(row, salt=salt) for row in confirmation_rows
@@ -1492,6 +1732,21 @@ def run_intake(
             )
             continue
         atom_id = generate_community_atom_id(candidate.summary, candidate.company_hash)
+        if (
+            (atom_id in blocked_rejected_ids or record_id in blocked_rejected_records)
+            and parse_review_conclusion(record) != REVIEW_PASS
+        ):
+            decisions.append(
+                IntakeDecision(
+                    record_id,
+                    STATUS_REJECTED_REVIEW,
+                    None,
+                    "",
+                    None,
+                    writeback_atom_id=atom_id,
+                )
+            )
+            continue
         if atom_id in blocked_ids or record_id in blocked_records:
             if atom_id:
                 blocked_ids.add(atom_id)
@@ -1600,16 +1855,55 @@ def run_intake(
 
     updated_existing: list[KnowledgeAtomV2] = []
     finalized_decisions: list[IntakeDecision] = []
+    newly_rejected: list[RejectedAtom] = []
+    reopened: set[str] = set()
+    rejected_atom_ids: set[str] = set()
     for decision in decisions:
-        if decision.status in {STATUS_MANUAL, STATUS_REJECTED, STATUS_REVOKED}:
+        if decision.status in {
+            STATUS_MANUAL,
+            STATUS_REJECTED,
+            STATUS_REVOKED,
+            STATUS_REJECTED_REVIEW,
+        }:
             finalized_decisions.append(decision)
             continue
         assert decision.atom is not None
         atom_id = result.merged_into.get(decision.atom.id, decision.atom.id)
         atom = final_atoms[atom_id]
+        source_record = records_by_id.get(decision.record_id, {})
+        reviewed, status, rejected = apply_human_review(
+            atom, source_record, today=used_today
+        )
+        if (
+            status == STATUS_PENDING
+            and atom.quality.review_status == "approved"
+            and rejected is None
+        ):
+            reviewed, status = atom, STATUS_APPROVED
+        if rejected is not None:
+            newly_rejected.append(rejected)
+            if rejected.id:
+                rejected_atom_ids.add(rejected.id)
+                blocked_ids.add(rejected.id)
+            finalized_decisions.append(
+                IntakeDecision(
+                    decision.record_id,
+                    STATUS_REJECTED_REVIEW,
+                    None,
+                    "",
+                    decision.hours_to_publish,
+                    writeback_atom_id=atom_id,
+                )
+            )
+            continue
+        assert reviewed is not None
+        if status == STATUS_APPROVED:
+            reopened.add(reviewed.id)
+            if decision.record_id:
+                reopened.add(decision.record_id)
         atom = flag_conflicts(
-            atom,
-            tuple(item for item in final_atoms.values() if item.id != atom.id),
+            reviewed,
+            tuple(item for item in final_atoms.values() if item.id != reviewed.id),
         )
         final_atoms[atom.id] = atom
         if atom.id in existing_by_id:
@@ -1619,13 +1913,6 @@ def run_intake(
         if benchmark_index:
             bench = benchmark_index.get((atom.scope.industry, scale), "")
         gift = render_gift(atom, bench)
-        grade = atom.quality.evidence_grade
-        if grade in {"A", "B"}:
-            status = STATUS_A
-        elif grade == "C":
-            status = STATUS_C
-        else:
-            status = STATUS_D
         finalized_decisions.append(
             IntakeDecision(decision.record_id, status, atom, gift, decision.hours_to_publish)
         )
@@ -1637,38 +1924,45 @@ def run_intake(
             updated_existing.append(confirmed)
             seen_updated.add(confirmed.id)
 
-    published_hours = [
-        item.hours_to_publish
+    approve_hours: list[float] = []
+    for item in finalized_decisions:
+        if item.status != STATUS_APPROVED or item.atom is None:
+            continue
+        reviewed_at = item.atom.quality.reviewed_at
+        created = ""
+        source_record = records_by_id.get(item.record_id, {})
+        created = _get(_fields_of(source_record), "创建时间", "提交时间")
+        hours = _created_hours(created, used_now) if created else item.hours_to_publish
+        if reviewed_at:
+            reviewed_hours = _created_hours(reviewed_at, used_now)
+            created_hours = _created_hours(created, used_now) if created else None
+            if created_hours is not None and reviewed_hours is not None:
+                hours = max(0.0, created_hours - reviewed_hours)
+        if hours is not None:
+            approve_hours.append(hours)
+    batch_ids = {
+        item.atom.id
         for item in finalized_decisions
-        if item.atom is not None and item.hours_to_publish is not None
-    ]
-    batch_ids = {item.atom.id for item in finalized_decisions if item.atom is not None}
-    unique_published = {atom_id: final_atoms[atom_id] for atom_id in batch_ids}
+        if item.atom is not None and item.status in {STATUS_PENDING, STATUS_APPROVED}
+    }
     metrics = {
         "submissions_total": len(records),
-        "promoted_c": sum(
+        "pending_total": sum(
+            1 for item in finalized_decisions if item.status == STATUS_PENDING
+        ),
+        "approved_total": sum(
+            1 for item in finalized_decisions if item.status == STATUS_APPROVED
+        ),
+        "rejected_total": sum(
             1
-            for atom in unique_published.values()
-            if atom.quality.evidence_grade == "C"
+            for item in finalized_decisions
+            if item.status in {STATUS_REJECTED, STATUS_REJECTED_REVIEW}
         ),
         "needs_manual": sum(
             1 for item in finalized_decisions if item.status == STATUS_MANUAL
         ),
-        "grade_d": sum(
-            1
-            for atom in unique_published.values()
-            if atom.quality.evidence_grade == "D"
-        ),
-        "grade_a": sum(
-            1
-            for atom in unique_published.values()
-            if atom.quality.evidence_grade == "A"
-        ),
-        "rejected": sum(
-            1 for item in finalized_decisions if item.status == STATUS_REJECTED
-        ),
-        "median_hours_submit_to_publish": (
-            round(float(median(published_hours)), 2) if published_hours else None
+        "median_hours_submit_to_approve": (
+            round(float(median(approve_hours)), 2) if approve_hours else None
         ),
         "confirmations_unresolved": unresolved,
         "revoked": len({item.id or item.record_id for item in newly_revoked}),
@@ -1678,13 +1972,19 @@ def run_intake(
         atoms=tuple(
             atom
             for atom in final_atoms.values()
-            if atom.id in batch_ids and atom.id not in blocked_ids
+            if atom.id in batch_ids
+            and atom.id not in blocked_ids
+            and atom.id not in rejected_atom_ids
         ),
         existing_updated=tuple(
-            atom for atom in updated_existing if atom.id not in blocked_ids
+            atom
+            for atom in updated_existing
+            if atom.id not in blocked_ids and atom.id not in rejected_atom_ids
         ),
         metrics=metrics,
         revoked=tuple(newly_revoked),
+        rejected=tuple(newly_rejected),
+        reopened=tuple(reopened),
     )
 
 

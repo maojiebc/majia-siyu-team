@@ -16,7 +16,7 @@ from .intake import (
     _fields_of,
     _get,
     _record_id,
-    grade_label,
+    public_mirror_grade,
     independent_confirmation_count,
     parse_observed_date,
     public_display_name,
@@ -144,7 +144,7 @@ def build_public_fields(
         "状态": decision.status,
         PUBLIC_SOURCE_FIELD: decision.record_id,
         "对外显示名": public_display_name(atom.source.contributor_display_name),
-        "等级": grade_label(atom),
+        "等级": public_mirror_grade(atom, decision.status),
         "印证数": independent_confirmation_count(atom),
         "数字/证据": _atom_evidence(decision),
     }
