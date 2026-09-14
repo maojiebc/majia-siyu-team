@@ -97,7 +97,7 @@ class ApprovedKnowledgeComplianceTests(unittest.TestCase):
             for line in APPROVED_ATOMS.read_text(encoding="utf-8").splitlines()
             if line.strip()
         ]
-        self.assertEqual(35, len(atoms))
+        self.assertEqual(41, len(atoms))
 
         conflicts: list[str] = []
         for atom in atoms:

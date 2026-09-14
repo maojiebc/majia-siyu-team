@@ -58,7 +58,7 @@ applicability 做确定性排序，默认最多选择 12 条。每条结果都�
 - 未声明业态与 `edu` 只选 L0；
 - `catering` 与 `retail` 可共享已发布的“餐饮零售” L1；
 - `retail` 额外加载种子层 `modules/_knowledge/02-industry/retail/L1-零售私域种子.md` 与社区语料；路由仍是 `generic_only`。零售行业册：敬请期待，当前为种子层，由社区印证逐步替换。
-- 社区语料在 `modules/_knowledge/05-community/`，不进入本目录的 35 条严格正式集。装配时严格原子在前，社区原子按证据等级标注后补位，总数仍不超过 12。
+- 社区语料在 `modules/_knowledge/05-community/`，不进入本目录的 当前严格正式集。装配时严格原子在前，社区原子按证据等级标注后补位，总数仍不超过 12。
 
 Runtime 和 Pilot 调用同一个 Assembler。Pilot 的人工 mapping 只是“期望选择结果”
 夹具，不再直接决定注入内容。这证明装配机制对齐，不是 H1/H2/H3 结论。
@@ -111,3 +111,10 @@ python3 tools/sync_public_knowledge.py --check
 
 `tools/build_growth_atoms.py` 重建公开正式集和 Pilot 语料夹具；
 `tests/fixtures/pilot/growth-task-atom-map.json` 仅保留为期望结果夹具。
+
+
+## 门店经验补充
+
+2026-09-14 的整理更新了收银引导、领礼后进群和召回停止条件，并新增开业演练、核销排错、员工激励、店长读数、内容排期、储值诉求六条方法。严格正式集现为 41 条；社区内容另计。公开来源指向脱敏方法文档，维护者私有映射保留原始修订依据。
+
+L0/L1 Markdown 可用单行字段 `条件`、`指标`（名称|定义|观察期）、`绑定`、`场景`、`复核日期`、`审阅者`补充可检索的适用条件与审阅记录。场景字段用于同主题内的具体问题排序，不突破行业和技能边界。缺少字段时沿用原构建规则。已有条目保持来源路径与章节身份不变。

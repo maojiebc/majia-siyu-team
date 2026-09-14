@@ -59,6 +59,8 @@ echo "群发文案" | python3 plugins/siyu-execution/skills/siyu-qunfa/scripts/q
 
 收尾时如果已形成可复用结论，提示一次：「有结论想留下，输入 `/siyu-save`。」一次对话最多提示一次。
 
+门店收银、进群承接、开业、核销排错、员工激励和日常内容，按具体问题读取 [门店会员执行参考](../../../../knowledge/02-industry/catering/门店会员执行参考.md)；口径与算账交 majia-huiyuan。
+
 ---
 
 ## 不知道下一步用哪个 skill？

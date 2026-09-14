@@ -62,6 +62,8 @@ python3 tools/atoms_query.py --file knowledge/04-atoms/growth-layers.approved.js
 诊断 / 全盘诊断计划注入的 `growth_atoms` 每行也带 `skills` 字段，
 可直接按归属取本 skill 相关的干货，不用整包背诵。
 
+门店收银、进群承接、开业、核销排错、员工激励和日常内容，按具体问题读取 [门店会员执行参考](../../../../knowledge/02-industry/catering/门店会员执行参考.md)；口径与算账交 majia-huiyuan。
+
 ---
 
 ## 不知道下一步用哪个 skill？

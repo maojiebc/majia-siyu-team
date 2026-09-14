@@ -73,6 +73,12 @@ PILOT_THEME_BY_LOCATOR: dict[str, str] = {
     "L1-12": "repurchase_recall",
     "L1-13": "add_wechat",
     "L1-14": "repurchase_recall",
+    "L1-15": "add_wechat",
+    "L1-16": "activity_increment",
+    "L1-17": "add_wechat",
+    "L1-18": "activity_increment",
+    "L1-19": "activity_increment",
+    "L1-20": "repurchase_recall",
 }
 
 # 只在判断句本身明确指向修饰维时覆盖；其余保持 any。
@@ -159,6 +165,8 @@ def build_atom(
     reviewer: str = "maojiebc",
 ) -> KnowledgeAtomV2:
     locator = fields["id"]
+    observed_at = fields.get("复核日期", observed_at)
+    reviewer = fields.get("审阅者", reviewer)
     if locator not in PILOT_THEME_BY_LOCATOR:
         raise SystemExit(f"locator 未映射 Pilot 主题：{locator}")
     pilot_theme = PILOT_THEME_BY_LOCATOR[locator]
@@ -174,6 +182,8 @@ def build_atom(
     atom_type = _type_of(locator + title)
     modifiers = _SCOPE_MODIFIERS.get(locator, {})
     preconditions = []
+    if fields.get("条件"):
+        preconditions.append(fields["条件"])
     if why:
         preconditions.append(f"依据：{why[:160]}")
     preconditions.append("业态：通用（L0）" if not industry else f"业态层：{industry}")
@@ -202,6 +212,21 @@ def build_atom(
         ),
     }
 
+    metric = metric_by_theme[pilot_theme]
+    if fields.get("指标"):
+        parts = [part.strip() for part in fields["指标"].split("|")]
+        if len(parts) != 3 or not all(parts):
+            raise ValueError(f"{locator}: 指标须为 名称|定义|观察期")
+        metric = Metric(*parts)
+    skills = (
+        [part.strip() for part in fields["绑定"].split("|") if part.strip()]
+        if fields.get("绑定")
+        else _skills_from(statement + action + title)
+    )
+    scenarios = tuple(
+        part.strip() for part in fields.get("场景", "").split("|") if part.strip()
+    )
+
     quality = (
         Quality(
             evidence_grade="C1",
@@ -223,7 +248,7 @@ def build_atom(
         type=atom_type,
         # 恰好一个 Pilot 主题 + 分层标签
         topics=(pilot_theme, layer_topic, "用户增长"),
-        skills=tuple(_skills_from(statement + action + title)),
+        skills=tuple(skills),
         source=SourceRef(
             source_id=growth_source_id(doc_path),
             source_type="expert_judgment",
@@ -244,12 +269,12 @@ def build_atom(
             ),
             org_layers=str(modifiers.get("org_layers", "any")),
             channels=("wecom_friend", "wecom_group", "instore") if industry else (),
-            scenarios=("user_growth", pilot_theme),
+            scenarios=("user_growth", pilot_theme, *scenarios),
         ),
         applicability=Applicability(
             preconditions=tuple(preconditions),
             recommended_action=tuple(recommended),
-            metrics=(metric_by_theme[pilot_theme],),
+            metrics=(metric,),
             failure_modes=tuple(failure_modes),
             counterexamples=tuple(counterexamples),
             execution_boundary=str(modifiers.get("execution_boundary", "any")),

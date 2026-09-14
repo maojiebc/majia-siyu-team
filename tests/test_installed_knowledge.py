@@ -304,6 +304,42 @@ class InstalledKnowledgeTests(unittest.TestCase):
             wheel_corpus,
         )
 
+    def test_distilled_store_scenes_work_outside_source_tree(self) -> None:
+        _, venv = self._require_wheel()
+        # -I prevents source-tree / user-site imports; the runtime must use its
+        # installed package data. Exercise user wording without explicit hints.
+        scenes = (
+            ("餐饮店收银话术怎么说，新客老客怎么区分", "L1-03", "收银"),
+            ("餐饮店欢迎语怎么写，顾客领礼后怎么进群", "L1-04", "领礼"),
+            ("餐饮新店开业活动怎么安排", "L1-15", "开业"),
+            ("餐饮店核销失败，顾客有券用不了", "L1-16", "核销失败"),
+            ("餐饮加盟店收银员不推会员，员工激励怎么落地", "L1-17", "激励"),
+            ("餐饮店核销下降，店长每天该查什么问题", "L1-18", "下降"),
+        )
+        for question, locator, keyword in scenes:
+            with self.subTest(locator=locator):
+                script = (
+                    "import json; from siyu_team.runtime import SiyuRuntime; "
+                    f"print(json.dumps(SiyuRuntime().plan({question!r}, trace=False).to_dict()))"
+                )
+                result = _run(
+                    [_venv_python(venv), "-I", "-c", script],
+                    cwd=self.temp_root,
+                    env=_offline_env(),
+                )
+                _require_success(result, "installed store scenario")
+                plan = _load_json_object(result.stdout, "installed store plan")
+                self.assertIn(locator, [a["locator"] for a in plan["knowledge"]["atoms"]])
+
+                query = _run(
+                    [sys.executable, "-I", self.bundle_root / "tools/atoms_query.py", keyword],
+                    cwd=self.temp_root,
+                    env=_offline_env(),
+                )
+                _require_success(query, "bundled store query")
+                atoms = [json.loads(line) for line in query.stdout.splitlines() if line.strip()]
+                self.assertIn(locator, [a["source"]["locator"] for a in atoms])
+
     def test_clean_wheel_install_siyu_plan_selects_public_knowledge(self) -> None:
         _, venv = self._require_wheel()
         isolated_home = self.temp_root / "isolated-home"
