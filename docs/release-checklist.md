@@ -1,6 +1,6 @@
 # 发布清单
 
-本清单只用于人工发布复核。所有 GitHub、ClawHub、SkillHub、WorkBuddy 和远端 Git 操作都必须由发布人明确执行；自动化代理不得代为推送、打标签、创建 Release、上传或发布。
+本清单用于维护者发布复核。开发过程不自动发布；维护者明确授权发布后，代理可执行范围内的推送、标签、Release 与渠道上传，并逐项回读结果。WorkBuddy 的登录、上传和审核按平台实际能力处理。
 
 版本号以仓库根目录 [`VERSION`](../VERSION) 为准。发布前用 `make bump VERSION=x.y.z`（或 `python tools/bump_version.py x.y.z --dry-run` 预览）统一 bump 所有声明面，再跑 `make check`。
 
@@ -15,18 +15,13 @@
 
 任一项失败就停止发布，继续保留上一可回滚版本。
 
-### 冻结组件（非发布门）
+### 评估边界
 
-以下目录/模块自 v1.5 起**冻结**，保留供参考，**不进入** `make check` 发布门：
-
-- Python Runtime：`src/siyu_team/pilot`、`src/siyu_team/eval`（及关联 CLI）
-- Pilot 文档与协议：`docs/pilot/`
-
-日常仍可 `make pilot` opt-in 校验合成夹具；Release 不依赖其通过。
+Python 任务识别、知识选择、安装与静态合规检查仍在 `make check` 内；不能称这些组件已冻结或不参与发布门。`make pilot` 是可选的离线工具校验，H1/H2/H3 的真实效果另行评估。
 
 ## 2. 同一提交三项核对
 
-以下含远端查询，只能由发布人在准备发布时人工运行。本仓库的开发或验证代理不得执行 `git ls-remote`。
+以下步骤用于发布时核对远端状态。只读查询可由代理执行；推送与平台发布仍须在维护者授权范围内。
 
 ```bash
 LOCAL_COMMIT=$(git rev-parse HEAD)

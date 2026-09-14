@@ -73,7 +73,7 @@ class RenderContributorsTests(unittest.TestCase):
             "rec_named",
             "署名作者的一条被另一家印证。",
             "江南茶社",
-            name="江南茶社小林",
+            name="示例门店甲",
             extra=(_confirm("北城面馆", "北城店员", "2026-08-20", "路人"),),
         )
         named_c_payload = named_c.to_dict()
@@ -86,7 +86,7 @@ class RenderContributorsTests(unittest.TestCase):
             "rec_named2",
             "同一署名的第二条仍算这个人。",
             "江南茶社",
-            name="江南茶社小林",
+            name="示例门店甲",
         )
         anon_one = _atom("rec_anon1", "匿名作者甲的方法。", "巷口便利")
         anon_two = _atom("rec_anon2", "匿名作者乙的方法。", "江东点心")
@@ -97,7 +97,7 @@ class RenderContributorsTests(unittest.TestCase):
             text,
         )
         self.assertIn(
-            "江南茶社小林 · 通过 1（A 0 / B 0 / C 1 / D 0）· 待审 1 · 印证 1",
+            "示例门店甲 · 通过 1（A 0 / B 0 / C 1 / D 0）· 待审 1 · 印证 1",
             text,
         )
         self.assertIn(f"{ANON_LABEL} · 2 位 · 通过 0 · 待审 2", text)
@@ -107,7 +107,7 @@ class RenderContributorsTests(unittest.TestCase):
         self.assertNotIn("巷口便利", text)
         self.assertNotIn("北城面馆", text)
         named_line = next(
-            line for line in text.splitlines() if line.startswith("江南茶社小林")
+            line for line in text.splitlines() if line.startswith("示例门店甲")
         )
         anon_line = next(line for line in text.splitlines() if line.startswith(ANON_LABEL))
         self.assertLess(text.index(named_line), text.index(anon_line))
@@ -120,7 +120,7 @@ class RenderContributorsTests(unittest.TestCase):
         self.assertNotIn(f"{ANON_LABEL} ·", first)
 
     def test_seeds_excluded_and_write_is_idempotent(self) -> None:
-        named = _atom("rec_wall", "贡献者墙要排除种子。", "甲店", name="小林")
+        named = _atom("rec_wall", "贡献者墙要排除种子。", "甲店", name="示例贡献者甲")
         seed = _atom("rec_seed", "种子不该上墙。", "乙店")
         seed = KnowledgeAtomV2.from_dict(
             {
@@ -141,7 +141,7 @@ class RenderContributorsTests(unittest.TestCase):
             path = self.mod.render_contributors(root)
             first = path.read_bytes()
             self.assertIn(
-                "小林 · 通过 0（A 0 / B 0 / C 0 / D 0）· 待审 1 · 印证 0".encode("utf-8"),
+                "示例贡献者甲 · 通过 0（A 0 / B 0 / C 0 / D 0）· 待审 1 · 印证 0".encode("utf-8"),
                 first,
             )
             self.assertNotIn("种子不该上墙".encode("utf-8"), first)

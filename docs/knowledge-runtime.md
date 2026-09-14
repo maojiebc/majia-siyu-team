@@ -9,7 +9,7 @@
 - `public`、`expert_private`、`client_private` 三层严格隔离。
 - 含 PII 或客户秘密的原子一律不得 `exportable=true`；
   `client_private` 还必须有 `client_id`。
-- 公开 Runtime 只消费经人工审批的 approved 原子，不会回退 draft。
+- 公开 Runtime 只消费经维护者审批或明确授权编辑审阅的 approved 原子，不会回退 draft。
 
 公开知识有三份字节一致的发布副本：
 

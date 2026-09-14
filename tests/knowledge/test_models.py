@@ -173,18 +173,18 @@ class KnowledgeModelTests(unittest.TestCase):
         restored = KnowledgeAtomV2.from_dict(payload)
         self.assertEqual(restored.source.contributor_role, "unknown")
         payload = build_atom().to_dict()
-        payload["source"]["contributor_display_name"] = "江南茶社小林"
+        payload["source"]["contributor_display_name"] = "示例门店甲"
         payload["quality"]["confirmations"] = [
             {
                 "contributor_hash": "a" * 64,
                 "company_hash": "b" * 64,
                 "confirmed_at": "2026-08-01",
-                "display_name": "江南茶社小林",
+                "display_name": "示例门店甲",
             }
         ]
         named = KnowledgeAtomV2.from_dict(payload)
-        self.assertEqual(named.source.contributor_display_name, "江南茶社小林")
-        self.assertEqual(named.quality.confirmations[0].display_name, "江南茶社小林")
+        self.assertEqual(named.source.contributor_display_name, "示例门店甲")
+        self.assertEqual(named.quality.confirmations[0].display_name, "示例门店甲")
         self.assertNotIn("contributor_display_name", build_atom().to_dict()["source"])
 
     def test_v1_migration_is_draft_and_not_exportable(self) -> None:

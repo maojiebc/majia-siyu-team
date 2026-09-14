@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "corpus_version": "0.5.0",
-  "release_batch": "2026-09-14-v1.4.3-store-membership-distillation",
+  "release_batch": "2026-09-14-v1.5.0-store-membership-distillation",
   "corpus_hash": "sha256:b3bc0b7c81ed63e742110d71e9738aed8c344baac6b3ddbbf5f48cb209a7e147",
   "atom_count": 41,
   "atom_schema_version": "2.0",
@@ -11,7 +11,7 @@
       "name": "growth-layers",
       "path": "04-atoms/growth-layers.approved.jsonl",
       "corpus_version": "0.5.0",
-      "release_batch": "2026-09-14-v1.4.3-store-membership-distillation",
+      "release_batch": "2026-09-14-v1.5.0-store-membership-distillation",
       "sha256": "sha256:b3bc0b7c81ed63e742110d71e9738aed8c344baac6b3ddbbf5f48cb209a7e147",
       "atom_count": 41,
       "schema_version": "2.0"
