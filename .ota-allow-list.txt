@@ -52,3 +52,7 @@ uv.lock:
 expected_revision
 结构缺失或超限
 Fleiss' kappa
+
+# Common industry term; reviewed one-way community identity fingerprint.
+商超生鲜
+f17ba7ab1db5e9c9e149e4516dd64ed3b6b0ca904c2c638dcb1a14ecef47442d

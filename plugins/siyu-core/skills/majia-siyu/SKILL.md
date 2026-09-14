@@ -5,7 +5,7 @@ description: |
   边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan；召回/提频/防流失的数据依据也在那边。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.4.3"
+  version: "1.5.0"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-siyu-team
 ---
@@ -97,11 +97,11 @@ metadata:
 
 ## 📋 版本记录
 
-- **v1.4.3** — 新增 WorkBuddy 专家团发布适配层、可复现 ZIP 构建器与发布包契约测试；平台上传与审核仍由人工完成。
-- **v1.4.2** — 入口与后台执行、分发契约对齐；知识严格装配；合规、隐私、会话与安装态边界加固。
-- **v1.4.1** — 会员动作的数据依据互指姊妹篇 majia-huiyuan。
+- **v1.5.0**（2026-09-14）门店会员执行知识与场景检索；41 条严格知识随包分发；补齐六场景安装验证，更新发布和使用说明。
+- **v1.4.3** — WorkBuddy 专家团适配、自包含 ZIP 和平台契约检查。
+- **v1.4.2** — 入口、公开知识与安装包一致性；隐私、存档和静态合规边界。
 
-完整变更见 [GitHub Releases](https://github.com/maojiebc/majia-siyu-team/releases)。
+完整历史见 [CHANGELOG](https://github.com/maojiebc/majia-siyu-team/blob/main/CHANGELOG.md)。
 
 ---
 

@@ -110,8 +110,8 @@ class CommunityIntakeTests(unittest.TestCase):
         self.assertEqual(c_atoms[0].type, "platform_workaround")
         self.assertEqual(c_atoms[0].quality.platform_rule_risk, "medium")
         self.assertTrue(c_atoms[0].lifecycle.valid_until)
-        self.assertEqual(c_atoms[0].source.contributor_display_name, "江南茶社小林")
-        self.assertEqual(c_atoms[0].quality.confirmations[0].display_name, "江南茶社小林")
+        self.assertEqual(c_atoms[0].source.contributor_display_name, "示例门店甲")
+        self.assertEqual(c_atoms[0].quality.confirmations[0].display_name, "示例门店甲")
         d_atoms = [atom for atom in result.atoms if atom.quality.evidence_grade == "D"]
         self.assertTrue(all(not atom.source.contributor_display_name for atom in d_atoms))
 
@@ -884,15 +884,15 @@ class CommunityIntakeTests(unittest.TestCase):
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
         s1 = next(item for item in payload["submissions"] if item["record_id"] == "rec_s1")
         candidate = record_to_candidate(s1, salt=SALT)
-        self.assertEqual(candidate.contributor_display_name, "江南茶社小林")
+        self.assertEqual(candidate.contributor_display_name, "示例门店甲")
         atom = candidate_to_atom(candidate, (), ())
-        self.assertEqual(atom.source.contributor_display_name, "江南茶社小林")
-        self.assertEqual(atom.quality.confirmations[0].display_name, "江南茶社小林")
+        self.assertEqual(atom.source.contributor_display_name, "示例门店甲")
+        self.assertEqual(atom.quality.confirmations[0].display_name, "示例门店甲")
         dumped = atom.to_json()
-        self.assertIn("江南茶社小林", dumped)
-        self.assertNotIn(hash_identity("江南茶社小林", SALT), dumped)
+        self.assertIn("示例门店甲", dumped)
+        self.assertNotIn(hash_identity("示例门店甲", SALT), dumped)
         gift = render_gift(atom)
-        self.assertIn("署名：江南茶社小林", gift)
+        self.assertIn("署名：示例门店甲", gift)
         self.assertNotIn(atom.quality.confirmations[0].company_hash, gift)
 
     def test_display_name_pii_lenient_becomes_anonymous(self) -> None:
