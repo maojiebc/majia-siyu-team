@@ -244,6 +244,16 @@ def _applicability_haystack(atom: KnowledgeAtomV2) -> str:
     ).casefold()
 
 
+def _matching_scenes(atom: KnowledgeAtomV2, text: str) -> tuple[str, ...]:
+    normalized = _normalized_text(text)
+    return tuple(sorted(
+        scene.casefold() for scene in atom.scope.scenarios
+        if scene.casefold() not in {"user_growth", *_THEME_ALIASES}
+        and len(_normalized_text(scene)) >= 2
+        and _normalized_text(scene) in normalized
+    ))
+
+
 def _relevance(
     atom: KnowledgeAtomV2,
     task: Task,
@@ -256,6 +266,14 @@ def _relevance(
     scenarios = {scenario.casefold() for scenario in atom.scope.scenarios}
     applicability = _applicability_haystack(atom)
     normalized_task = _normalized_text(task_text)
+
+    # Explicit scene phrases distinguish concrete store problems within one
+    # broad theme. Count once so many aliases cannot crowd out other knowledge.
+    scene_matches = _matching_scenes(atom, task_text)
+    if scene_matches:
+        # A concrete scene match outranks a shared high-level theme.
+        score += 90
+        reasons.append(f"scene:{scene_matches[0]}")
 
     for theme in themes:
         if theme in topics:
@@ -484,7 +502,11 @@ class KnowledgeAssembler:
                 value.casefold()
                 for value in (*atom.topics, *atom.scope.scenarios)
             }
-            if themes and not set(themes).intersection(atom_themes):
+            if (
+                themes
+                and not set(themes).intersection(atom_themes)
+                and not _matching_scenes(atom, text)
+            ):
                 continue
             relevance_score, relevance_reasons = _relevance(
                 atom,
