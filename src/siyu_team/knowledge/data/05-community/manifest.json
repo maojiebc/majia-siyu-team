@@ -2,7 +2,7 @@
   "files": {
     "approved.jsonl": {
       "atom_count": 1,
-      "sha256": "sha256:5de304f31067c082f68d517189942be26c7b3599d71be8e1661e00f9133775a6"
+      "sha256": "sha256:585228c0f21f62016ef163ddd1fd68c37ca1d997cb0c542072eb22d50fe40fbe"
     },
     "pending.jsonl": {
       "atom_count": 1,
@@ -21,11 +21,11 @@
       "sha256": "sha256:d6eecf46fa693b46fa7c7e8905c3ed8510aeac4b635985b26d9613e93709ad0f"
     }
   },
-  "last_run": "2026-09-13T07:08:12Z",
+  "last_run": "2026-09-14T07:31:35Z",
   "metrics": {
     "approved_total": 1,
     "confirmations_unresolved": 0,
-    "median_hours_submit_to_approve": 240.0,
+    "median_hours_submit_to_approve": 264.0,
     "needs_manual": 0,
     "pending_total": 1,
     "rejected_total": 0,
