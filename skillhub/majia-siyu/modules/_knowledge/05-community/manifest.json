@@ -2,7 +2,7 @@
   "files": {
     "approved.jsonl": {
       "atom_count": 1,
-      "sha256": "sha256:2c3250f690ee16fd13669dc3ea0df4373886849ea9d22020f2f76bf495e85961"
+      "sha256": "sha256:b2df850e87137af42552e7c74a16f06631adc70341aa721dde23cc712e28ba2f"
     },
     "pending.jsonl": {
       "atom_count": 1,
@@ -25,7 +25,7 @@
   "metrics": {
     "approved_total": 1,
     "confirmations_unresolved": 0,
-    "median_hours_submit_to_approve": 936.0,
+    "median_hours_submit_to_approve": 0.0,
     "needs_manual": 0,
     "pending_total": 1,
     "rejected_total": 0,

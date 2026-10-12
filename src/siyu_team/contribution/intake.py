@@ -582,6 +582,7 @@ class RejectedAtom:
     reviewer: str
     reason: str
     record_id: str = ""
+    review_grade: str = ""
 
     def to_dict(self) -> dict[str, str]:
         payload = {
@@ -592,6 +593,8 @@ class RejectedAtom:
         }
         if self.record_id:
             payload["record_id"] = self.record_id
+        if self.review_grade:
+            payload["review_grade"] = self.review_grade
         return payload
 
     @classmethod
@@ -609,6 +612,7 @@ class RejectedAtom:
             reviewer=str(data.get("reviewer") or "").strip(),
             reason=str(data.get("reason") or "").strip(),
             record_id=record_id,
+            review_grade=str(data.get("review_grade") or "").strip(),
         )
 
 
@@ -644,7 +648,10 @@ def merge_rejected(
     by_key: dict[tuple[str, str], RejectedAtom] = {}
     for item in (*existing, *incoming):
         key = (item.id, item.record_id)
-        if key not in by_key:
+        previous = by_key.get(key)
+        if previous is None or (
+            previous.reviewer, previous.reason, previous.review_grade
+        ) != (item.reviewer, item.reason, item.review_grade):
             by_key[key] = item
     return tuple(by_key.values())
 
@@ -1449,6 +1456,7 @@ def apply_human_review(
     record: Mapping[str, Any],
     *,
     today: date | None = None,
+    previous_quality: Quality | None = None,
 ) -> tuple[KnowledgeAtomV2 | None, str, RejectedAtom | None]:
     used_today = today or date.today()
     conclusion = parse_review_conclusion(record)
@@ -1467,10 +1475,22 @@ def apply_human_review(
                 reviewer=reviewer,
                 reason=notes,
                 record_id=record_id,
+                review_grade=parse_review_grade(record),
             ),
         )
     if conclusion == REVIEW_PASS:
         grade = parse_review_grade(record) or atom.quality.suggested_grade or "D"
+        # Different records can dedupe into one atom. Compare the persisted review,
+        # not a review temporarily applied to this atom earlier in the same batch.
+        baseline = previous_quality or atom.quality
+        unchanged = (
+            baseline.review_status == "approved"
+            and baseline.evidence_grade == grade
+            and baseline.reviewer == reviewer
+            and baseline.review_notes == notes
+        )
+        if unchanged:
+            when = baseline.reviewed_at
         quality = Quality(
             evidence_grade=grade,
             confidence=_confidence(grade),
@@ -1479,7 +1499,7 @@ def apply_human_review(
             reviewed_at=when,
             confirmations=atom.quality.confirmations,
             platform_rule_risk=atom.quality.platform_rule_risk,
-            review_notes=notes or atom.quality.review_notes,
+            review_notes=notes,
             suggested_grade=atom.quality.suggested_grade,
         )
         return _replace_quality(atom, quality), STATUS_APPROVED, None
@@ -1644,6 +1664,7 @@ def run_intake(
     revoked_record_ids: Iterable[str] = (),
     rejected_ids: Iterable[str] = (),
     rejected_record_ids: Iterable[str] = (),
+    rejected_entries: Sequence[RejectedAtom] = (),
 ) -> IntakeRun:
     used_today = today or date.today()
     used_now = now or datetime.now(timezone.utc)
@@ -1652,6 +1673,8 @@ def run_intake(
     blocked_records = {item for item in revoked_record_ids if item}
     blocked_rejected_ids = {item for item in rejected_ids if item}
     blocked_rejected_records = {item for item in rejected_record_ids if item}
+    rejected_by_record = {item.record_id: item for item in rejected_entries if item.record_id}
+    repeated_rejected: list[RejectedAtom] = []
     records_by_id = {_record_id(record): record for record in records if _record_id(record)}
     maintainers = frozenset(maintainer_id_set if maintainer_id_set is not None else maintainer_ids())
     parsed_confirmations = [
@@ -1736,6 +1759,18 @@ def run_intake(
             (atom_id in blocked_rejected_ids or record_id in blocked_rejected_records)
             and parse_review_conclusion(record) != REVIEW_PASS
         ):
+            previous_rejection = rejected_by_record.get(record_id)
+            if previous_rejection is not None and parse_review_conclusion(record) == REVIEW_REJECT:
+                fields = _fields_of(record)
+                incoming = RejectedAtom(
+                    id=previous_rejection.id,
+                    rejected_at=record_modified_date(record, used_today),
+                    reviewer=parse_reviewer_name(fields.get("评审人")) or "maintainer",
+                    reason=_get(fields, "评审批注"),
+                    record_id=record_id,
+                    review_grade=parse_review_grade(record),
+                )
+                repeated_rejected.extend(merge_rejected((previous_rejection,), (incoming,)))
             decisions.append(
                 IntakeDecision(
                     record_id,
@@ -1855,7 +1890,7 @@ def run_intake(
 
     updated_existing: list[KnowledgeAtomV2] = []
     finalized_decisions: list[IntakeDecision] = []
-    newly_rejected: list[RejectedAtom] = []
+    newly_rejected: list[RejectedAtom] = list(repeated_rejected)
     reopened: set[str] = set()
     rejected_atom_ids: set[str] = set()
     for decision in decisions:
@@ -1872,7 +1907,9 @@ def run_intake(
         atom = final_atoms[atom_id]
         source_record = records_by_id.get(decision.record_id, {})
         reviewed, status, rejected = apply_human_review(
-            atom, source_record, today=used_today
+            atom, source_record, today=used_today,
+            previous_quality=(existing_by_id[atom_id].quality
+                              if atom_id in existing_by_id else None),
         )
         if (
             status == STATUS_PENDING
@@ -1928,7 +1965,9 @@ def run_intake(
     for item in finalized_decisions:
         if item.status != STATUS_APPROVED or item.atom is None:
             continue
-        reviewed_at = item.atom.quality.reviewed_at
+        # Use the final effective review for merged atoms; an intermediate review
+        # must not keep moving the manifest metric even when final bytes are stable.
+        reviewed_at = final_atoms[item.atom.id].quality.reviewed_at
         created = ""
         source_record = records_by_id.get(item.record_id, {})
         created = _get(_fields_of(source_record), "创建时间", "提交时间")

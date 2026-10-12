@@ -105,6 +105,17 @@ def _snapshot(root: Path) -> dict[Path, bytes]:
 
 
 def check(output: Path) -> int:
+    if output.exists():
+        try:
+            actual_version = json.loads(
+                (output / ".codebuddy-plugin/plugin.json").read_text(encoding="utf-8")
+            ).get("version")
+        except (OSError, ValueError, AttributeError):
+            actual_version = None
+        expected_version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+        if actual_version is not None and actual_version != expected_version:
+            print(f"本地 WorkBuddy 包是旧版 {actual_version}，运行 make workbuddy 重建")
+            return 1
     with tempfile.TemporaryDirectory(prefix="siyu-workbuddy-check-") as directory:
         candidate = Path(directory) / output.name
         archive = Path(directory) / f"{output.name}.zip"
@@ -117,21 +128,14 @@ def check(output: Path) -> int:
     if actual == expected:
         print("WorkBuddy bundle 生成物一致")
         return 0
-    print(
-        json.dumps(
-            {
-                "missing": sorted(str(path) for path in expected.keys() - actual.keys()),
-                "extra": sorted(str(path) for path in actual.keys() - expected.keys()),
-                "changed": sorted(
-                    str(path)
-                    for path in expected.keys() & actual.keys()
-                    if expected[path] != actual[path]
-                ),
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+    differences = [
+        (str(path), "缺失" if path not in actual else "多出" if path not in expected else "内容不同")
+        for path in sorted(expected.keys() | actual.keys())
+        if expected.get(path) != actual.get(path)
+    ]
+    print(f"WorkBuddy 包有 {len(differences)} 个文件不一致，运行 make workbuddy 重建")
+    for path, reason in differences[:10]:
+        print(f"{reason}：{path}")
     return 1
 
 

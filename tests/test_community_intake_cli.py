@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import importlib.util
+from datetime import date
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -34,6 +36,69 @@ def _load_cli():
 
 
 class CommunityIntakeCliTests(unittest.TestCase):
+    def test_same_review_next_day_changes_no_files(self) -> None:
+        record = {"record_id": "rec_stable", "fields": {
+            "业态": "餐饮", "经营模式": "直营", "门店数": "1",
+            "这条属于": "方法", "公司/品牌": "甲店",
+            "一件有效的事（或没用的事）": "预订前确认门店自己的包间余量。",
+            "发现时间": "2026-08-01", "创建时间": "2026-09-01",
+            "评审结论": "通过", "评审等级": "C",
+        }}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            previous = []
+            snapshots = []
+            for day in (3, 4):
+                result = self.cli.run_intake((record,), existing_atoms=previous,
+                                            salt=SALT, today=date(2026, 9, day))
+                self.cli._write_community_state(root,
+                    previous_buckets=self.cli._partition(previous), atoms=result.atoms,
+                    revoked_entries=(), metrics=result.metrics,
+                    last_run=f"2026-09-{day:02}T00:00:00Z")
+                previous = list(result.atoms)
+                snapshots.append({p.relative_to(root): p.read_bytes()
+                                  for p in root.rglob("*") if p.is_file()})
+            self.assertEqual(snapshots[0], snapshots[1])
+            self.assertEqual(json.loads((root / "05-community/manifest.json").read_text())
+                             ["metrics"]["median_hours_submit_to_approve"], 48.0)
+
+    def test_state_summary_counts_ids_not_changed_lines(self) -> None:
+        before = {"approved": {"ka_old": "old"}, "pending": {"ka_new": "pending"}}
+        same = self.cli._state_changes(before, before)
+        self.assertFalse(same["changed"])
+        after = {"approved": {"ka_old": "edited", "ka_new": "approved"}, "pending": {}}
+        changes = self.cli._state_changes(before, after)
+        self.assertEqual(changes["states"]["approved"], {"added": 1, "removed": 0, "updated": 1})
+        self.assertEqual(changes["states"]["pending"], {"added": 0, "removed": 1, "updated": 0})
+        edits = self.cli._state_changes(before, {**before, "approved": {"ka_old": "edited"}})
+        self.assertEqual(edits["description"], "更新已有条目")
+
+    def test_merged_different_reviews_next_day_changes_no_files(self) -> None:
+        fields = {"业态": "餐饮", "经营模式": "直营", "门店数": "1",
+                  "这条属于": "方法", "公司/品牌": "甲店",
+                  "一件有效的事（或没用的事）": "预订前确认门店自己的包间余量。",
+                  "发现时间": "2026-08-01", "创建时间": "2026-09-01",
+                  "评审结论": "通过", "评审等级": "C", "评审人": "评审员"}
+        records = ({"record_id": "rec_a", "fields": fields},
+                   {"record_id": "rec_b", "fields": {**fields, "公司/品牌": "乙店",
+                                                       "评审人": "另一评审员"}})
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            previous = []
+            before = None
+            for day in (3, 4):
+                result = self.cli.run_intake(records, existing_atoms=previous,
+                                            salt=SALT, today=date(2026, 9, day))
+                self.cli._write_community_state(root,
+                    previous_buckets=self.cli._partition(previous), atoms=result.atoms,
+                    revoked_entries=(), metrics=result.metrics,
+                    last_run=f"2026-09-{day:02}T00:00:00Z")
+                current = {p.relative_to(root): p.read_bytes()
+                           for p in root.rglob("*") if p.is_file()}
+                if before is not None:
+                    self.assertEqual(current, before)
+                before = current
+                previous = list(result.atoms)
     @classmethod
     def setUpClass(cls) -> None:
         cls.cli = _load_cli()

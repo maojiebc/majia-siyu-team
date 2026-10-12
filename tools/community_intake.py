@@ -62,6 +62,52 @@ MANIFEST_METRIC_KEYS = (
 )
 
 
+def _state_snapshot(knowledge_root: Path) -> dict[str, dict[str, str]]:
+    result: dict[str, dict[str, str]] = {}
+    for state, relative in (("approved", APPROVED), ("pending", PENDING),
+                            ("rejected", REJECTED), ("revoked", REVOKED), ("seed", SEEDS)):
+        entries = {}
+        path = knowledge_root / relative
+        if path.is_file():
+            for raw in path.read_text(encoding="utf-8").splitlines():
+                if raw.strip():
+                    row = json.loads(raw)
+                    key = row.get("id") or row.get("record_id")
+                    entries[str(key)] = json.dumps(row, ensure_ascii=False, sort_keys=True)
+        result[state] = entries
+    return result
+
+
+def _state_changes(before: Mapping[str, Mapping[str, str]],
+                   after: Mapping[str, Mapping[str, str]]) -> dict[str, Any]:
+    states = {}
+    labels = {"approved": "通过", "pending": "待审", "rejected": "驳回",
+              "revoked": "撤销", "seed": "种子"}
+    changes = []
+    updated = 0
+    for state in sorted(before.keys() | after.keys()):
+        left, right = before.get(state, {}), after.get(state, {})
+        added = len(right.keys() - left.keys())
+        removed = len(left.keys() - right.keys())
+        edits = sum(left[key] != right[key] for key in left.keys() & right.keys())
+        states[state] = {"added": added, "removed": removed, "updated": edits}
+        updated += edits
+        if added or removed:
+            changes.append(f"{labels.get(state, state)} +{added}/-{removed}")
+    if updated:
+        changes.append("更新已有条目")
+    return {"states": states, "changed": bool(changes),
+            "description": "，".join(changes) or "语料统计更新"}
+
+
+def _emit_changes(changes: Mapping[str, Any]) -> None:
+    print(json.dumps({"community_changes": changes}, ensure_ascii=False))
+    output = os.environ.get("GITHUB_OUTPUT")
+    if output:
+        with Path(output).open("a", encoding="utf-8") as handle:
+            handle.write(f"change_description={changes['description']}\n")
+
+
 def _sha256_bytes(payload: bytes) -> str:
     return "sha256:" + hashlib.sha256(payload).hexdigest()
 
@@ -475,6 +521,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     knowledge_root = Path(args.knowledge_root)
     community_root = knowledge_root / COMMUNITY_REL
+    before_state = _state_snapshot(knowledge_root)
     existing = _existing_pipeline_atoms(community_root)
     previous_revoked = load_revoked_entries(knowledge_root / REVOKED)
     previous_rejected = load_rejected_entries(knowledge_root / REJECTED)
@@ -497,6 +544,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         revoked_record_ids=tuple(item.record_id for item in previous_revoked if item.record_id),
         rejected_ids=tuple(item.id for item in previous_rejected if item.id),
         rejected_record_ids=tuple(item.record_id for item in previous_rejected if item.record_id),
+        rejected_entries=previous_rejected,
     )
     enriched = tuple(maybe_enrich(atom) for atom in result.atoms)
     summary = {
@@ -553,6 +601,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         metrics=result.metrics,
         last_run=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     )
+    _emit_changes(_state_changes(before_state, _state_snapshot(knowledge_root)))
 
     if client is None:
         return 0

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import os
 from pathlib import Path
 import re
@@ -89,6 +90,19 @@ class WorkBuddyBundleTests(unittest.TestCase):
     bundle: ClassVar[Path]
     archive: ClassVar[Path]
     metadata: ClassVar[dict[str, Any]]
+
+    def test_stale_version_explains_rebuild_without_file_diff(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "majia-siyu"
+            shutil.copytree(self.bundle, output)
+            manifest_path = output / ".codebuddy-plugin/plugin.json"
+            manifest = _json_object(manifest_path)
+            manifest["version"] = "1.4.3"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            result = _run([sys.executable, BUILD_SCRIPT, "--output", output, "--check"], cwd=Path(tmp))
+            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.stdout.strip(),
+                             "本地 WorkBuddy 包是旧版 1.4.3，运行 make workbuddy 重建")
 
     @classmethod
     def setUpClass(cls) -> None:
