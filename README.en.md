@@ -159,7 +159,7 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 
 ## Version history
 
-- **v1.6.0** (2026-10-12): Seasonal catering templates, prompt-only self-tests and content fixes, optional read-only client context; community date stability and clearer stale-bundle checks. Release preparation only; H1/H2/H3 remain Not Evaluated.
+- **v1.6.0** (2026-10-12): Seasonal catering templates, prompt-only self-tests and content fixes, optional read-only client context; community date stability and clearer stale-bundle checks. H1/H2/H3 remain Not Evaluated.
 - **v1.5.0** (2026-09-14): Store membership execution and scenario retrieval; 41 curated rules, with six scenarios checked in source, wheel and SkillHub packages.
 - **v1.4.3**: WorkBuddy expert-team packaging and archive checks.
 
