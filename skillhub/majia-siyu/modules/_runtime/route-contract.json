@@ -1,5 +1,5 @@
 {
-  "content_sha256": "sha256:90c8e14f4d09faa6d3e870b2c8a1603025978b347fe21651744419a9f607fa4c",
+  "content_sha256": "sha256:da123e4adef3048449c3caeacc9d2b1bc113d493b706d881a8b84df185de1e76",
   "contract_schema_version": "1.0",
   "industry_capabilities": {
     "catering": {
@@ -201,7 +201,7 @@
     "industry_rules": [
       {
         "industry": "catering",
-        "pattern": "(餐饮|餐厅|饭店|门店套餐)"
+        "pattern": "(餐饮|餐厅|饭店|门店套餐|年夜饭)"
       },
       {
         "industry": "retail",
@@ -253,13 +253,13 @@
       {
         "ignore_case": false,
         "kind": "group_campaign",
-        "pattern": "(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本)",
+        "pattern": "(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本|(群里|群内).{0,8}发什么)",
         "weight": 2.2
       },
       {
         "ignore_case": false,
         "kind": "conversation_script",
-        "pattern": "(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本)",
+        "pattern": "(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本|顾客.{0,24}(怎么回|怎么答))",
         "weight": 2.2
       },
       {

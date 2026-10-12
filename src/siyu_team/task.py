@@ -129,12 +129,12 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
     ),
     (
         TaskKind.GROUP_CAMPAIGN,
-        re.compile(r"(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本)"),
+        re.compile(r"(群发|社群栏目|秒杀通知|活动通知|群公告|推送脚本|(群里|群内).{0,8}发什么)"),
         2.2,
     ),
     (
         TaskKind.CONVERSATION_SCRIPT,
-        re.compile(r"(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本)"),
+        re.compile(r"(欢迎语|破冰|答疑|话术|新人进群|加人后|私聊脚本|顾客.{0,24}(怎么回|怎么答))"),
         2.2,
     ),
     (
@@ -191,7 +191,7 @@ _GOAL_RULES: tuple[tuple[Goal, re.Pattern[str]], ...] = (
 )
 
 _INDUSTRY_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("catering", re.compile(r"(餐饮|餐厅|饭店|门店套餐)")),
+    ("catering", re.compile(r"(餐饮|餐厅|饭店|门店套餐|年夜饭)")),
     ("retail", re.compile(r"(零售|商超|便利店)")),
     ("edu", re.compile(r"(教培|培训机构|试听课)")),
 )
