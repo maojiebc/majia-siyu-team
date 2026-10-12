@@ -43,6 +43,9 @@ from siyu_team.contribution.intake import (
     run_intake,
     statement_jaccard,
     writeback_fields_changed,
+    RejectedAtom,
+    merge_rejected,
+    record_modified_date,
 )
 
 
@@ -52,6 +55,65 @@ SALT = "test-salt"
 
 
 class CommunityIntakeTests(unittest.TestCase):
+    def test_review_dates_only_change_when_review_changes(self) -> None:
+        record = {"record_id": "rec_stable", "fields": {
+            "业态": "餐饮", "经营模式": "直营", "门店数": "1",
+            "这条属于": "方法", "公司/品牌": "甲店",
+            "一件有效的事（或没用的事）": "预订前确认门店自己的包间余量。",
+            "发现时间": "2026-08-01", "创建时间": "2026-09-01",
+            "评审结论": "通过", "评审等级": "C", "评审人": "评审员",
+            "评审批注": "已核验",
+        }}
+        first = run_intake((record,), salt=SALT, today=date(2026, 9, 3))
+        second = run_intake((record,), existing_atoms=first.atoms, salt=SALT,
+                            today=date(2026, 9, 4))
+        self.assertEqual(first.atoms[0].quality.reviewed_at, "2026-09-03")
+        self.assertEqual(first.atoms[0].to_json(), second.atoms[0].to_json())
+        current = second.atoms
+        for field, value in (("评审等级", "B"), ("评审人", "另一评审员"),
+                             ("评审批注", "")):
+            record["fields"][field] = value
+            changed = run_intake((record,), existing_atoms=current, salt=SALT,
+                                 today=date(2026, 9, 5))
+            self.assertEqual(changed.atoms[0].quality.reviewed_at, "2026-09-05")
+            current = changed.atoms
+        self.assertEqual(current[0].quality.review_notes, "")
+
+    def test_review_timestamp_parses_milliseconds_iso_and_invalid(self) -> None:
+        for value, expected in ((1788364800000, "2026-09-03"),
+                                ("2026-09-03T09:30:00+08:00", "2026-09-03"),
+                                ("invalid", "2026-09-06")):
+            with self.subTest(value=value):
+                self.assertEqual(record_modified_date(
+                    {"last_modified_time": value}, date(2026, 9, 6)), expected)
+
+    def test_rejection_preserves_date_but_accepts_changed_review(self) -> None:
+        old = RejectedAtom("ka_stable", "2026-09-03", "评审员", "待补证据", "rec_r")
+        repeated = RejectedAtom("ka_stable", "2026-09-04", "评审员", "待补证据", "rec_r")
+        changed = RejectedAtom("ka_stable", "2026-09-05", "评审员", "证据冲突", "rec_r")
+        self.assertEqual(merge_rejected((old,), (repeated,)), (old,))
+        self.assertEqual(merge_rejected((old,), (changed,)), (changed,))
+
+    def test_rejected_record_rechecks_metadata_without_reingesting(self) -> None:
+        fields = {"业态": "餐饮", "经营模式": "直营", "门店数": "1",
+                  "这条属于": "方法", "公司/品牌": "甲店",
+                  "一件有效的事（或没用的事）": "预订前确认门店自己的包间余量。",
+                  "发现时间": "2026-08-01", "评审结论": "驳回", "评审批注": "待补证据"}
+        record = {"record_id": "rec_r", "fields": fields}
+        first = run_intake((record,), salt=SALT, today=date(2026, 9, 3))
+        rejected = first.rejected[0]
+        second = run_intake((record,), salt=SALT, today=date(2026, 9, 4),
+                            rejected_ids=(rejected.id,), rejected_record_ids=("rec_r",),
+                            rejected_entries=first.rejected)
+        self.assertEqual(second.rejected, first.rejected)
+        fields["评审批注"] = "证据冲突"
+        third = run_intake((record,), salt=SALT, today=date(2026, 9, 5),
+                           rejected_ids=(rejected.id,), rejected_record_ids=("rec_r",),
+                           rejected_entries=second.rejected)
+        self.assertEqual(third.rejected[0].rejected_at, "2026-09-05")
+        self.assertEqual(third.rejected[0].reason, "证据冲突")
+        self.assertEqual(third.atoms, ())
+
     def test_hash_is_salted_and_normalized(self) -> None:
         first = hash_identity("江南茶社", SALT)
         second = hash_identity(" 江南 茶社 ", SALT)

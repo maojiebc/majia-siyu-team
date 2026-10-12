@@ -54,6 +54,7 @@ jobs:
           python -m pip install -e ".[dev]"
 
       - name: Pull, validate, write community corpus
+        id: intake
         if: steps.cfg.outputs.skip != 'true'
         env:
           LARK_APP_ID: ${{ secrets.LARK_APP_ID }}
@@ -85,6 +86,7 @@ jobs:
         if: steps.cfg.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGE_DESCRIPTION: ${{ steps.intake.outputs.change_description }}
         run: |
           set -euo pipefail
           git add -A
@@ -95,8 +97,7 @@ jobs:
           allowed='^(knowledge/05-community/|knowledge/02-industry/benchmarks.community.md|src/siyu_team/knowledge/data/|skillhub/majia-siyu/modules/_knowledge/)'
           extra=$(git diff --cached --name-only | grep -Ev "$allowed" || true)
           date_stamp=$(date -u +%F)
-          added=$(git diff --cached --numstat -- knowledge/05-community/*.jsonl | awk '{s+=$1} END {print s+0}')
-          message="community: intake ${date_stamp}, +${added} atoms"
+          message="community: intake ${date_stamp}（${CHANGE_DESCRIPTION:-语料统计更新}）"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "$message"
