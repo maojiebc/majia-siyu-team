@@ -56,3 +56,19 @@ Fleiss' kappa
 # Common industry term; reviewed one-way community identity fingerprint.
 商超生鲜
 f17ba7ab1db5e9c9e149e4516dd64ed3b6b0ca904c2c638dcb1a14ecef47442d
+
+# v1.6.0：逐项核实的普通语句上下文与空语料 SHA-256 片段。
+预览与明示选择
+预览后明示选择
+未发明标杆里没有的东西
+权重越高越强
+在超限时
+携带刚读到的
+比已读不回强
+把超限内容拆分
+不为其临时发明通过阈值
+同一波
+退群超线即停
+社区超市
+给刚加好友的老客
+e3b0c44298fc1c149afbf4c8996fb924
