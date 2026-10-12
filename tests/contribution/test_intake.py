@@ -94,6 +94,27 @@ class CommunityIntakeTests(unittest.TestCase):
         self.assertEqual(merge_rejected((old,), (repeated,)), (old,))
         self.assertEqual(merge_rejected((old,), (changed,)), (changed,))
 
+    def test_merged_reviews_compare_persisted_metadata_across_days(self) -> None:
+        fields = {"业态": "餐饮", "经营模式": "直营", "门店数": "1",
+                  "这条属于": "方法", "公司/品牌": "甲店",
+                  "一件有效的事（或没用的事）": "预订前确认门店自己的包间余量。",
+                  "发现时间": "2026-08-01", "创建时间": "2026-09-01",
+                  "评审结论": "通过", "评审等级": "C", "评审人": "评审员"}
+        a = {"record_id": "rec_a", "fields": fields}
+        b = {"record_id": "rec_b", "fields": {**fields, "公司/品牌": "乙店",
+                                                  "评审人": "另一评审员"}}
+        first = run_intake((a, b), salt=SALT, today=date(2026, 9, 3))
+        second = run_intake((a, b), existing_atoms=first.atoms, salt=SALT,
+                            today=date(2026, 9, 4))
+        self.assertEqual(len(second.atoms), 1)
+        self.assertEqual(second.atoms[0].to_json(), first.atoms[0].to_json())
+        self.assertEqual(second.metrics, first.metrics)
+        b["fields"]["评审等级"] = "B"
+        changed = run_intake((a, b), existing_atoms=second.atoms, salt=SALT,
+                             today=date(2026, 9, 5))
+        self.assertEqual(changed.atoms[0].quality.reviewed_at, "2026-09-05")
+        self.assertEqual(changed.atoms[0].quality.evidence_grade, "B")
+
     def test_rejected_record_rechecks_metadata_without_reingesting(self) -> None:
         fields = {"业态": "餐饮", "经营模式": "直营", "门店数": "1",
                   "这条属于": "方法", "公司/品牌": "甲店",

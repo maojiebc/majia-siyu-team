@@ -1456,6 +1456,7 @@ def apply_human_review(
     record: Mapping[str, Any],
     *,
     today: date | None = None,
+    previous_quality: Quality | None = None,
 ) -> tuple[KnowledgeAtomV2 | None, str, RejectedAtom | None]:
     used_today = today or date.today()
     conclusion = parse_review_conclusion(record)
@@ -1479,14 +1480,17 @@ def apply_human_review(
         )
     if conclusion == REVIEW_PASS:
         grade = parse_review_grade(record) or atom.quality.suggested_grade or "D"
+        # Different records can dedupe into one atom. Compare the persisted review,
+        # not a review temporarily applied to this atom earlier in the same batch.
+        baseline = previous_quality or atom.quality
         unchanged = (
-            atom.quality.review_status == "approved"
-            and atom.quality.evidence_grade == grade
-            and atom.quality.reviewer == reviewer
-            and atom.quality.review_notes == notes
+            baseline.review_status == "approved"
+            and baseline.evidence_grade == grade
+            and baseline.reviewer == reviewer
+            and baseline.review_notes == notes
         )
         if unchanged:
-            return atom, STATUS_APPROVED, None
+            when = baseline.reviewed_at
         quality = Quality(
             evidence_grade=grade,
             confidence=_confidence(grade),
@@ -1903,7 +1907,9 @@ def run_intake(
         atom = final_atoms[atom_id]
         source_record = records_by_id.get(decision.record_id, {})
         reviewed, status, rejected = apply_human_review(
-            atom, source_record, today=used_today
+            atom, source_record, today=used_today,
+            previous_quality=(existing_by_id[atom_id].quality
+                              if atom_id in existing_by_id else None),
         )
         if (
             status == STATUS_PENDING
@@ -1959,7 +1965,9 @@ def run_intake(
     for item in finalized_decisions:
         if item.status != STATUS_APPROVED or item.atom is None:
             continue
-        reviewed_at = item.atom.quality.reviewed_at
+        # Use the final effective review for merged atoms; an intermediate review
+        # must not keep moving the manifest metric even when final bytes are stable.
+        reviewed_at = final_atoms[item.atom.id].quality.reviewed_at
         created = ""
         source_record = records_by_id.get(item.record_id, {})
         created = _get(_fields_of(source_record), "创建时间", "提交时间")
