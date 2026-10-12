@@ -12,7 +12,7 @@
 
 | 能力 | 状态 | 可核验证据 | 当前边界 |
 |---|---|---|---|
-| Task 与确定性路由 | 仅 Python 实现 | `task.py`、`routing.py`、84 条人工路由对照 | Prompt-only 解释契约，不等于执行 Python 解析器 |
+| Task 与确定性路由 | 仅 Python 实现 | `task.py`、`routing.py`、90 条人工路由对照 | Prompt-only 解释契约，不等于执行 Python 解析器 |
 | 插件入口路由 | 仅提示词实现 | 主入口与生成的 `route-contract.json` | 与 Python 路由同源；宿主执行语义仍不可由仓库强制 |
 | 四官上下文白名单与最小字段 | 仅 Python 实现 | `runtime.py`、`context.py`、`build_isolated_officer_prompt()`、隔离与 `context_incomplete` 回归 | Runtime 计划层与 Python Prompt 派发层均 fail-closed；Markdown 宿主是否执行投影未验证 |
 | Python 执行计划 CLI | 仅 Python 实现 | ExecutionPlan v1、`siyu-plan --contract-info`、wheel 干净安装回归 | 安装态能找到公开知识；Markdown 宿主是否调用 Runtime 仍不可强制 |

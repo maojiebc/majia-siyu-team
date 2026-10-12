@@ -8,7 +8,7 @@
 
 | 执行面 | 当前真实入口 | 已自动验证 | 尚未闭环 |
 |---|---|---|---|
-| 插件与 SkillHub | Markdown Skill 由宿主解释执行 | 文件结构、发布版本、生成路由契约、84 条人工对照、公开知识副本一致性 | Prompt-only 不具备代码强制隔离/追踪 |
+| 插件与 SkillHub | Markdown Skill 由宿主解释执行 | 文件结构、发布版本、生成路由契约、90 条人工对照、公开知识副本一致性 | Prompt-only 不具备代码强制隔离/追踪 |
 | Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | ExecutionPlan v1、Task、路由、上下文隔离、默认 metadata Trace、严格 Corpus 与相关性装配、安装态回归 | Markdown 宿主是否真正调用 Runtime；plan 本身不执行专家 Prompt |
 | Knowledge Pilot | `siyu-pilot` 与离线夹具 | 盲化、数据契约、Dry Run 工具、与 Runtime 共用 `KnowledgeAssembler` | H1/H2/H3 真实人工评估 |
 
