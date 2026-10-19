@@ -25,7 +25,7 @@
 | 零售/教培通用回答 | 已实现 | `generic_only` 路由回归 | 零售行业册：敬请期待，当前为种子层，由社区印证逐步替换；教培不得伪造独立行业册 |
 | 公开知识 Runtime 装配 | 已实现 | `CorpusLoader`、`KnowledgeAssembler`、Runtime 与安装态回归 | approved-only 且默认最多 12 条；只证明工程装配，不证明答案效果 |
 | Pilot 知识装配 | 已实现 | Pilot 与 Runtime 共用 `KnowledgeAssembler`；mapping 对照回归 | mapping 只是期望夹具；Dry Run 不是 H1/H2/H3 结果 |
-| Judge 质量评分 | 仅 Python 实现 | `siyu-eval judge`、严格 `JudgeReport` 与主编排条件流程 | 仍需宿主启动独立 Judge 并回填完整来源；缺失时明确为未评分 |
+| Judge 质量评分 | Python 实现，单入口包附辅助 CLI | 原要求/来源/答案绑定，事实、适配、风险和覆盖阻断，再评分 | 仍需宿主独立评审并回填；代码不判断来源真假，Prompt-only 不声称强制拦截 |
 | 静态合规扫描 | 已实现 | `siyu-eval compliance`、执行 lint、语境与安装态回归 | 按客户文案/内部报告/知识/引证模式解释命中；不产生质量分或徽章 |
 | 飞书/BI/Get 笔记/Nowledge 连接器 | 骨架 | `src/siyu_team/connectors/` | 未接外部 API，不可描述为可用集成 |
 | H1 知识价值 | 未验证 | `docs/pilot/results/h1-knowledge-value.md` | `Not Evaluated` |

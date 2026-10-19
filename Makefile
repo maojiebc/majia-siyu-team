@@ -8,6 +8,7 @@ compliance:
 judge:
 	PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -m siyu_team.eval.cli judge $(FILE) \
 		$(if $(SCORES),--scores $(SCORES),--emit-prompts) \
+		$(if $(REQUEST),--request $(REQUEST),) $(if $(EVIDENCE),--evidence $(EVIDENCE),) \
 		$(if $(REPORT),--output $(REPORT),) \
 		--threshold $(or $(THRESHOLD),80) --mode $(or $(MODE),customer_copy)
 

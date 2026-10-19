@@ -1,31 +1,32 @@
 {
   "schema_version": "1.0",
-  "corpus_version": "0.5.0",
-  "release_batch": "2026-09-14-v1.6.0-store-membership-distillation",
-  "corpus_hash": "sha256:b3bc0b7c81ed63e742110d71e9738aed8c344baac6b3ddbbf5f48cb209a7e147",
-  "atom_count": 41,
+  "corpus_version": "0.6.0",
+  "release_batch": "2026-10-19-v1.7.0-rehearsal-distillation",
+  "corpus_hash": "sha256:4bd5e8a65858d30a14c7f058bcd5ea71da767b509bdb1e026e73e2cb42e695fa",
+  "atom_count": 49,
   "atom_schema_version": "2.0",
   "atom_schema": "04-atoms/schema/atom-v2.schema.json",
   "public_corpora": [
     {
       "name": "growth-layers",
       "path": "04-atoms/growth-layers.approved.jsonl",
-      "corpus_version": "0.5.0",
-      "release_batch": "2026-09-14-v1.6.0-store-membership-distillation",
-      "sha256": "sha256:b3bc0b7c81ed63e742110d71e9738aed8c344baac6b3ddbbf5f48cb209a7e147",
-      "atom_count": 41,
+      "corpus_version": "0.6.0",
+      "release_batch": "2026-10-19-v1.7.0-rehearsal-distillation",
+      "sha256": "sha256:4bd5e8a65858d30a14c7f058bcd5ea71da767b509bdb1e026e73e2cb42e695fa",
+      "atom_count": 49,
       "schema_version": "2.0"
     }
   ],
   "status": "editorial-approved",
-  "notes": "门店运营经验经脱敏与编辑审阅接入。编辑批准不代表业务效果或 Pilot 已验证；新增条目审阅者为受维护者授权的 Codex。",
+  "notes": "维护者授权从试讲与课件提炼；新增8条有条件的执行判断，校正旧有绝对规则。仅编辑审阅通过，不代表经营效果或Pilot验证；原始材料与具体来源映射本地保留。",
   "methodology": [
     "00-methodology/私域公理与消解案例库.md",
     "00-methodology/L0-通用用户增长原则.md",
     "00-methodology/用户增长分层索引.md",
     "00-methodology/经营画像与执行边界.md",
     "02-industry/catering/L1-餐饮零售用增Know-how.md",
-    "02-industry/catering/门店会员执行参考.md"
+    "02-industry/catering/门店会员执行参考.md",
+    "02-industry/catering/餐饮私域条件与执行.md"
   ],
   "growth_layers": {
     "l0": "00-methodology/L0-通用用户增长原则.md",

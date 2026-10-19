@@ -39,6 +39,10 @@ BUNDLED_EVAL_MODULES = (
     "rubrics.py",
     "compliance_lexicon.py",
     "static.py",
+    "engine.py",
+    "judge.py",
+    "cli.py",
+    "monte_carlo.py",
 )
 ROUTE_CONTRACT = ROUTER / "references/route-contract.json"
 # 包内路径重写：SKILL.md 里的仓库根相对引用改指包内 _knowledge，

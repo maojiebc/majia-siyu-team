@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import tempfile
@@ -71,7 +72,7 @@ class EvalCliIntegrationTests(unittest.TestCase):
 
         payload = json.loads(output)
         self.assertEqual(code, 0)
-        self.assertEqual(set(payload), set(DIMENSION_WEIGHTS))
+        self.assertEqual(set(payload), set(DIMENSION_WEIGHTS) | {"reliability_checks"})
         self.assertNotIn("score", payload)
         self.assertNotIn("badge", payload)
 
@@ -99,6 +100,10 @@ class EvalCliIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             plan = Path(tmp) / "plan.md"
             plan.write_text(SAFE_PLAN, encoding="utf-8")
+            request = Path(tmp) / "request.md"
+            evidence = Path(tmp) / "evidence.md"
+            request.write_text("写一个会员触达小试方案", encoding="utf-8")
+            evidence.write_text("用户只需小范围验证，无外部动态事实。", encoding="utf-8")
             scores = Path(tmp) / "judge-scores.json"
             scores.write_text(
                 json.dumps(
@@ -107,6 +112,17 @@ class EvalCliIntegrationTests(unittest.TestCase):
                         "config": {"temperature": 0, "prompt_version": "1"},
                         "reviewed_at": "2026-08-09T08:00:00Z",
                         "review_method": "independent_host_judge",
+                        "review_binding": {
+                            "answer_sha256": hashlib.sha256(plan.read_bytes()).hexdigest(),
+                            "request_sha256": hashlib.sha256(request.read_bytes()).hexdigest(),
+                            "evidence_sha256": hashlib.sha256(evidence.read_bytes()).hexdigest(),
+                        },
+                        "reliability_checks": {
+                            "factual_support": {"status": "pass", "reason": "无动态事实。"},
+                            "customer_fit": {"status": "pass", "reason": "只建议小范围验证。"},
+                            "risk_screening": {"status": "not_applicable", "reason": "不涉及采购。"},
+                            "option_coverage": {"status": "not_applicable", "reason": "不涉及比选。"},
+                        },
                         "scores": {
                             dim: {"score": 0.9, "why": f"{dim} 有可核验依据"}
                             for dim in DIMENSION_WEIGHTS
@@ -117,7 +133,8 @@ class EvalCliIntegrationTests(unittest.TestCase):
                 encoding="utf-8",
             )
             code, output = self._run(
-                ["judge", str(plan), "--scores", str(scores)]
+                ["judge", str(plan), "--scores", str(scores),
+                 "--request", str(request), "--evidence", str(evidence)]
             )
 
         payload = json.loads(output)

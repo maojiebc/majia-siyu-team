@@ -1,0 +1,27 @@
+{
+  "run_date": "2026-10-19",
+  "base_commit": "4ee6174",
+  "method": "one independent context per version; six fixed offline tasks; one separate blinded model reviewer",
+  "model": "inherited Codex session model; exact model revision and sampling parameters not exposed by the agent tool",
+  "human_review": false,
+  "live_vendor_verification": false,
+  "agents": {
+    "baseline": "/root/quality_baseline",
+    "old": "/root/quality_old",
+    "new": "/root/quality_new",
+    "judge": "/root/quality_blind_review"
+  },
+  "artifacts_sha256": {
+    "new-answers.json": "2e78ea5aa303392c12cf8f70de78915f1ea7a5f1d4ba90628bd51782bfdfe694",
+    "old-answers.json": "a4e01515ce4b5b262833abf0fea8272f4db41b984e2548fc602200405360f706",
+    "baseline-answers.json": "f33686a5f2a7795b384805b359d46fc71f3f089887304c42796b98b215e05ea7",
+    "blind-key.json": "c8dc3105c20ff12aeee8eb8fde1b6696eb3ad71e6db63a767e2de69ef09f77f7",
+    "blind-review.json": "5f2083e83723048b7fd1ee7f0ae0c14049f89a038f492508437da21617dfe1ae"
+  },
+  "scenarios_sha256": "4502fac18bd589ea591ff0b4d4716e3dabfe073c85758c37375a88e2852de128",
+  "tested_skill_snapshots_sha256": {
+    "old": "74f7c5319ac42377b4a431a756ebf1b3cc7b899269c5177d505a9ac4121260d1",
+    "new": "f350b89986199dab5498a56afe01d28b27b47f7b8658188983e04555d8c88591"
+  },
+  "limit": "Behavior run used three skill snapshots before later entry wording compression, helper documentation, and consistency fixes to routing, orchestration and business guides; no full host integration or repeated sampling. Raw user answer and its review remain local only."
+}

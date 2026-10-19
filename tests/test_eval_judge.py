@@ -18,7 +18,7 @@ class JudgeLayerTests(unittest.TestCase):
 
     def test_batch_covers_all_dimensions(self) -> None:
         batch = build_judge_batch("测试方案：会员日到店 8 折")
-        self.assertEqual(set(batch), set(DIMENSION_WEIGHTS))
+        self.assertEqual(set(batch), set(DIMENSION_WEIGHTS) | {"reliability_checks"})
         for prompt in batch.values():
             self.assertIn("待评方案", prompt)
 

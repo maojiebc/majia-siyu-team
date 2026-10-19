@@ -79,6 +79,14 @@ PILOT_THEME_BY_LOCATOR: dict[str, str] = {
     "L1-18": "activity_increment",
     "L1-19": "activity_increment",
     "L1-20": "repurchase_recall",
+    "L1-21": "add_wechat",
+    "L1-22": "add_wechat",
+    "L1-23": "add_wechat",
+    "L1-24": "activity_increment",
+    "L1-25": "activity_increment",
+    "L1-26": "activity_increment",
+    "L1-27": "repurchase_recall",
+    "L1-28": "repurchase_recall",
 }
 
 # 只在判断句本身明确指向修饰维时覆盖；其余保持 any。

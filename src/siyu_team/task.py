@@ -169,6 +169,17 @@ _KIND_RULES: tuple[tuple[TaskKind, re.Pattern[str], float], ...] = (
     ),
 )
 
+# Only fill otherwise-unrecognized operating choices. Do not add scores to an
+# explicit copy, data, market, archive or diagnosis intent.
+_OPERATING_CHOICE_PATTERN = re.compile(
+    r"((桌贴|桌面|收银).{0,14}(本单|下次|付款时点)|"
+    r"(直接进群|先加好友).{0,12}(还是|怎么选|取舍)|"
+    r"(优惠谁出|低执行门店|素材谁做|谁发谁接)|"
+    r"(活动|推送).{0,20}(缺货|撤停)|"
+    r"(会员等级|权益等级).{0,12}(召回|生命周期)|"
+    r"(店员|人手).{0,12}(没空|无空|不足).{0,20}(不加|不换|不能变))"
+)
+
 # 存档/恢复类与内容生产类同时命中时，压低存档分，优先内容任务。
 _CONTENT_KINDS = frozenset(
     {
@@ -371,6 +382,12 @@ def _score_kinds(
             continue
         if pattern.search(text):
             scores[kind] = scores.get(kind, 0.0) + weight
+    if (
+        not scores
+        and TaskKind.DIAGNOSIS not in excluded_kinds
+        and _OPERATING_CHOICE_PATTERN.search(text)
+    ):
+        scores[TaskKind.DIAGNOSIS] = 3.0
     # 「保存上次朋友圈文案」会同时命中 SAVE_MEMORY 与 MOMENTS_COPY。
     if scores.keys() & _CONTENT_KINDS:
         for memory_kind in (TaskKind.SAVE_MEMORY, TaskKind.RESTORE_MEMORY):
