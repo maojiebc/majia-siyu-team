@@ -20,7 +20,7 @@ metadata:
 
 ### A. 账号 IP 立住（开户 / 改名模板）
 来自 `knowledge/02-industry/catering/餐饮私域方法论.md` 的造 IP 公式，详见 [`references/造IP账号立住.md`](references/造IP账号立住.md)：
-- 头像：真人 + 微笑 + 工服/门店场景，**禁 logo**（除非品牌势能极强）。
+- 头像：真人 + 微笑 + 工服/门店场景，身份可识别（除非品牌势能极强）。
 - 名称：单店 = `门店+人名(+福利发放版)`；连锁 = `品牌+门店+职务+人名`。反面：本名/法人全名。
 - 朋友圈背景 = 招牌菜。
 
@@ -69,6 +69,8 @@ echo "话术" | python3 plugins/siyu-execution/skills/siyu-huashu/scripts/huashu
 收尾时如果已形成可复用结论，提示一次：「有结论想留下，输入 `/siyu-save`。」一次对话最多提示一次。
 
 门店收银、进群承接、开业、核销排错、员工激励和日常内容，按具体问题读取 [门店会员执行参考](../../../../knowledge/02-industry/catering/门店会员执行参考.md)；口径与算账交 majia-huiyuan。
+
+餐饮的付款触点、进群取舍、内容分工、活动撤停、分层与资源变化，按需读 [餐饮私域条件与执行](../../../../knowledge/02-industry/catering/餐饮私域条件与执行.md)；只读取与当前问题有关的段落。
 
 ---
 
