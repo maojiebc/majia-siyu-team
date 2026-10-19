@@ -1,6 +1,6 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.6.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.7.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.6.0 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.7.0 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
 </p>
 
 > **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
@@ -159,6 +159,7 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 
 ## Version history
 
+- **v1.7.0** (2026-10-19): Evidence-based vendor selection, platform coverage, 49 conditional knowledge atoms, and channel-specific copy and visual briefs. H1/H2/H3 remain Not Evaluated.
 - **v1.6.0** (2026-10-12): Seasonal catering templates, prompt-only self-tests and content fixes, optional read-only client context; community date stability and clearer stale-bundle checks. H1/H2/H3 remain Not Evaluated.
 - **v1.5.0** (2026-09-14): Store membership execution and scenario retrieval; 41 curated rules, with six scenarios checked in source, wheel and SkillHub packages.
 - **v1.4.3**: WorkBuddy expert-team packaging and archive checks.

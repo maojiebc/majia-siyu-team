@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.6.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.7.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.6.0 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.7.0 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
 </p>
 
 图中的代码约束适用于 Python 模式；纯提示模式按文档执行，不能声称已实现代码隔离。
@@ -234,6 +234,7 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v1.7.0**（2026-10-19）选型核验履约风险与平台覆盖；49条有条件知识；朋友圈、私聊、群发、欢迎与图文设计方法进入执行技能。原始私有素材不随包分发，H1/H2/H3未验证。
 - **v1.6.0**（2026-10-12）Q4 至春节模板、模型出活自测与内容修正、只读档案复用；修复社区假更新与旧包提示。H1/H2/H3 未验证。
 - **v1.5.0**（2026-09-14）门店会员执行知识与场景检索；41 条严格知识随包分发；补齐六场景安装验证，更新发布和使用说明。
 - **v1.4.3** — WorkBuddy 专家团适配、自包含 ZIP 和平台契约检查。
