@@ -1,0 +1,32 @@
+{
+  "hotpot_unknown": {
+    "A": "baseline",
+    "B": "old",
+    "C": "new"
+  },
+  "vendor_risk": {
+    "A": "old",
+    "B": "baseline",
+    "C": "new"
+  },
+  "platform_coverage": {
+    "A": "new",
+    "B": "old",
+    "C": "baseline"
+  },
+  "existing_stack": {
+    "A": "baseline",
+    "B": "old",
+    "C": "new"
+  },
+  "quiet_groups": {
+    "A": "new",
+    "B": "baseline",
+    "C": "old"
+  },
+  "simple_copy": {
+    "A": "new",
+    "B": "baseline",
+    "C": "old"
+  }
+}

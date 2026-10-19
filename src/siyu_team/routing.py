@@ -63,7 +63,7 @@ TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
     ),
     TaskKind.MARKET_RESEARCH: (
         "siyu-market-research",
-        "请求涉及厂商、产品、价格或市场动态，先实时检索并生成证据快照。",
+        "先明确选型需求与材料范围；新增候选或当前动态事实须实时检索留证。",
     ),
     TaskKind.MEMBERSHIP_DATA: (
         "majia-huiyuan",
@@ -256,7 +256,10 @@ def route_task(task: Task) -> RouteDecision:
 
     focus = industry_route["focus"]
     if task.kind is TaskKind.MARKET_RESEARCH:
-        focus = "先完成实时检索与证据快照；证据不足的对象不得进入正式推荐。"
+        focus = (
+            "先判断需求；已有材料可做标明边界的初筛。新增候选和当前事实须实时核验，"
+            "分别检查适配、履约风险与相关平台/独立方案覆盖，证据不足不作采购推荐。"
+        )
     elif task.kind is TaskKind.MEMBERSHIP_DATA:
         focus = "按会员数据能力的字段、口径、SQL 与看板边界继续处理。"
     elif task.kind is TaskKind.UPDATE:

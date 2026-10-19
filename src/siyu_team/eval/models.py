@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Mapping
 
-from .rubrics import DIMENSION_WEIGHTS
+from .rubrics import DIMENSION_WEIGHTS, RELIABILITY_CHECKS
 
 
 class ScanMode(str, Enum):
@@ -107,7 +107,7 @@ class JudgeReport:
     therefore remain optional until complete independent scores are supplied.
     """
 
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
     status: str = "not_evaluated"
     source: str = ""
     model: str = ""
@@ -118,6 +118,8 @@ class JudgeReport:
     reasons: Mapping[str, str] = field(default_factory=dict)
     score: float | None = None
     badge: str | None = None
+    reliability_checks: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
+    review_binding: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         complete_statuses = {"complete", "passed", "failed"}
@@ -168,6 +170,17 @@ class JudgeReport:
             raise ValueError("完成态 JudgeReport.review_method 必须确认独立评审")
         if self.config.get("metadata_complete") is not True:
             raise ValueError("完成态 JudgeReport.config 必须确认 metadata_complete=true")
+        if set(self.reliability_checks) != set(RELIABILITY_CHECKS):
+            raise ValueError("完成态 JudgeReport 必须包含事实、适配、风险及覆盖检查")
+        for name, check in self.reliability_checks.items():
+            allowed = {"pass", "not_applicable"} if name in {
+                "risk_screening", "option_coverage"} else {"pass"}
+            if check.get("status") not in allowed or not check.get("reason", "").strip():
+                raise ValueError("完成态 JudgeReport 可靠性检查未通过")
+        if set(self.review_binding) != {
+            "answer_sha256", "request_sha256", "evidence_sha256"
+        } or any(len(value) != 64 for value in self.review_binding.values()):
+            raise ValueError("完成态 JudgeReport 必须绑定本次答案、要求和证据")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -182,4 +195,7 @@ class JudgeReport:
             "reasons": dict(self.reasons),
             "score": self.score,
             "badge": self.badge,
+            "reliability_checks": {key: dict(value)
+                                   for key, value in self.reliability_checks.items()},
+            "review_binding": dict(self.review_binding),
         }

@@ -204,6 +204,10 @@ def cmd_judge(args: argparse.Namespace) -> int:
         return 2
     try:
         text = Path(args.file).read_text(encoding="utf-8")
+        request = (Path(args.request).read_text(encoding="utf-8")
+                   if getattr(args, "request", None) else "")
+        evidence = (Path(args.evidence).read_text(encoding="utf-8")
+                    if getattr(args, "evidence", None) else "")
     except (OSError, UnicodeError) as exc:
         print("方案读取失败:", exc)
         return 2
@@ -224,7 +228,8 @@ def cmd_judge(args: argparse.Namespace) -> int:
         from .judge import build_judge_batch
 
         written = _emit_json(
-            build_judge_batch(text), getattr(args, "output", None)
+            build_judge_batch(text, request=request, evidence=evidence),
+            getattr(args, "output", None)
         )
         return 0 if written else 2
 
@@ -248,6 +253,9 @@ def cmd_judge(args: argparse.Namespace) -> int:
             config=review_config,
             reviewed_at=getattr(args, "reviewed_at", None),
             review_method=getattr(args, "review_method", None),
+            plan=text,
+            request=request,
+            evidence=evidence,
         )
     except (ValueError, OSError, json.JSONDecodeError) as exc:
         print("维度分解析失败:", exc)
@@ -271,6 +279,8 @@ def cmd_judge(args: argparse.Namespace) -> int:
 
     if not _emit_json(payload, getattr(args, "output", None)):
         return 2
+    if report.status == "blocked":
+        return 1
     if report.score is None:
         return 2
     return 0 if report.status == "passed" else 1
@@ -356,6 +366,8 @@ def main(argv: list[str] | None = None) -> None:
         "--emit-prompts", action="store_true", help="输出独立评审 prompts"
     )
     judge_action.add_argument("--scores", help="独立宿主回填的评分 JSON")
+    judge_parser.add_argument("--request", help="用户要求与必要上下文的 UTF-8 文件")
+    judge_parser.add_argument("--evidence", help="本次来源正文/摘要与定位的 UTF-8 文件")
     judge_parser.add_argument("--samples", help="N 份蒙卡样本度量 JSON")
     judge_parser.add_argument("--threshold", type=int, default=80)
     judge_parser.add_argument("--output", help="机器可读输出文件")

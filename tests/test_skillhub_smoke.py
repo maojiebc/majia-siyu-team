@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 import json
+import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -154,6 +155,42 @@ class SkillHubBundleSmokeTests(unittest.TestCase):
             skill = route.get("skill")
             if route.get("target_type") == "bundled" and skill != "majia-siyu":
                 self.assertIn(skill, index)
+
+    def test_standalone_judge_blocks_unsupported_procurement(self) -> None:
+        documents = {
+            "answer": "十家店必须采购央厨配送系统。",
+            "request": "十家火锅店需要什么系统？",
+            "evidence": "用户未说明是否有央厨，现有系统和目标未知。",
+        }
+        paths = {}
+        for name, content in documents.items():
+            paths[name] = self.temp_root / (name + ".md")
+            paths[name].write_text(content, encoding="utf-8")
+        scores = self.temp_root / "review.json"
+        scores.write_text(json.dumps({
+            "scores": {},
+            "review_binding": {
+                name + "_sha256": hashlib.sha256(content.encode()).hexdigest()
+                for name, content in documents.items()
+            },
+            "reliability_checks": {"customer_fit": {
+                "status": "fail", "reason": "用户未说明央厨，不能断言必须采购。"}},
+        }, ensure_ascii=False), encoding="utf-8")
+        launcher = (
+            "import sys,runpy; sys.path.insert(0,sys.argv.pop(1)); "
+            "runpy.run_module('siyu_team.eval.cli',run_name='__main__')"
+        )
+        result = _run([
+            sys.executable, "-I", "-B", "-c", launcher, self.bundle / "tools",
+            "judge", paths["answer"], "--request", paths["request"],
+            "--evidence", paths["evidence"], "--scores", scores,
+            "--mode", "internal_report",
+        ], cwd=self.temp_root, env=self.env)
+        self.assertEqual(result.returncode, 1, _output(result))
+        payload = _json_object(result.stdout, "standalone Judge report")
+        self.assertEqual(payload["status"], "blocked")
+        self.assertFalse(payload["gate_passed"])
+        self.assertIsNone(payload["score"])
 
     def test_bundle_links_and_routes_pass_repository_checkers(self) -> None:
         links = _run(

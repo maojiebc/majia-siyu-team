@@ -1,5 +1,5 @@
 {
-  "content_sha256": "sha256:da123e4adef3048449c3caeacc9d2b1bc113d493b706d881a8b84df185de1e76",
+  "content_sha256": "sha256:abbeca1af3d60ff08439332081da54722a9170144fc7978e60fc1408d2335df1",
   "contract_schema_version": "1.0",
   "industry_capabilities": {
     "catering": {
@@ -48,7 +48,7 @@
       "target_type": "bundled"
     },
     "market_research": {
-      "reason": "请求涉及厂商、产品、价格或市场动态，先实时检索并生成证据快照。",
+      "reason": "先明确选型需求与材料范围；新增候选或当前动态事实须实时检索留证。",
       "skill": "siyu-market-research",
       "target_type": "bundled"
     },
