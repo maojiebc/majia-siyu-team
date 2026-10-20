@@ -97,8 +97,8 @@
 <line x1="205" y1="494" x2="205" y2="506" class="line" marker-end="url(#arrow)"/>
 <g class="coral">
   <rect x="84" y="510" width="242" height="54" rx="10"/>
-  <text x="205" y="533" text-anchor="middle" font-size="13" font-weight="600">生成前合规扫描</text>
-  <text x="205" y="551" text-anchor="middle" font-size="11">命中 COMPLIANCE_RED 就地打回</text>
+  <text x="205" y="533" text-anchor="middle" font-size="13" font-weight="600">后台事实与风险检查</text>
+  <text x="205" y="551" text-anchor="middle" font-size="11">具体问题就地修正，保留创作表达</text>
 </g>
 <line x1="205" y1="564" x2="205" y2="585" class="line" marker-end="url(#arrow)"/>
 <g class="teal">
