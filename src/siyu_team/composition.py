@@ -17,7 +17,7 @@ CAPABILITIES: dict[str, dict[str, Any]] = {
     "moments_copy": {
         "skill": "siyu-pyq", "kind": "moments_copy", "target_type": "bundled",
         "accepts": "已确认的读者、活动条件与真实素材；未确认条件保留待核",
-        "delivers": "朋友圈正文、按需配图简报与真实检查状态",
+        "delivers": "朋友圈正文与按需配图简报；真实检查状态留内部交接",
         "does_not_deliver": ["会员圈选", "擅定优惠", "自动发布", "把配图简报当成图"],
         "acceptance": ["正文符合本次范围", "事实与原材料一致", "按技能完成合规检查"],
     },

@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.8.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.8.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-majia--siyu--team-171515.svg)](https://github.com/maojiebc/majia-siyu-team)
 
@@ -10,7 +10,7 @@
 
 私域经营动作全景图（统一入口 → 按目标接力 → 执行 / 问诊 / 升级全盘诊断；动态事实先检索留证；知识 Pilot 仅离线验证）：
 
-![majia-siyu v1.8.0 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
+![majia-siyu v1.8.1 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
 
 完整框架 SVG 与源码说明见 [GitHub docs/framework.svg](https://github.com/maojiebc/majia-siyu-team/blob/main/docs/framework.svg)。
 
@@ -62,6 +62,7 @@ skillhub install siyu
 
 ## 📋 版本记录
 
+- **v1.8.1**（2026-10-20）文案与配图表达修复：先交成品，加入完整模拟示范、场景语气与常用构图。
 - **v1.8.0**（2026-10-20）同活动的朋友圈、群发、私聊按需接力，沿用已完成稿件；精简补充文案和配图方法，完整素材分析留给独立收费项目。
 - **v1.7.0**（2026-10-19）选型核验风险与平台覆盖；49条有条件知识；分渠道文案、欢迎、评论和配图简报进入执行技能。H1/H2/H3未验证。
 - **v1.6.0**（2026-10-12）Q4 至春节模板、模型出活自测与内容修正、只读档案复用；修复社区假更新与旧包提示。H1/H2/H3 未验证。

@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.8.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.8.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,12 +16,14 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.8.0 框架全局：统一入口按目标接力；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.8.1 框架全局：统一入口按目标接力；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
 </p>
 
 图中的代码约束适用于 Python 模式；纯提示模式按文档执行，不能声称已实现代码隔离。
 
 > **一张图看懂**：说真实处境 → `/siyu` 按目标安排必要步骤 → 单条内容直接交付，同一活动的朋友圈 / 群发 / 话术可接力完成 → 需要诊断、圈人或核验时先取得依据 → 真结构问题才升级全盘诊断评审。经营动作归本仓；会员指标 / SQL / 数仓请用 [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan)。
+
+v1.8.1 改善文案和配图的表达：按场景选择语气，合理使用 emoji、分组与留白；补充重新创作的完整示范和四种常用画面。先交成品，事实与风险检查在后台完成，影响使用的缺口集中说明。
 
 同一活动需要几份配套物料，可以一次说清。已有定稿沿用；只要求一条不会扩成整套。先圈人再写召回话术时，入口保留会员数据前置，缺能力或证据不会靠猜测补齐。步骤、交接与完成规则见[任务接力](plugins/siyu-core/skills/majia-siyu/references/任务接力.md)；这是由宿主执行的计划，不是自动群发或发布工具。
 
@@ -68,7 +70,7 @@
 
 | 真实处境 | 直接产出 |
 |---|---|
-| 朋友圈写到枯竭，每天从零想素材 | 按配比排好的整周朋友圈（时段、标签、合规扫描） |
+| 朋友圈写到枯竭，每天从零想素材 | 按需要交单条或整周朋友圈，配套图文思路与必要说明 |
 | 群发没人打开，活动通知越发越沉 | 栏目化群发脚本、首句 A/B、承接动作，并判断该救文案还是救机制 |
 | 新客加进来不知道第一句说什么 | 分场景欢迎语、破冰流程、高频答疑话术 |
 | 有具体私域问题，但说不清卡在哪 | 五层问诊：先判断问题是否成立，再给处方或升级全盘诊断 |
@@ -238,6 +240,7 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v1.8.1**（2026-10-20）文案先交成品，补充跨场景完整示范与实用构图，检查留在后台，保留真实业务条件。
 - **v1.8.0**（2026-10-20）同一活动的朋友圈、群发与私聊按需接力，保留前置条件、已完成稿件和整体核对；小幅补充文案与配图方法，完整素材分析留给独立收费项目。
 - **v1.7.0**（2026-10-19）选型核验履约风险与平台覆盖；49条有条件知识；朋友圈、私聊、群发、欢迎与图文设计方法进入执行技能。原始私有素材不随包分发，H1/H2/H3未验证。
 - **v1.6.0**（2026-10-12）Q4 至春节模板、模型出活自测与内容修正、只读档案复用；修复社区假更新与旧包提示。H1/H2/H3 未验证。

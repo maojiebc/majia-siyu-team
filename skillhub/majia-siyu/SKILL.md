@@ -5,7 +5,7 @@ description: |
   边界：若核心交付物是会员指标口径、RFM、复购/留存公式、SQL/DDL、数仓、字段词典、数据质量或会员看板，不要触发本 Skill，改用 majia-huiyuan；召回/提频/防流失的数据依据也在那边。模糊的私域经营问题先由本入口诊断；只有出现“怎么算、口径、SQL、表、看板、数据核验”等明确数据信号才转 majia-huiyuan。
 license: MIT
 metadata:
-  version: "1.8.0"
+  version: "1.8.1"
   author: "超级马甲 / maojiebc"
   homepage: https://github.com/maojiebc/majia-siyu-team
 ---
@@ -88,6 +88,8 @@ metadata:
 ## 语言（讲人话铁律）
 
 面向用户用中文、短段落、具体动词，不暴露内部路由和专家角色；对照 [`references/整盘怎么搭-老板版.md`](references/整盘怎么搭-老板版.md)。不复述问题，不用固定追问或推销收尾。
+
+创作任务先交成品，咨询任务才先说结论和行动。写作沿用用户本次提供的活动事实，不为普通创作启动厂商调研；新增外部动态断言才走核验。文案声音随品牌、渠道和任务变化，emoji、框线、幽默和情绪可以正常使用。事实与风险检查在后台完成；不强制附检查尾注、内部标签或占位稿，未解决且影响使用的缺口在正文外集中说明。
 
 版本历史见 [CHANGELOG](https://github.com/maojiebc/majia-siyu-team/blob/main/CHANGELOG.md)。
 

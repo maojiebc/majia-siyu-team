@@ -1,5 +1,5 @@
 <svg width="100%" viewBox="0 0 760 940" role="img" xmlns="http://www.w3.org/2000/svg">
-<title>majia-siyu v1.8.0 私域专家团架构图</title>
+<title>majia-siyu v1.8.1 私域专家团架构图</title>
 <desc>用户请求先进入统一入口和结构化 后台；动态外部事实先实时检索留证，知识条目V2 按范围隔离；与姊妹篇 majia-huiyuan 双向互指——执行内容归本团，动作的数据依据归 huiyuan；Pilot 仍只做离线盲测与人工审核，不接入后台自动系统。</desc>
 <defs>
   <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
@@ -28,7 +28,7 @@
 <text x="38" y="38" font-size="21" class="title">majia-siyu · 私域专家团</text>
 <g class="violet">
   <rect x="648" y="18" width="76" height="28" rx="14"/>
-  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.8.0</text>
+  <text x="686" y="37" text-anchor="middle" font-size="12" font-weight="600">v1.8.1</text>
 </g>
 <text x="38" y="60" font-size="12" class="muted">同一动作两半：话术素材归本入口；圈谁 / 阈值 / 力度 / 回收等数据依据交给 majia-huiyuan</text>
 
@@ -97,8 +97,8 @@
 <line x1="205" y1="494" x2="205" y2="506" class="line" marker-end="url(#arrow)"/>
 <g class="coral">
   <rect x="84" y="510" width="242" height="54" rx="10"/>
-  <text x="205" y="533" text-anchor="middle" font-size="13" font-weight="600">生成前合规扫描</text>
-  <text x="205" y="551" text-anchor="middle" font-size="11">命中 COMPLIANCE_RED 就地打回</text>
+  <text x="205" y="533" text-anchor="middle" font-size="13" font-weight="600">后台事实与风险检查</text>
+  <text x="205" y="551" text-anchor="middle" font-size="11">具体问题就地修正，保留创作表达</text>
 </g>
 <line x1="205" y1="564" x2="205" y2="585" class="line" marker-end="url(#arrow)"/>
 <g class="teal">
