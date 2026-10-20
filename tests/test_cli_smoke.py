@@ -45,6 +45,25 @@ class TestPlanCli(unittest.TestCase):
         self.assertIn("task", payload)
         self.assertIn("decision", payload)
 
+    def test_context_file_preserves_declared_outputs_and_facts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            context = Path(directory) / "context.json"
+            context.write_text(json.dumps({
+                "composition": {
+                    "deliverables": ["moments_copy", "group_message"],
+                    "confirmed_facts": {"活动规则": "由用户提供"},
+                }
+            }, ensure_ascii=False), encoding="utf-8")
+            code, out, _ = self._run([
+                "补齐已确认活动的两个渠道", "--context-file", str(context), "--no-trace",
+            ])
+            self.assertEqual(code, 0)
+            payload = json.loads(out)
+            self.assertEqual([step["skill"] for step in payload["workflow"]["steps"]],
+                             ["siyu-pyq", "siyu-qunfa"])
+            self.assertEqual(payload["task"]["context"]["composition"]["confirmed_facts"],
+                             {"活动规则": "由用户提供"})
+
     def test_missing_request_exits_2(self) -> None:
         code, _, err = self._run([])
         self.assertEqual(code, 2)

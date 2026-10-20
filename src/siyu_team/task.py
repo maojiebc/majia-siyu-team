@@ -412,6 +412,16 @@ def _infer_kind(
     return TaskKind.UNKNOWN
 
 
+def kind_signal_positions(text: str) -> dict[TaskKind, int]:
+    """Keep independent prerequisite signals even when another intent wins."""
+    positions: dict[TaskKind, int] = {}
+    for kind, pattern, _weight in _KIND_RULES:
+        match = pattern.search(text)
+        if match:
+            positions[kind] = min(positions.get(kind, match.start()), match.start())
+    return positions
+
+
 # 置信度语义：信号强度（权重归一）乘歧义系数（与次高分的差距）。
 # 差距小于该阈值视为歧义（同句命中多个意图），应触发澄清而不是猜。
 _AMBIGUITY_GAP = 0.7

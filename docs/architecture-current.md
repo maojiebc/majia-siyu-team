@@ -9,7 +9,7 @@
 | 执行面 | 当前真实入口 | 已自动验证 | 尚未闭环 |
 |---|---|---|---|
 | 插件与 SkillHub | Markdown Skill 由宿主解释执行 | 文件结构、发布版本、生成路由契约、90 条人工对照、公开知识副本一致性 | Prompt-only 不具备代码强制隔离/追踪 |
-| Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | ExecutionPlan v1、Task、路由、上下文隔离、默认 metadata Trace、严格 Corpus 与相关性装配、安装态回归 | Markdown 宿主是否真正调用 Runtime；plan 本身不执行专家 Prompt |
+| Python Runtime | `siyu-plan` / `SiyuRuntime.plan()` | ExecutionPlan 1.1、Task、单步路由与有限任务接力、上下文隔离、默认 metadata Trace、严格 Corpus 与相关性装配、安装态回归 | Markdown 宿主是否真正调用 Runtime；plan 本身不执行专家 Prompt |
 | Knowledge Pilot | `siyu-pilot` 与离线夹具 | 盲化、数据契约、Dry Run 工具、与 Runtime 共用 `KnowledgeAssembler` | H1/H2/H3 真实人工评估 |
 
 这三个执行面目前仍非同一条强制生产链：Markdown 宿主可以处于
@@ -25,6 +25,7 @@ Prompt-only 模式。知识分支已收敛为共用的 `CorpusLoader` 与 `Knowl
 
 ExecutionPlan
   ├─ 单能力路由
+  ├─ 同一目标的配套内容 → workflow 前置条件、各步产物与整体验收
   └─ 信息齐备的全盘任务 → 四官白名单上下文
 
 本地运行状态（独立组件，不由每次 plan 自动创建）
@@ -50,6 +51,8 @@ ExecutionPlan
 就宣称执行过 Runtime；Python 模式必须先用 `siyu-plan --contract-info` 完成哈希握手。
 包内的严格知识查询工具只证明 Corpus 可发现，不会把 Prompt-only 模式变成
 Python Runtime 模式。
+
+任务接力的能力和发现规则统一定义在 `src/siyu_team/composition.py`，生成总路由契约和各技能的接手契约；不新增 Agent。宿主通过本任务 `context.composition` 交接事实、假设与结果引用。程序只校验结构与依赖，不读取结果文件、不证明宿主填写的 `passed` 真实；事实改变时由宿主清除受影响结果后重规划。多渠道产物完成后仍须整体核对，完整约定见[任务接力](../plugins/siyu-core/skills/majia-siyu/references/任务接力.md)。
 
 三个执行文案 lint 与 Runtime 使用同一套 mode-aware 合规扫描器；SkillHub 随包携带
 这套最小扫描支持，因此不会在独立安装时退回另一份粗糙词表。正常序号、否定、引用、

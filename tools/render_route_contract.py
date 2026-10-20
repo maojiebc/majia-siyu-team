@@ -14,6 +14,7 @@ if str(SOURCE) not in sys.path:
     sys.path.insert(0, str(SOURCE))
 
 from siyu_team.routing import route_contract_document  # noqa: E402
+from siyu_team.composition import CAPABILITIES  # noqa: E402
 
 
 TARGETS = (
@@ -35,9 +36,29 @@ def rendered_bytes() -> bytes:
     ).encode("utf-8")
 
 
-def check_targets(expected: bytes) -> list[str]:
+def rendered_targets() -> dict[Path, bytes]:
+    targets = {target: rendered_bytes() for target in TARGETS}
+    for output, capability in CAPABILITIES.items():
+        if capability["target_type"] == "external":
+            continue
+        matches = list(
+            (ROOT / "plugins").glob(f"*/skills/{capability['skill']}/SKILL.md")
+        )
+        if len(matches) != 1:
+            raise RuntimeError(f"接手契约必须对应唯一技能：{capability['skill']}")
+        target = matches[0].parent / "references/handoff-contract.json"
+        targets[target] = (
+            json.dumps(
+                {"output": output, **capability}, ensure_ascii=False,
+                sort_keys=True, indent=2,
+            ) + "\n"
+        ).encode("utf-8")
+    return targets
+
+
+def check_targets(targets: dict[Path, bytes]) -> list[str]:
     errors: list[str] = []
-    for target in TARGETS:
+    for target, expected in targets.items():
         if not target.is_file():
             errors.append(f"缺少生成契约：{target.relative_to(ROOT)}")
         elif target.read_bytes() != expected:
@@ -49,16 +70,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="生成 Runtime/Markdown 共用路由契约")
     parser.add_argument("--check", action="store_true", help="只检查，不写文件")
     args = parser.parse_args()
-    expected = rendered_bytes()
+    targets = rendered_targets()
     if args.check:
-        errors = check_targets(expected)
+        errors = check_targets(targets)
         if errors:
             for error in errors:
                 print(f"- {error}")
             return 1
         print("路由契约生成物一致")
         return 0
-    for target in TARGETS:
+    for target, expected in targets.items():
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(expected)
         print(target.relative_to(ROOT))

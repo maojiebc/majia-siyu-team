@@ -1,0 +1,19 @@
+{
+  "acceptance": [
+    "正文符合本次范围",
+    "事实与原材料一致",
+    "按技能完成合规检查"
+  ],
+  "accepts": "已确认的读者、活动条件与真实素材；未确认条件保留待核",
+  "delivers": "朋友圈正文、按需配图简报与真实检查状态",
+  "does_not_deliver": [
+    "会员圈选",
+    "擅定优惠",
+    "自动发布",
+    "把配图简报当成图"
+  ],
+  "kind": "moments_copy",
+  "output": "moments_copy",
+  "skill": "siyu-pyq",
+  "target_type": "bundled"
+}

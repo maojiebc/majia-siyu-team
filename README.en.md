@@ -19,7 +19,7 @@
   <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.7.0 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
 </p>
 
-> **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
+> **In one glance**: describe a real situation → `/siyu` connects the necessary steps for that goal → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
 
 ---
 
@@ -54,6 +54,8 @@ Generic copy tools cover most of bucket 1. This toolbox finishes the last 20% an
 - **Continuity** — local client archives for save / resume / report
 
 The public repo ships framework, methodology, and installable Skills. Real client operating SOPs stay private.
+
+The free toolbox stays compact: a few transferable copy and image methods, plus the steps needed for one request. The full material library, case texts, and industry analysis remain in the separate paid SaaS-siyu project.
 
 ## Capability map
 

@@ -293,7 +293,7 @@ class RuntimeCacheAndConfidenceTests(unittest.TestCase):
         self.assertEqual(len(second.growth_atoms), len(first.growth_atoms))
 
     def test_low_confidence_plan_asks_for_kind(self) -> None:
-        plan = SiyuRuntime().plan("写朋友圈和群发通知", trace=False)
+        plan = SiyuRuntime().plan("写朋友圈还是写群发通知", trace=False)
         self.assertTrue(plan.decision.needs_clarification)
         self.assertIn("kind", plan.decision.required_fields)
         self.assertLess(plan.decision.confidence, 0.6)
