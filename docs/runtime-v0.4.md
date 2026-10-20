@@ -1,5 +1,7 @@
 # v0.4.0 Runtime 架构说明（含 v1.4.2 稳定化注记）
 
+> 同一任务接力迭代新增 ExecutionPlan/路由契约 1.1：`workflow` 表达多个产物、前置依赖和完成状态；`decision` 保留当前应处理的一步。通过 `--context-file` 提供本任务的交接事实与实际结果引用。详见[任务接力](../plugins/siyu-core/skills/majia-siyu/references/任务接力.md)。以下“唯一一步”描述是早期单任务路由背景，不代表接力只能交付一份产物。
+
 > 本文保留 v0.4.0 引入结构化 Runtime 时的设计背景。以下运行状态、追踪与
 > Prompt 安全描述已按 v1.4.2 的当前实现校正；最新能力边界仍以
 > [`architecture-current.md`](architecture-current.md) 和

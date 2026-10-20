@@ -8,6 +8,7 @@ from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any, Mapping
 
+from .composition import build_workflow, next_step
 from .context import AgentContext, build_agent_context
 from .knowledge.assembler import KnowledgeAssembler
 from .knowledge.growth_layers import describe_growth_load
@@ -20,7 +21,7 @@ from .tracing import TraceRecorder
 
 # 内置四官（roster 缺失/损坏时的回退名单；正常路径从 roster 读取）。
 PANEL_OFFICERS = ("公关官", "产品官", "广告官", "合规官")
-PLAN_SCHEMA_VERSION = "1.0"
+PLAN_SCHEMA_VERSION = "1.1"
 EMPTY_CORPUS_HASH = (
     "sha256:e3b0c44298fc1c149afbf4c8996fb924"
     "27ae41e4649b934ca495991b7852b855"
@@ -43,6 +44,7 @@ class ExecutionPlan:
     agent_contexts: tuple[AgentContext, ...] = ()
     growth_atoms: tuple[dict[str, Any], ...] = ()
     growth_load_note: str = ""
+    workflow: Mapping[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         knowledge = dict(
@@ -67,6 +69,7 @@ class ExecutionPlan:
             ],
             "growth_atoms": [dict(row) for row in self.growth_atoms],
             "growth_load_note": self.growth_load_note,
+            "workflow": dict(self.workflow) if self.workflow is not None else None,
         }
 
 
@@ -116,7 +119,33 @@ class SiyuRuntime:
         trace: bool = True,
     ) -> ExecutionPlan:
         task = parse_task(request, hints)
+        workflow = build_workflow(task, infer=not (hints and "kind" in hints))
+        step = next_step(workflow) if workflow else None
+        if step:
+            task = replace(task, kind=TaskKind(step["kind"]), confidence=None)
         decision = route_task(task)
+        if workflow and step is None:
+            decision = replace(
+                decision, skill="majia-siyu",
+                needs_clarification=workflow["status"] == "blocked",
+                required_fields=(
+                    ("workflow.delivery_review",)
+                    if workflow["status"] == "blocked" else ()
+                ),
+                reason=(
+                    "请求的产物已完成，交付后结束。"
+                    if workflow["status"] == "complete"
+                    else "整体核对未通过，先按原条件修正产物。"
+                    if workflow["status"] == "blocked"
+                    else "各项产物已完成，入口按原条件做跨渠道一致性核对。"
+                ),
+            )
+        if workflow and step and step["status"] == "blocked":
+            decision = replace(
+                decision, needs_clarification=True,
+                required_fields=(f"workflow.{step['id']}",),
+                reason=step["reason"],
+            )
         trace_id = self.trace_recorder.new_trace_id()
 
         selection = self._knowledge_assembler.assemble(task, decision)
@@ -188,6 +217,7 @@ class SiyuRuntime:
             agent_contexts=contexts,
             growth_atoms=growth_atoms,
             growth_load_note=growth_note,
+            workflow=workflow,
         )
         if trace:
             self.trace_recorder.emit(

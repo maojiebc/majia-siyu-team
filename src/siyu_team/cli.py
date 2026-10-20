@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 import sys
 from typing import Sequence
 
@@ -55,6 +56,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--client", default="")
     parser.add_argument("--audience", default="")
+    parser.add_argument(
+        "--context-file", type=Path,
+        help="读取本任务的 JSON context（可含 composition 交接事实及结果引用）",
+    )
     trace_group = parser.add_mutually_exclusive_group()
     trace_group.add_argument("--no-trace", action="store_true")
     trace_group.add_argument(
@@ -147,6 +152,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         if value
     }
     try:
+        if args.context_file:
+            if args.context_file.stat().st_size > 128 * 1024:
+                raise TaskValidationError("context 文件不能超过 128 KiB")
+            try:
+                context = json.loads(args.context_file.read_text(encoding="utf-8"))
+            except (ValueError, OSError) as exc:
+                raise TaskValidationError(f"context 文件无法读取为 JSON：{exc}") from exc
+            if not isinstance(context, dict):
+                raise TaskValidationError("context 文件必须是 JSON 对象")
+            hints["context"] = context
         runtime = SiyuRuntime(
             trace_recorder=TraceRecorder(
                 args.trace_dir,

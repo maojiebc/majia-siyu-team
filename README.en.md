@@ -1,6 +1,6 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.7.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.8.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,10 +16,10 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.7.0 architecture: one entry picks the current step; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.8.0 architecture: one entry connects the necessary steps; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
 </p>
 
-> **In one glance**: describe a real situation → `/siyu` picks only the current step → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
+> **In one glance**: describe a real situation → `/siyu` connects the necessary steps for that goal → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
 
 ---
 
@@ -54,6 +54,8 @@ Generic copy tools cover most of bucket 1. This toolbox finishes the last 20% an
 - **Continuity** — local client archives for save / resume / report
 
 The public repo ships framework, methodology, and installable Skills. Real client operating SOPs stay private.
+
+The free toolbox stays compact: a few transferable copy and image methods, plus the steps needed for one request. The full material library, case texts, and industry analysis remain in the separate paid SaaS-siyu project.
 
 ## Capability map
 
@@ -159,6 +161,7 @@ Feishu is intake + human review only — not a runtime source. No auto-approval,
 
 ## Version history
 
+- **v1.8.0** (2026-10-20): Bounded handoffs for related campaign copy, prerequisite checks, completed drafts and final consistency review. Focused copy and image guidance; the complete material library stays in the separate paid project.
 - **v1.7.0** (2026-10-19): Evidence-based vendor selection, platform coverage, 49 conditional knowledge atoms, and channel-specific copy and visual briefs. H1/H2/H3 remain Not Evaluated.
 - **v1.6.0** (2026-10-12): Seasonal catering templates, prompt-only self-tests and content fixes, optional read-only client context; community date stability and clearer stale-bundle checks. H1/H2/H3 remain Not Evaluated.
 - **v1.5.0** (2026-09-14): Store membership execution and scenario retrieval; 41 curated rules, with six scenarios checked in source, wheel and SkillHub packages.

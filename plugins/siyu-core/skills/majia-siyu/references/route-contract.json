@@ -1,6 +1,177 @@
 {
-  "content_sha256": "sha256:abbeca1af3d60ff08439332081da54722a9170144fc7978e60fc1408d2335df1",
-  "contract_schema_version": "1.0",
+  "composition": {
+    "capabilities": {
+      "diagnosis": {
+        "acceptance": [
+          "区分事实与假设",
+          "明确 proceed/stop/revise 及理由"
+        ],
+        "accepts": "原始问题、可用证据与执行约束",
+        "delivers": "有依据的诊断、未证实解释及后续动作是否成立",
+        "does_not_deliver": [
+          "以群内沉默认定流失",
+          "把假设当事实",
+          "自动发券"
+        ],
+        "gate": true,
+        "kind": "diagnosis",
+        "skill": "siyu-wenzhen",
+        "target_type": "bundled"
+      },
+      "dm_script": {
+        "acceptance": [
+          "回答当前问题",
+          "沿用真实权益与人群条件",
+          "按技能完成合规检查"
+        ],
+        "accepts": "真实客户问题与服务边界；圈人任务须先有可用人群依据",
+        "delivers": "欢迎、私聊或答疑话术及必要的转人工条件",
+        "does_not_deliver": [
+          "猜测目标会员",
+          "虚构权益",
+          "自动联系顾客"
+        ],
+        "kind": "conversation_script",
+        "skill": "siyu-huashu",
+        "target_type": "bundled"
+      },
+      "group_message": {
+        "acceptance": [
+          "触达范围与限制明确",
+          "事实与原材料一致",
+          "按技能完成合规检查"
+        ],
+        "accepts": "已确认的活动条件、目标群与触达约束",
+        "delivers": "群发或群内推送正文及必要承接",
+        "does_not_deliver": [
+          "改变活动规则",
+          "擅自群发",
+          "假定统一发送时刻"
+        ],
+        "kind": "group_campaign",
+        "skill": "siyu-qunfa",
+        "target_type": "bundled"
+      },
+      "market_evidence": {
+        "acceptance": [
+          "结论不超过证据",
+          "明确 proceed/stop/revise 及适用范围"
+        ],
+        "accepts": "需要核验的动态事实或用户给定的选型材料",
+        "delivers": "标明来源、日期、冲突与未知的证据快照",
+        "does_not_deliver": [
+          "无联网时新增厂商事实",
+          "把材料初筛当采购批准"
+        ],
+        "gate": true,
+        "kind": "market_research",
+        "skill": "siyu-market-research",
+        "target_type": "bundled"
+      },
+      "membership_audience": {
+        "acceptance": [
+          "口径和时间窗明确",
+          "保留来源与排除条件",
+          "明确 proceed/stop/revise"
+        ],
+        "accepts": "已授权的数据、消费时间窗、会员口径与排除条件",
+        "delivers": "有数据依据的会员口径、人群规则或结果及其适用条件",
+        "does_not_deliver": [
+          "缺数据时编造名单",
+          "替代触达授权",
+          "编写渠道文案"
+        ],
+        "gate": true,
+        "kind": "membership_data",
+        "skill": "majia-huiyuan",
+        "target_type": "external"
+      },
+      "moments_copy": {
+        "acceptance": [
+          "正文符合本次范围",
+          "事实与原材料一致",
+          "按技能完成合规检查"
+        ],
+        "accepts": "已确认的读者、活动条件与真实素材；未确认条件保留待核",
+        "delivers": "朋友圈正文、按需配图简报与真实检查状态",
+        "does_not_deliver": [
+          "会员圈选",
+          "擅定优惠",
+          "自动发布",
+          "把配图简报当成图"
+        ],
+        "kind": "moments_copy",
+        "skill": "siyu-pyq",
+        "target_type": "bundled"
+      }
+    },
+    "delivery_checks": [
+      "按原始任务交齐要求的产物，不增加用户未要求的渠道",
+      "多渠道的价格、权益、适用对象、时间和限制一致，冲突未解不得标完成",
+      "不把待核稿、配图简报、模型自检或检查通过写成已发布、已出图或经营见效"
+    ],
+    "discovery": {
+      "action": "写|生成|制作|补|起草|改写|重写|给.{0,6}(?:一|两|三|几|份|条)",
+      "audience": "(?:会员|消费记录|人群).{0,24}(?:圈选|圈出|筛选|分层)|(?:圈选|圈出|筛选).{0,16}(?:会员|人群)",
+      "choice": "还是|或者|二选一|哪个|哪种",
+      "clause_split": "[，,。！？!?；;\\n]|(?=只(?:写|补|做|要))|(?:但|不过|只是)(?=(?:不要|不用|无需|不必|不需要|暂不|别))",
+      "content": {
+        "dm_script": "私聊|答疑|话术|欢迎语|破冰",
+        "group_message": "群发|群公告|群内推送|社群推送",
+        "moments_copy": "朋友圈|发圈"
+      },
+      "diagnosis_gate": "先.{0,16}(?:诊断|核实|判断)|(?:诊断|判断).{0,24}(?:再|然后|之后|据此)",
+      "diagnosis_request": "(?:请|帮我|先|需要).{0,5}诊断",
+      "finished": "(?:已经|已)(?:完成|定稿|写好)|已有.{0,8}(?:定稿|成稿)",
+      "list_remainder": "^(?:通知|文案|脚本|稿件|正文|各|每|一|两|三|份|条|都|也|以及|和|与|、|\\s)*$",
+      "negative": "(?:不要|不用|无需|不必|不需要|暂不|别)(?:再|帮我)?(?:写(?!得|太|过于|那么|这么|很)|做(?!得|太)|生成|补|制作|圈选|圈出|筛选|分层|诊断|调查|核验|朋友圈|群发|私聊|话术)",
+      "past_action": "写(?:过|了|好|完)|(?:已经|已).{0,4}写",
+      "specific_dm": "私聊|答疑|欢迎语|破冰"
+    },
+    "execution": "sequential",
+    "gate_dispositions": [
+      "proceed",
+      "stop",
+      "revise"
+    ],
+    "handoff": {
+      "confirmed_facts": "task.context.composition.confirmed_facts",
+      "constraints": "task.constraints",
+      "hypotheses": "task.context.composition.hypotheses",
+      "original_request": "task.source_text",
+      "upstream_results": "task.context.composition.results"
+    },
+    "input_keys": [
+      "available_skills",
+      "confirmed_facts",
+      "deliverables",
+      "delivery_review",
+      "hypotheses",
+      "prerequisites",
+      "results"
+    ],
+    "input_path": "task.context.composition",
+    "result_statuses": [
+      "passed",
+      "failed"
+    ],
+    "rules": [
+      "优先使用宿主按用户真实要求声明的 deliverables 与 prerequisites；未知输出报错。",
+      "无内容交付且未声明接力时保持单步，优先沿用既有市场核验或会员数据路由；其余明确诊断只做诊断。",
+      "显式 kind 不重新猜测其他意图；对应单项内容仍沿用已核验结果，不重复生成。",
+      "自动发现只采用有创作动词或承接同一动词的渠道列表，排除否定及已完成分句；比较渠道不生成多个稿件。",
+      "各前置信号独立保留，不能只看最高分意图；按用户原文顺序加入，已核验市场快照沿用原豁免。",
+      "动态事实仍先核验；prerequisites 依次执行，渠道产物依赖全部前置结果。",
+      "已有 passed 结果须有 artifact 引用；前置结果还须有 disposition。",
+      "外部能力须由宿主确认可用；缺失时阻断该步及依赖它的后续步骤。",
+      "passed 只记录宿主核验结果；程序不读取引用文件，不验证结果真实性。",
+      "分支失败不阻断无依赖分支；全部结果通过且跨渠道核对通过才能标 complete。",
+      "不自动创建 Agent、发送、发布或持久存档；满足当前目标即结束。"
+    ],
+    "version": "1.0"
+  },
+  "content_sha256": "sha256:ff48c8f43147bab40d57017c1a577f78339aa9006385e0e4a5030a8105a57f74",
+  "contract_schema_version": "1.1",
   "industry_capabilities": {
     "catering": {
       "industry_book": "knowledge/02-industry/catering/",

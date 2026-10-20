@@ -2,7 +2,7 @@
 name: reactivation-playbook
 description: 私域社群促活方法论库，含沉默用户分层、唤醒路径、三端话术模板、活动节奏表与转化口径。Use this skill when 设计社群促活方案、唤醒沉默用户、排活动节奏、或需要可直接群发的促活话术时。
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 ---
 
 # 沉默用户唤醒与社群促活 Playbook（社群促活官）
@@ -70,5 +70,5 @@ python3 tools/atoms_query.py --file knowledge/04-atoms/growth-layers.approved.js
 
 输入 `/siyu`。
 
-这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
-并直接路由到对应 skill。迷路了就回 `/siyu`。
+这是私域工具箱的导航入口。它会沿用已有事实和产物，按当前目标安排必要的步骤，
+并在当前对话继续完成。迷路了就回 `/siyu`。

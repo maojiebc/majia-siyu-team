@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/maojiebc/majia-siyu-team/raw/main/schemas/execution-plan-v1.schema.json",
-  "title": "ExecutionPlan v1",
+  "title": "ExecutionPlan v1.1",
   "description": "Contract for a Siyu execution plan produced by the Python runtime or the prompt-only fallback.",
   "type": "object",
   "required": [
@@ -11,11 +11,12 @@
     "task",
     "decision",
     "knowledge",
-    "warnings"
+    "warnings",
+    "workflow"
   ],
   "properties": {
     "plan_schema_version": {
-      "const": "1.0"
+      "const": "1.1"
     },
     "runtime_mode": {
       "type": "string",
@@ -129,6 +130,58 @@
     },
     "growth_load_note": {
       "type": "string"
+    },
+    "workflow": {
+      "description": "Host-executed composition plan, or null for legacy single-route workflows. No model invocation is implied.",
+      "type": ["object", "null"],
+      "required": ["version", "execution", "status", "steps", "delivery_checks"],
+      "properties": {
+        "version": {"const": "1.0"},
+        "execution": {"const": "sequential"},
+        "status": {"enum": ["planned", "blocked", "awaiting_review", "complete"]},
+        "delivery_checks": {"type": "array", "items": {"type": "string"}},
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id", "output", "skill", "kind", "target_type", "depends_on",
+              "status", "reason", "acceptance", "handoff"
+            ],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "output": {"type": "string", "minLength": 1},
+              "skill": {"type": "string", "minLength": 1},
+              "kind": {"type": "string", "minLength": 1},
+              "target_type": {"enum": ["bundled", "external"]},
+              "depends_on": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+              "status": {"enum": ["ready", "waiting", "blocked", "complete"]},
+              "reason": {"type": "string"},
+              "acceptance": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+              "handoff": {
+                "type": "object",
+                "required": [
+                  "original_request", "constraints", "confirmed_facts",
+                  "hypotheses", "upstream_results", "upstream_outputs", "deliverable"
+                ],
+                "properties": {
+                  "original_request": {"type": "string"},
+                  "constraints": {"type": "string"},
+                  "confirmed_facts": {"type": "string"},
+                  "hypotheses": {"type": "string"},
+                  "upstream_results": {"type": "string"},
+                  "upstream_outputs": {"type": "array", "items": {"type": "string"}},
+                  "deliverable": {"type": "string"}
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

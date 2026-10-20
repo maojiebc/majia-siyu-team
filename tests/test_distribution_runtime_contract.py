@@ -193,9 +193,10 @@ class GeneratedRouteContractTests(unittest.TestCase):
                 "industry_capabilities",
                 "stages",
                 "required_fields",
+                "composition",
             },
         )
-        self.assertEqual(document["contract_schema_version"], "1.0")
+        self.assertEqual(document["contract_schema_version"], "1.1")
 
     def test_rendered_contracts_are_byte_identical_and_current(self) -> None:
         plugin_bytes = PLUGIN_CONTRACT.read_bytes()
@@ -231,7 +232,7 @@ class GeneratedRouteContractTests(unittest.TestCase):
 
 class ExecutionPlanContractTests(unittest.TestCase):
     def test_runtime_modes_and_schema_version_are_stable(self) -> None:
-        self.assertEqual(PLAN_SCHEMA_VERSION, "1.0")
+        self.assertEqual(PLAN_SCHEMA_VERSION, "1.1")
         self.assertEqual(RuntimeMode.PYTHON.value, "python")
         self.assertEqual(RuntimeMode.PROMPT_ONLY.value, "prompt_only")
 
@@ -253,6 +254,7 @@ class ExecutionPlanContractTests(unittest.TestCase):
             "agent_contexts",
             "growth_atoms",
             "growth_load_note",
+            "workflow",
         }
         self.assertEqual(set(payload), expected_top_level)
         self.assertEqual(payload["plan_schema_version"], PLAN_SCHEMA_VERSION)

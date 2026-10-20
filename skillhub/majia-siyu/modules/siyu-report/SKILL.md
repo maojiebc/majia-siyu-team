@@ -4,7 +4,7 @@ description: |
   合并同一客户的多份本地存档，生成经过合规扫描的可交付 markdown 私域咨询报告。
   触发方式：/siyu-report、/出报告、「打包」「整理一份」「给老板或客户看」；支持 --client 和 --since。
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 ---
 
 # siyu-report：客户咨询报告
@@ -102,5 +102,5 @@ PYTHONPATH=src python3 -m siyu_team.eval.cli score "{报告路径}" --threshold 
 
 输入 `/siyu`。
 
-这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
-并直接路由到对应 skill。迷路了就回 `/siyu`。
+这是私域工具箱的导航入口。它会沿用已有事实和产物，按当前目标安排必要的步骤，
+并在当前对话继续完成。迷路了就回 `/siyu`。

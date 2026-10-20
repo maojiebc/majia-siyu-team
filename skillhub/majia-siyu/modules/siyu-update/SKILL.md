@@ -4,7 +4,7 @@ description: |
   更新私域专家团。用户说「更新私域专家团」「升级 siyu」「检查并安装最新版」或输入 /siyu-update 时使用。
   只同步 maojiebc/majia-siyu-team，不修改 ~/.siyu/ 客户档案，不更新其他 skill。
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 ---
 
 # siyu-update：更新私域专家团
@@ -61,5 +61,5 @@ npx -y skills add ~/Projects/majia-siyu-team -g --all
 
 输入 `/siyu`。
 
-这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
-并直接路由到对应 skill。迷路了就回 `/siyu`。
+这是私域工具箱的导航入口。它会沿用已有事实和产物，按当前目标安排必要的步骤，
+并在当前对话继续完成。迷路了就回 `/siyu`。

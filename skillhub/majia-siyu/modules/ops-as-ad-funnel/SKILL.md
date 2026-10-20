@@ -2,7 +2,7 @@
 name: ops-as-ad-funnel
 description: 运营即广告投放（漏斗/埋点）。Use this skill when 把运营动作设计成自带传播/转化的漏斗、做埋点时。
 metadata:
-  version: "1.7.0"
+  version: "1.8.0"
 ---
 
 # 运营即广告投放（漏斗/埋点）
@@ -53,5 +53,5 @@ python3 tools/atoms_query.py --file modules/_knowledge/04-atoms/growth-layers.ap
 
 输入 `/siyu`。
 
-这是私域工具箱的导航入口。它会读取刚才的具体结论，选择当前最值得处理的一个方向，
-并直接路由到对应 skill。迷路了就回 `/siyu`。
+这是私域工具箱的导航入口。它会沿用已有事实和产物，按当前目标安排必要的步骤，
+并在当前对话继续完成。迷路了就回 `/siyu`。

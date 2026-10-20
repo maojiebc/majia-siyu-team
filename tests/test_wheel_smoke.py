@@ -212,7 +212,7 @@ class WheelInstallSmokeTests(unittest.TestCase):
         _require_success(result, "已安装 siyu-plan")
         payload = _json_object(result.stdout, "已安装 siyu-plan 输出")
         self.assertEqual(payload.get("runtime_mode"), "python")
-        self.assertEqual(payload.get("plan_schema_version"), "1.0")
+        self.assertEqual(payload.get("plan_schema_version"), "1.1")
         knowledge = payload.get("knowledge")
         self.assertIsInstance(knowledge, dict)
         assert isinstance(knowledge, dict)
@@ -234,7 +234,7 @@ class WheelInstallSmokeTests(unittest.TestCase):
         )
         _require_success(result, "已安装 siyu-plan --contract-info")
         payload = _json_object(result.stdout, "contract info")
-        self.assertEqual(payload.get("plan_schema_version"), "1.0")
+        self.assertEqual(payload.get("plan_schema_version"), "1.1")
         self.assertRegex(
             str(payload.get("route_contract_hash", "")),
             r"^sha256:[0-9a-f]{64}$",

@@ -10,6 +10,7 @@ import hashlib
 import json
 from typing import Any
 
+from .composition import composition_contract
 from .task import (
     CONFIDENCE_CLARIFY_THRESHOLD,
     Task,
@@ -45,7 +46,7 @@ STAGE_FOCUS = {
     "mature": "先解决『规模化裂变 + 会员体系』：合规裂变机制、会员等级、案例复制。",
 }
 
-ROUTE_CONTRACT_VERSION = "1.0"
+ROUTE_CONTRACT_VERSION = "1.1"
 EXTERNAL_ROUTE_TARGETS = frozenset({"majia-huiyuan"})
 
 TASK_ROUTES: dict[TaskKind, tuple[str, str]] = {
@@ -109,6 +110,7 @@ def route_contract_payload() -> dict[str, Any]:
     """Build the hashable prompt-only route contract from Runtime constants."""
     return {
         "contract_schema_version": ROUTE_CONTRACT_VERSION,
+        "composition": composition_contract(),
         "task": task_routing_contract(),
         "routes": {
             kind.value: {

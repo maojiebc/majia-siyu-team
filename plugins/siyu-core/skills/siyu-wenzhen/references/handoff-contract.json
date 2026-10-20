@@ -1,0 +1,18 @@
+{
+  "acceptance": [
+    "区分事实与假设",
+    "明确 proceed/stop/revise 及理由"
+  ],
+  "accepts": "原始问题、可用证据与执行约束",
+  "delivers": "有依据的诊断、未证实解释及后续动作是否成立",
+  "does_not_deliver": [
+    "以群内沉默认定流失",
+    "把假设当事实",
+    "自动发券"
+  ],
+  "gate": true,
+  "kind": "diagnosis",
+  "output": "diagnosis",
+  "skill": "siyu-wenzhen",
+  "target_type": "bundled"
+}

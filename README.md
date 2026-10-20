@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.7.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v1.8.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -16,12 +16,14 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.7.0 框架全局：统一入口先选当前一步；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
+  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.8.0 框架全局：统一入口按目标接力；动态事实先检索留证；结构问题才升级全盘诊断；知识试验只做离线验证">
 </p>
 
 图中的代码约束适用于 Python 模式；纯提示模式按文档执行，不能声称已实现代码隔离。
 
-> **一张图看懂**：说真实处境 → `/siyu` 只选当前最该做的一步 → 高频任务直接写朋友圈 / 群发 / 话术（边写边合规）→ 真结构问题才升级全盘诊断评审 → 结论可存档、可续聊、可出报告。经营动作归本仓；会员指标 / SQL / 数仓请用 [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan)。
+> **一张图看懂**：说真实处境 → `/siyu` 按目标安排必要步骤 → 单条内容直接交付，同一活动的朋友圈 / 群发 / 话术可接力完成 → 需要诊断、圈人或核验时先取得依据 → 真结构问题才升级全盘诊断评审。经营动作归本仓；会员指标 / SQL / 数仓请用 [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan)。
+
+同一活动需要几份配套物料，可以一次说清。已有定稿沿用；只要求一条不会扩成整套。先圈人再写召回话术时，入口保留会员数据前置，缺能力或证据不会靠猜测补齐。步骤、交接与完成规则见[任务接力](plugins/siyu-core/skills/majia-siyu/references/任务接力.md)；这是由宿主执行的计划，不是自动群发或发布工具。
 
 ---
 
@@ -59,6 +61,8 @@
 - **结论可接力**：本地客户档案存 / 续 / 出报告，下次不用重讲一遍  
 
 > 本仓开源的是框架、方法论与可安装 Skill；真实客户操盘 SOP 属作者私有，不在公开库。
+
+免费版保持小而美：文案、配图只吸收少量可迁移方法，同一任务按需接力。完整素材库、案例全文和行业分析体系留给独立收费项目 SaaS-siyu。
 
 ## 解决什么问题
 
@@ -234,6 +238,7 @@ PYTHONPATH=src python3 -m siyu_team.cli "群发三轮没人打开，问题出在
 
 ## 📋 版本记录
 
+- **v1.8.0**（2026-10-20）同一活动的朋友圈、群发与私聊按需接力，保留前置条件、已完成稿件和整体核对；小幅补充文案与配图方法，完整素材分析留给独立收费项目。
 - **v1.7.0**（2026-10-19）选型核验履约风险与平台覆盖；49条有条件知识；朋友圈、私聊、群发、欢迎与图文设计方法进入执行技能。原始私有素材不随包分发，H1/H2/H3未验证。
 - **v1.6.0**（2026-10-12）Q4 至春节模板、模型出活自测与内容修正、只读档案复用；修复社区假更新与旧包提示。H1/H2/H3 未验证。
 - **v1.5.0**（2026-09-14）门店会员执行知识与场景检索；41 条严格知识随包分发；补齐六场景安装验证，更新发布和使用说明。
