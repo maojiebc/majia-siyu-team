@@ -93,7 +93,7 @@
           "按技能完成合规检查"
         ],
         "accepts": "已确认的读者、活动条件与真实素材；未确认条件保留待核",
-        "delivers": "朋友圈正文、按需配图简报与真实检查状态",
+        "delivers": "朋友圈正文与按需配图简报；真实检查状态留内部交接",
         "does_not_deliver": [
           "会员圈选",
           "擅定优惠",
@@ -170,7 +170,7 @@
     ],
     "version": "1.0"
   },
-  "content_sha256": "sha256:ff48c8f43147bab40d57017c1a577f78339aa9006385e0e4a5030a8105a57f74",
+  "content_sha256": "sha256:544f98c0979a99e91938bda3ddfe958903ca068821b59e4eb118b723aafb4de4",
   "contract_schema_version": "1.1",
   "industry_capabilities": {
     "catering": {
