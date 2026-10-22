@@ -1,0 +1,77 @@
+[
+  {"id": "hotpot_unknown", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "第一句就给结论“不用先上一整套系统”，再按“客人不回头/备货浪费/对账麻烦”把痛点对到会员、库存、报表三块，不报厂商名，最后只问一个最头疼的问题，老板一眼能用。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "“把收银、团购系统的合同或后台翻一遍，列出已有功能”很实在，但篇幅压在会员和联系顾客上，火锅最常卡的进货库存没提，咨询经历叙述偏长。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "六类系统列得全，点出火锅“食材多、损耗大”供应链值得做，但整体像通用清单，最后一次抛四个问题，老板读完还是不知道先动哪块。"}
+  }, "preferred": ["A"]},
+  {"id": "vendor_risk", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "表格一屏看清两家差距，还挑出“甲主体存续没附来源”“乙存续只是自家官网写的”，试用四项每项都写了过关标准，来源逐条带日期。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "结论先行，“没查不等于没有”“乙材料讲的是工具和报表，有没有人帮你做运营没写”正好接住用户“只缺复购运营”，五项试用过关标准做成表很好用。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "初筛判断和补材料清单都对，“问清资金是否经过它的账户”很老练，但把甲“外卖订单和企微身份不能关联”引申成“企微里的人对不上消费记录”略有扩大，也没标乙存续是自述。"}
+  }, "preferred": ["A", "B"]},
+  {"id": "platform_coverage", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "三类候选、同一条“团购下单→核销→入会或加企微→再来”逐段试、拆开“平台资源”都很清楚，但“平台方案不自动排在独立厂商前面”没回应用户自己说的优先考虑公域资源。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "找候选渠道（问同城老板、让收银服务商列已对接名单、看平台服务市场）和统一演示剧本都很能落地，还提醒按三年算总账，但四步写得太长，老板要翻很久才看到比较表。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "“平台资源优先看，但要查得到、试得出才算分”既尊重用户偏好又不默认美团，“自愿入会”“没查到不等于没有”这些边界说清，篇幅也比B紧。"}
+  }, "preferred": ["C"]},
+  {"id": "existing_stack", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 4, "reason": "分工和时间排得清楚、先试2-3家，但“欢迎语自动发券”“回头券核销在收银系统里查”默认企微和收银能打通，这正是题目不知道的地方。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "每店单独做团购客加好友码、欢迎语里放“下次到店出示这条消息送冰粉”，不依赖跨系统打通就能分清是团购客，还提醒“回来的人有些本来也会来”。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "先定每月好处上限、“收银发不了批次券就在企微备注团购＋日期”接住了打通不确定，“高峰排队就挪到离店前说”很实在，但没给分辨团购客的码，店长每天数“加上几位”不好分。"}
+  }, "preferred": ["B"]},
+  {"id": "quiet_groups", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 3, "reason": "列了关群条件和毛利算法，但结尾“现在这几条都不成立，先留着”在没有成本、毛利、老客对照数据时直接下了结论。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "“能说明/说明不了”分得清，告示牌比喻好懂，“真要关先在群里说清以后去哪找你们”很周到，但没让记维护成本，关群条件里缺算账这一条。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "既说“先别关”，又提醒“别把这些单全算成群带来的”，还让店长顺手记维护时间和让出去的钱，关群条件里有“券钱加人工超过毛利”，最贴合不加投入只想判断的诉求。"}
+  }, "preferred": ["C"]},
+  {"id": "simple_copy", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "“酸梅汤我们请～”开头自然，日期时段、本店堂食每桌一份、现场送不用领券、不叠加全部带上且没加条件，emoji分行一眼看完。"},
+    "B": {"critical_errors": 0, "usefulness": 3, "reason": "条件齐全、字数合规，但整段一行没有emoji，群里刷过去不抓眼。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "“明晚来涮锅，酸梅汤我们请～”贴火锅口吻，条件一条不落也没多加，emoji排版好读。"}
+  }, "preferred": ["A", "C"]},
+  {"id": "cashier_reluctant", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "“把扫码挪出收银那几秒：排队的地方放同样的牌子”直接解高峰排队，奖励按“加上且没马上删、同一人只算一次”，还用“如果你们是吃完才结账”兼顾了不知道的业态。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "把总部给什么、加盟商自己定什么分开写，“总部不替他们承诺”接住了两层结构，话术短到一口气说完，按店码先帮没动起来的店。"},
+    "C": {"critical_errors": 1, "usefulness": 3, "reason": "提醒加盟商在意顾客加的是不是自己店的账号很有见地，但“等锅开”“服务员上锅底时说一句”把用户没说的业态当成火锅，整套方案建在餐桌上。"}
+  }, "preferred": ["A", "B"]},
+  {"id": "store_leaderboard", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "加微率、7天留存、分组和进步榜都给了，还建议拉提议的店长一起定规则，但偏通用清单，没讲排出来以后先去帮垫底的店。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "“3000单加300是10%，600单加90是15%”一个例子讲透为什么改比例，规则先写死“加上没马上删才算”，并点明“榜单比的是拉人，不是门店业绩”。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "用四个问题评估提议，口径、公平、用途、防刷都覆盖，“选址、生意不行的加微救不了”“别拿这个榜评门店经营”说得到位。"}
+  }, "preferred": ["B", "C"]},
+  {"id": "franchise_member_day", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "“如果折扣全由总部出你愿意参加吗”这一问能分开钱和非钱的阻力，算账、单聊、小试三步完整，但问题清单和应对清单较长。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "“多卖40单却让了240单”把熟客吃掉折扣讲得直观，“分摊比例谈定前不能算成他们已经答应”，结尾问清折扣现在谁出，很有实战感。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "每家问三个“如果……你参加吗”，哪个让他改口就是主要阻力，判断方法最利落，还提醒“问完给不了比不问更伤信任”。"}
+  }, "preferred": ["C"]},
+  {"id": "recall_all_30d", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "按“比他自己平时久没来”分三拨，对一个月来一次的人不发券，留对照组、排除拒收和投诉未处理的，并给了算不出个人间隔时按半年次数粗分的退路。"},
+    "B": {"critical_errors": 1, "usefulness": 3, "reason": "留10%-20%对照和算账都好，但“半年4次以上30天没来就召回、2-3次等60天”和自己说的按个人节奏矛盾，半年4次的人30天没来本来就正常，照做会把券发给本来要来的人。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "分三拨和A一样准，额外排除“最近刚联系过的”、提醒没回来先查券到没到，结尾问能否按会员拉出消费日期，下一步很清楚。"}
+  }, "preferred": ["A", "C"]},
+  {"id": "franchise_coupon_cost", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "点破“效果有”说服不了加盟商，用“发券组回来15%、不发组10%，券却给15%都打了折”讲清怎么算，分摊按试出来的账定。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "分摊方式给得多（按比例、只为增量付费、封顶、营销基金视合同而定），但像选项清单，没帮老板挑一个先做。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "开头就给做法“下一轮留一组不发，账出来前总部先多扛”，“1000张核销100张其中60人本来就来”例子直观，还提醒留出来的人别从群里、短信里收到同一张券。"}
+  }, "preferred": ["C"]},
+  {"id": "flash_sale_crowding", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 4, "reason": "限时段用券、按店报产能限量、分批推、看正价单有没有被挤掉都对，但“秒杀券一买就能用”“份数按总部总量定”把不知道的规则当成挤的原因写死，结尾才问。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "限定核销时段、按店限量、选出餐快的品、先在抱怨最多的店试两周都可执行，但六条并列，预约到店、页面显示各店余量对门店和系统要求偏高。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "“限制写在秒杀消息第一眼能看到的地方”避免顾客到店才知道，并提醒“挪开午高峰就没人用，说明之前不少是本来要来吃午饭的人”，改完看什么也写清了。"}
+  }, "preferred": ["C"]},
+  {"id": "new_store_7days", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "先进群后转好友的顺序清楚，按“收银台付钱的/线上点好来取的”分开说好处，接住了付款方式未知，店长开业前自己走一遍、每天按班次看人数。"},
+    "B": {"critical_errors": 1, "usefulness": 3, "reason": "只教一句话、指定1-2个负责人思路对，但“每张桌子放码”“上锅底时那一句话”“别影响翻台”把用户没说的品类当成火锅。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "只练一句“扫码进群，这单立减X元”，加上“前提是这单真有能用的优惠”，按“先付钱/吃完才结账”分开写，还给了一开始就要加好友时的替代做法。"}
+  }, "preferred": ["A", "C"]},
+  {"id": "weekly_moments", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "四条带emoji、留【填】位不编价格菜品，点出“上班族周末多半不在这一片，周五那条最要紧”，配图提醒别拿网图，但每条都重复一整套信息块，读着有点像模板。"},
+    "B": {"critical_errors": 1, "usefulness": 2, "reason": "文案没有emoji、读着平淡，还写“周末就交给火锅吧”“起来吃顿火锅”，用户没说是火锅店，六条也偏多。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "周二只种念头、周四出菜单、周五催约人、周六写给附近住的人，节奏清楚，日期星期都对，“私信问我”拉互动，露脸要征得同意也想到了。"}
+  }, "preferred": ["C"]},
+  {"id": "assigned_task_unconverted", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "按真实用户、券还在不在、附近有没有店、联系渠道拆九成，券过期要不要再给优惠交领导拍板，也不评价活动，但第一句就是“别把目标写成把九成都转化回来”，开口就顶了领导派的任务。"},
+    "B": {"critical_errors": 1, "usefulness": 5, "reason": "第一句接住任务，在九成里分四层、每层一句不同的话、留对照组，把调目标和改活动的话放进“给你自己看”，但“门店归属只有两成，说明领券时没让顾客选门店”是猜测当结论。"},
+    "C": {"critical_errors": 3, "usefulness": 2, "reason": "第一句就说“相当一部分本来就转化不了”；示例短信编了“12张券11月15日到期”“春熙路店步行6分钟”“成都86家门店”；“用户手里已经有几十张券”把券当没过期；“拉回来比例多在个位数百分比”没有数据；篇幅过长。"}
+  }, "preferred": ["B"]}
+]

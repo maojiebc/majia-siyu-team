@@ -1,0 +1,80 @@
+{
+  "seed": 20261025,
+  "key": {
+    "hotpot_unknown": {
+      "A": "new",
+      "B": "cur",
+      "C": "bare"
+    },
+    "vendor_risk": {
+      "A": "new",
+      "B": "cur",
+      "C": "bare"
+    },
+    "platform_coverage": {
+      "A": "new",
+      "B": "bare",
+      "C": "cur"
+    },
+    "existing_stack": {
+      "A": "bare",
+      "B": "new",
+      "C": "cur"
+    },
+    "quiet_groups": {
+      "A": "bare",
+      "B": "new",
+      "C": "cur"
+    },
+    "simple_copy": {
+      "A": "new",
+      "B": "bare",
+      "C": "cur"
+    },
+    "cashier_reluctant": {
+      "A": "new",
+      "B": "cur",
+      "C": "bare"
+    },
+    "store_leaderboard": {
+      "A": "bare",
+      "B": "new",
+      "C": "cur"
+    },
+    "franchise_member_day": {
+      "A": "bare",
+      "B": "new",
+      "C": "cur"
+    },
+    "recall_all_30d": {
+      "A": "cur",
+      "B": "bare",
+      "C": "new"
+    },
+    "franchise_coupon_cost": {
+      "A": "cur",
+      "B": "bare",
+      "C": "new"
+    },
+    "flash_sale_crowding": {
+      "A": "new",
+      "B": "bare",
+      "C": "cur"
+    },
+    "new_store_7days": {
+      "A": "new",
+      "B": "bare",
+      "C": "cur"
+    },
+    "weekly_moments": {
+      "A": "cur",
+      "B": "bare",
+      "C": "new"
+    },
+    "assigned_task_unconverted": {
+      "A": "cur",
+      "B": "new",
+      "C": "bare"
+    }
+  }
+}
