@@ -10,14 +10,13 @@
 - [ ] `ruff check src tests tools`、`mypy src/siyu_team`、`make check` 全部通过。
 - [ ] `python tools/check_versions.py` 与 `python tools/check_consistency.py` 通过。
 - [ ] `python tools/build_skillhub_bundle.py --check` 与 `python tools/build_workbuddy_bundle.py --check` 通过。
-- [ ] 干净 wheel 安装后，`siyu-plan` 能运行并加载随包公开知识。
-- [ ] H1、H2、H3 指标从社区共建流水线日志读取，发布说明仍标 **Not Evaluated**（或当前流水线状态）；不得声称离线 Pilot 已给出 Pass/Fail。
+- [ ] 技能或案例有实质改动时，已按 [`evals/README.md`](../evals/README.md) 跑过装和不装的盲评；发布说明引用最新一次结果，没跑就写没跑。
 
 任一项失败就停止发布，继续保留上一可回滚版本。
 
 ### 评估边界
 
-Python 任务识别、知识选择、安装与静态合规检查仍在 `make check` 内；不能称这些组件已冻结或不参与发布门。`make pilot` 是可选的离线工具校验，H1/H2/H3 的真实效果另行评估。
+`make check` 只证明结构、链接、分发包、版本与静态合规一致，不证明回答变好。回答好不好只看盲评结果；模型盲评和真人盲评分开写，不混成一个数。
 
 ## 2. 同一提交三项核对
 
@@ -45,8 +44,8 @@ test "$LOCAL_COMMIT" = "$REMOTE_MAIN"
 ### 3.1 GitHub Release / tag（main）
 
 - [ ] 先人工创建 GitHub Release `v$(cat VERSION)`，tag 指向上节核对过的 **main** commit。
-- [ ] Release 说明聚焦能力、安装态与契约；H1/H2/H3 写当前社区流水线状态，不引用离线 Pilot 为发布依据。
-- [ ] 发布后重新下载 Release 源码或产物，核对 VERSION、wheel 与 bundle 均与 `VERSION` 一致。
+- [ ] Release 说明聚焦能力、案例与安装态；回答质量只引用 `evals/` 里的盲评结果。
+- [ ] 发布后重新下载 Release 源码或产物，核对 bundle 与 `VERSION` 一致。
 
 GitHub Release 完成前，不发布下游渠道。
 
@@ -82,7 +81,7 @@ clawhub publish ./skillhub/majia-siyu \
 - [ ] 从 GitHub Release 同一 commit 运行 `python tools/build_skillhub_bundle.py --check`。
 - [ ] 上传 `skillhub/majia-siyu`，SemVer 与 `VERSION` 一致。
 - [ ] [`.codebuddy-plugin/*.json`](../.codebuddy-plugin/) 中的 `version` 字段已随 bump 更新（SkillHub / 安装器读取）。
-- [ ] 上传后核对根 `SKILL.md`、modules、route-contract、公开知识 manifest 均来自同一 commit。
+- [ ] 上传后核对根 `SKILL.md`、modules、公开知识与案例均来自同一 commit。
 
 ClawHub 与 SkillHub 的 commit 与 SemVer 必须同时匹配 GitHub Release；任一不一致都停止发布。
 
@@ -97,7 +96,7 @@ ClawHub 与 SkillHub 的 commit 与 SemVer 必须同时匹配 GitHub Release；�
 
 ## 5. 发布后验证与回滚
 
-- [ ] 分别从 GitHub、ClawHub、SkillHub、WorkBuddy（如已上架）做一次干净安装，运行入口、知识查询和一条静态合规回归。
+- [ ] 分别从 GitHub、ClawHub、SkillHub、WorkBuddy（如已上架）做一次干净安装，运行入口、问一道案例对得上的问题、跑一条静态合规回归。
 - [ ] 核对各渠道显示版本与 `VERSION` 一致。
 - [ ] 保存人工发布记录：操作者、时间、commit、SemVer、产物校验值和异常。
 - [ ] 任一安装态失败，立即停止继续分发；按平台人工撤回或回指上一版本，并记录原因。

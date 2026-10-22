@@ -1,16 +1,14 @@
-"""Typed contracts shared by compliance scanning and independent judging.
+"""Typed contracts for compliance scanning.
 
 The public CLI still exposes dictionaries for backwards compatibility.  These
-models give the scanner and judge a stable, serialisable contract underneath
-that compatibility layer.
+models give the scanner a stable, serialisable contract underneath that
+compatibility layer.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Mapping
-
-from .rubrics import DIMENSION_WEIGHTS, RELIABILITY_CHECKS
+from typing import Any
 
 
 class ScanMode(str, Enum):
@@ -96,106 +94,4 @@ class ScanResult:
             "hard_fail": self.hard_fail,
             "mode": self.mode.value,
             "text_length": self.text_length,
-        }
-
-
-@dataclass(frozen=True)
-class JudgeReport:
-    """Machine-readable record of an independent host/Judge assessment.
-
-    A static compliance scan is not a Judge report.  ``score`` and ``badge``
-    therefore remain optional until complete independent scores are supplied.
-    """
-
-    schema_version: str = "1.1"
-    status: str = "not_evaluated"
-    source: str = ""
-    model: str = ""
-    config: Mapping[str, Any] = field(default_factory=dict)
-    reviewed_at: str = ""
-    review_method: str = "independent_host_judge"
-    scores: Mapping[str, float] = field(default_factory=dict)
-    reasons: Mapping[str, str] = field(default_factory=dict)
-    score: float | None = None
-    badge: str | None = None
-    reliability_checks: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
-    review_binding: Mapping[str, str] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        complete_statuses = {"complete", "passed", "failed"}
-        has_complete_status = self.status in complete_statuses
-
-        if self.score is None:
-            if self.badge is not None:
-                raise ValueError("没有完整 Judge score 时不得生成 badge")
-            if has_complete_status:
-                raise ValueError("完成态 JudgeReport 必须包含 score 与 badge")
-            return
-
-        if not 0.0 <= self.score <= 100.0:
-            raise ValueError("JudgeReport.score 必须在 0 到 100 之间")
-        if not has_complete_status or not self.badge:
-            raise ValueError("有 score 的 JudgeReport 必须是完成态且包含 badge")
-
-        expected_dimensions = set(DIMENSION_WEIGHTS)
-        if set(self.scores) != expected_dimensions:
-            missing = sorted(expected_dimensions - set(self.scores))
-            extra = sorted(set(self.scores) - expected_dimensions)
-            raise ValueError(
-                f"完成态 JudgeReport 维度不完整：missing={missing}, extra={extra}"
-            )
-        if any(not 0.0 <= float(value) <= 1.0 for value in self.scores.values()):
-            raise ValueError("JudgeReport.scores 各维分必须在 0 到 1 之间")
-        if set(self.reasons) != expected_dimensions or any(
-            not str(reason).strip() for reason in self.reasons.values()
-        ):
-            raise ValueError("完成态 JudgeReport 必须包含每个维度的非空理由")
-
-        required_metadata = {
-            "source": self.source,
-            "model": self.model,
-            "config": self.config,
-            "reviewed_at": self.reviewed_at,
-            "review_method": self.review_method,
-        }
-        missing_metadata = [
-            key for key, value in required_metadata.items() if not value
-        ]
-        if missing_metadata:
-            raise ValueError(
-                "完成态 JudgeReport 缺少独立评审元数据："
-                + ", ".join(missing_metadata)
-            )
-        if "independent" not in self.review_method.lower():
-            raise ValueError("完成态 JudgeReport.review_method 必须确认独立评审")
-        if self.config.get("metadata_complete") is not True:
-            raise ValueError("完成态 JudgeReport.config 必须确认 metadata_complete=true")
-        if set(self.reliability_checks) != set(RELIABILITY_CHECKS):
-            raise ValueError("完成态 JudgeReport 必须包含事实、适配、风险及覆盖检查")
-        for name, check in self.reliability_checks.items():
-            allowed = {"pass", "not_applicable"} if name in {
-                "risk_screening", "option_coverage"} else {"pass"}
-            if check.get("status") not in allowed or not check.get("reason", "").strip():
-                raise ValueError("完成态 JudgeReport 可靠性检查未通过")
-        if set(self.review_binding) != {
-            "answer_sha256", "request_sha256", "evidence_sha256"
-        } or any(len(value) != 64 for value in self.review_binding.values()):
-            raise ValueError("完成态 JudgeReport 必须绑定本次答案、要求和证据")
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "schema_version": self.schema_version,
-            "status": self.status,
-            "source": self.source,
-            "model": self.model,
-            "config": dict(self.config),
-            "reviewed_at": self.reviewed_at,
-            "review_method": self.review_method,
-            "scores": dict(self.scores),
-            "reasons": dict(self.reasons),
-            "score": self.score,
-            "badge": self.badge,
-            "reliability_checks": {key: dict(value)
-                                   for key, value in self.reliability_checks.items()},
-            "review_binding": dict(self.review_binding),
         }

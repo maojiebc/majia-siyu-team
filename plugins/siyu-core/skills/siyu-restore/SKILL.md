@@ -4,12 +4,12 @@ description: |
   从本地客户档案拉出最近一次私域咨询状态并接续工作，配合 siyu-save 使用。
   触发方式：/siyu-restore、/续上、「上次」「接着」「之前聊到哪了」；支持序号、list 和 --client。
 metadata:
-  version: "1.8.1"
+  version: "2.0.0"
 ---
 
 # siyu-restore：接续客户档案
 
-从 `~/.siyu/clients/` 读取存档，恢复跨对话状态。不要把它与单次编排使用的 `.siyu-team/` 混用。
+从 `~/.siyu/clients/` 读取存档，恢复跨对话状态。
 
 ## 用户措辞
 

@@ -1,0 +1,325 @@
+[
+  {
+    "id": "hotpot_unknown",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "先讲系统是补缺口，按常见问题给了初步判断，只问一个关键问题；但用户没提私域，A 默认往私域方向想，进货和后厨没覆盖到。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": "六类系统都列到了，几条原则也对，但偏泛，最后一口气问四个问题，老板拿到手还是不知道先补哪块。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "按类让老板自己对照有没有，每类都附了怎么查（先看现有收银带不带、开没开、要不要另付钱），进货后厨也照顾到，最后只问一个问题，最好用。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "vendor_risk",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "结论准、表格清楚、下一步具体，也提醒乙没做负面检索；只是把乙官网自己写的'存续'直接当成登记信息，没让去官方系统再核。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "结论放在最前面，适合赶时间的人；点出乙的'存续'只是厂商自己说的，要去官方登记系统核、还要确认签约方和收款方是同一家；还提醒把现有收银自带的会员功能一起比，最贴'别乱说'。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "要求甲讲清资金怎么走，这条问得很好；但没提乙还没做负面检索，还把'外卖订单对不上企微'说成了所有消费记录都对不上，说重了。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "platform_coverage",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "方法完整，把'有平台资源'拆开看，美团的处理也守住了用户的意思（不默认选），正反两面都查；但候选去哪找只给了方向，没给具体渠道。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "按三类各找两三家，还给了实际去哪找（问同行、问收银服务商、查平台服务市场名录）；演示要用自己的测试账号，比靠什么认人、数据延迟、三年总成本，最能直接上手。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "和 A 差不多扎实，提醒'现有系统加个接口'也算一个选项；同样缺具体的找候选渠道。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "existing_stack",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "动作小、守住了不换系统，用'回店出示权益'来数人，绕开了身份对不上的问题，很聪明；但权益只留了个空，没给例子，店里拿到还得自己想。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "最具体（券、欢迎语、台卡、标签、到期提醒都有）；但默认欢迎语能自动发券、收银后台能查到这张券的使用记录，企微和收银能不能打通并没确认。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "谁做什么分得清，券就用收银现在能直接核的东西，上线前先让店长自己走一遍，影响翻台怎么调也说了，观察期按火锅客人的回店间隔来定，很实在。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "quiet_groups",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "判断留群、讲清这些到店不全是群带来的，什么情况下再考虑关也写清了，简洁。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "明确说'现在只是判断关不关，证据够先留着'，回答正中问题；不加投入，只每周记一行；还提醒真要关时先发一条说明，别直接解散，很周到。"
+      },
+      "C": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "让用户把群券单的毛利全算成'群带来的'，把相关当成了因果；用户没给成本和对照数据，C 却说关群的几条条件'现在都不成立'，结论超出了证据。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "simple_copy",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "59字，条件齐全、没加条件、没提问；带了个表情和'哦'，语气偏活泼，发群里能直接用。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "63字，条件齐全、口气自然，'这份赠饮不和其他优惠叠加'说得清楚，拿来就能发。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "60字，条件齐全，结尾'欢迎来吃火锅'自然，没加多余条件，拿来就能发。"
+      }
+    },
+    "preferred": [
+      "B",
+      "C"
+    ]
+  },
+  {
+    "id": "cashier_reluctant",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先去店里看清卡在哪，再对症改；把'先付款还是吃完结账'分开讲，加盟商这层是总部给东西、不下命令，店员奖励规则防刷，也提醒别按总数排名，最周全、最能落地。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "主战场挪到餐桌和等位区，点出'加的是总部号还是门店号'会影响加盟商有没有动力，这条很有价值；但按加微数发钱，没说怎么防刷数。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "咖啡连锁的经历对'台卡怎么写'有参考价值，也按付款前、付款后分开改了；但'一分钱不出的店数据就不好'是凭经验下的断言，重心还是放在收银员开口上，对高峰排队的问题回应得不如 A。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "store_leaderboard",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "比法改得对，'用榜单找没动起来的店'这个视角有用，规则和奖励也讲到了；但每家店要用自己的码、新店停业的天数怎么处理这些细节没提。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "加微率、分组排、进步榜、7天后还剩多少都有，还建议把提议的店长拉进来一起定规则；少了跨店重复加怎么算、每店一个码这类口径。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "四个问题问得准，口径写清了（有效新增、跨店重复加只算一次、每店一个码、新店和停业的天数单独看），还有抽查和防刷规则，可以直接定稿。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "franchise_member_day",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "算账考虑到了'本来就满的日子打折'和'别重复扣优惠'，阻力分五类，还拿愿意和不愿意的店对比，找到之后怎么改也一一对应，很实用。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "'如果折扣全由总部出，你愿意吗'这一问很能分出是不是钱的问题，问题清单也好用；整体略泛，最后的结论段有点重复。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "算的是多来的生意，不是总流水；'没数据就承认算不清，别拿总部估算压加盟商'很到位；给了一组每家都问的问题，还把补贴有没有按时到账这种信任问题列进去，可以直接拿去问。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "recall_all_30d",
+    "ratings": {
+      "A": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "分层和留一部分人不发券做对照都对，但硬插了一个用户根本不知道的'会员数据工具 majia-huiyuan'，是编出来的、和用户无关的内容；咖啡连锁的经历对这个问题帮助也不大。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "按每个人自己的间隔来判断，先排除不想收消息的、有投诉没处理完的，定好最多联系几次，留一部分人不发做对照，只来过一次的单独处理，稳妥又能直接做。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "给了很具体的起步分档、对照比例和算账方法，上手快；但不知道品类就套了固定天数，两三周就比对照和60天的门槛对不上，也没提排除不想收消息的人。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "franchise_coupon_cost",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "分担的办法多（按增量付费、每店封顶、走营销基金还提醒对照加盟合同），也要求留对照；但开头先认定了券有效果，只是加盟商没看到，偏向总部。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先把增量算到每家店的账上，再按算出来的结果分情况谈；证据不够时总部先出钱试点，加盟商自愿选档、要他们自己点头，判断最准。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "思路和 B 接近，'不参加的店别往他的会员发'和'补贴按时到账'很实在；但'总部多出一点积极性会高很多'是直接下断言。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "flash_sale_crowding",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "错峰、按店定量、选好做的菜、给门店留个反馈口子都对；咖啡小程序被挤崩的经历和门店做不过来不太是一回事，引用得有点勉强。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先查清堵在哪、有没有挤掉正价客，再一次只改一样；试点要看排队、正价单、秒杀单本身赚不赚钱，最稳、最能落地。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "办法具体（午高峰不能用、延长有效期、预约），但'用折扣抢自己的正价客'是先下了结论，'显示各店剩余名额'也默认系统能做到。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "new_store_7days",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "顺序清楚：先把整条路走通，再培训一句话，每天只改一处；提醒别拿手机号批量加人，以免被平台限制，第八天以后怎么接也说了，不挑品类都能用。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "'新店先直接进群'这个判断有实战依据，也写了什么情况下该反过来先加好友；但用户要的是加企微顾客，B 绕了一道先进群再转好友。"
+      },
+      "C": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "节奏和物料安排得很实在，但没给品类就默认是火锅（'上锅底时说一句'），别的品类这一步用不上。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "weekly_moments",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "四条文案节奏合理，所有不知道的都留了空让用户填，配图和发送时间的说明也实在；文案稍平。"
+      },
+      "B": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "没给品类却直接写成了火锅（'起来吃顿火锅''热气腾腾的锅'）；六条文案价格和菜反复出现，比较啰嗦。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "专门写了一条给'周末还在加班的上班族'，解决了'上班族周末不在附近'这个真问题；留空规范，还提醒各条信息要写得一模一样、配图要用真实照片，拿来就能用。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  }
+]

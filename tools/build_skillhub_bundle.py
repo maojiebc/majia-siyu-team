@@ -20,7 +20,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 ROUTER = ROOT / "plugins/siyu-core/skills/majia-siyu"
 DEFAULT_OUTPUT = ROOT / "skillhub/majia-siyu"
-PUBLIC_KNOWLEDGE = ROOT / "src/siyu_team/knowledge/data"
+PUBLIC_KNOWLEDGE = ROOT / "knowledge"
 RASTER = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico"}
 
 # 随包分发的公开知识子集；03-majia-sop 是护城河，永不进包。
@@ -28,23 +28,10 @@ KNOWLEDGE_PUBLIC_DIRS = (
     "00-methodology",
     "01-wechat-official",
     "02-industry",
-    "04-atoms",
-    "05-community",
+    "cases",
 )
-# 随包分发的原子工具（零依赖，在分发态也执行严格 v2 契约）。
-BUNDLED_TOOLS = ("atoms_query.py", "atoms_validate.py")
-BUNDLED_KNOWLEDGE_MODULES = ("models.py", "paths.py", "corpus.py", "query.py")
-BUNDLED_EVAL_MODULES = (
-    "models.py",
-    "rubrics.py",
-    "compliance_lexicon.py",
-    "static.py",
-    "engine.py",
-    "judge.py",
-    "cli.py",
-    "monte_carlo.py",
-)
-ROUTE_CONTRACT = ROUTER / "references/route-contract.json"
+# 三个文案检查脚本和出报告共用的合规扫描器（零依赖）。
+BUNDLED_EVAL_MODULES = ("models.py", "compliance_lexicon.py", "static.py", "cli.py")
 # 包内路径重写：SKILL.md 里的仓库根相对引用改指包内 _knowledge，
 # 否则独立安装态全是死指针。顺序敏感：先收相对逃逸，再收裸路径；
 # 裸路径用负向后顾防止把已改写的 `_knowledge/...` 再匹配一次。
@@ -53,8 +40,10 @@ EXPERT_REFERENCE_ESCAPE = (
     "../../siyu-core/skills/majia-siyu/references/",
     "../../references/",
 )
+# siyu-core 下的兄弟技能引用入口 references；包里入口在根目录。
+SIBLING_REFERENCE_ESCAPE = ("../majia-siyu/references/", "../../references/")
 BARE_KNOWLEDGE_RE = re.compile(
-    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|04-atoms|05-community)"
+    r"(?<![\w/])knowledge/(00-methodology|01-wechat-official|02-industry|cases)"
 )
 EXECUTION_SCRIPT_RE = re.compile(
     r"plugins/siyu-execution/skills/([^/]+)/scripts/"
@@ -126,9 +115,8 @@ def copy_modules(output: Path, modules: list[Path]) -> dict[str, str]:
 
 
 def copy_knowledge(output: Path) -> int:
-    """公开知识层随包走：modules/_knowledge/{00,01,02,04,05}+manifest。
+    """公开知识层随包走：modules/_knowledge/{00,01,02,cases}。
 
-    resolver（knowledge/paths.py）已给这个槽位留了发现优先级；
     03-majia-sop 显式排除——本机构建时该目录含真实 SOP。
     """
     target = output / "modules" / "_knowledge"
@@ -140,10 +128,6 @@ def copy_knowledge(output: Path) -> int:
             raise RuntimeError(f"公开知识目录缺失：{source}")
         shutil.copytree(source, target / name)
         copied += sum(1 for path in (target / name).rglob("*") if path.is_file())
-    manifest = PUBLIC_KNOWLEDGE / "manifest.json"
-    if manifest.exists():
-        shutil.copy2(manifest, target / "manifest.json")
-        copied += 1
     forbidden = target / "03-majia-sop"
     if forbidden.exists():
         raise RuntimeError("护城河目录被拷进 bundle，立即中止")
@@ -151,51 +135,19 @@ def copy_knowledge(output: Path) -> int:
 
 
 def copy_tools(output: Path) -> int:
-    """Ship query/lint tools plus their strict, shared Python support."""
-    target = output / "tools"
-    target.mkdir(parents=True, exist_ok=True)
-    for name in BUNDLED_TOOLS:
-        shutil.copy2(ROOT / "tools" / name, target / name)
-    package = target / "siyu_team"
-    knowledge_package = package / "knowledge"
+    """Ship the compliance scanner the three lint scripts import."""
+    package = output / "tools" / "siyu_team"
     eval_package = package / "eval"
-    knowledge_package.mkdir(parents=True)
     eval_package.mkdir(parents=True)
     (package / "__init__.py").write_text("", encoding="utf-8")
-    (knowledge_package / "__init__.py").write_text("", encoding="utf-8")
     (eval_package / "__init__.py").write_text("", encoding="utf-8")
     shutil.copy2(ROOT / "src/siyu_team/errors.py", package / "errors.py")
-    for name in BUNDLED_KNOWLEDGE_MODULES:
-        source = ROOT / "src/siyu_team/knowledge" / name
-        if not source.is_file():
-            raise RuntimeError(f"知识查询模块缺失：{source}")
-        shutil.copy2(source, knowledge_package / name)
     for name in BUNDLED_EVAL_MODULES:
         source = ROOT / "src/siyu_team/eval" / name
         if not source.is_file():
             raise RuntimeError(f"合规扫描模块缺失：{source}")
         shutil.copy2(source, eval_package / name)
-    return (
-        len(BUNDLED_TOOLS)
-        + len(BUNDLED_KNOWLEDGE_MODULES)
-        + len(BUNDLED_EVAL_MODULES)
-        + 4
-    )
-
-
-def copy_runtime_contract(output: Path) -> int:
-    """Ship the generated prompt-only contract without implying Python exists."""
-    if not ROUTE_CONTRACT.is_file():
-        raise RuntimeError(
-            "路由契约缺失：先运行 python3 tools/render_route_contract.py"
-        )
-    target = output / "modules/_runtime/route-contract.json"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROUTE_CONTRACT, target)
-    duplicate = output / "references/route-contract.json"
-    if duplicate.is_file():
-        duplicate.unlink()
-    return 1
+    return len(BUNDLED_EVAL_MODULES) + 3
 
 
 def rewrite_knowledge_paths(output: Path) -> int:
@@ -205,10 +157,7 @@ def rewrite_knowledge_paths(output: Path) -> int:
         text = path.read_text(encoding="utf-8")
         updated = text.replace(*RELATIVE_ESCAPE)
         updated = updated.replace(*EXPERT_REFERENCE_ESCAPE)
-        updated = updated.replace(
-            "references/route-contract.json",
-            "modules/_runtime/route-contract.json",
-        )
+        updated = updated.replace(*SIBLING_REFERENCE_ESCAPE)
         updated = BARE_KNOWLEDGE_RE.sub(r"modules/_knowledge/\1", updated)
         updated = EXECUTION_SCRIPT_RE.sub(r"modules/\1/scripts/", updated)
         if updated != text:
@@ -239,7 +188,6 @@ def build(output: Path) -> dict[str, object]:
     index = copy_modules(output, modules)
     knowledge_files = copy_knowledge(output)
     tool_files = copy_tools(output)
-    runtime_files = copy_runtime_contract(output)
     rewritten = rewrite_knowledge_paths(output)
     add_bundle_rules(output / "SKILL.md")
     license_file = ROOT / "LICENSE"
@@ -261,7 +209,6 @@ def build(output: Path) -> dict[str, object]:
         "bytes": total,
         "knowledgeFiles": knowledge_files,
         "bundledTools": tool_files,
-        "runtimeFiles": runtime_files,
         "pathRewrites": rewritten,
         "removed": removed,
     }

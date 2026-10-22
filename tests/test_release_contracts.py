@@ -18,7 +18,7 @@ class VersionReleaseContractTests(unittest.TestCase):
     def test_repository_distribution_versions_are_aligned(self) -> None:
         version, install_units, skill_count, errors = check_versions.check(ROOT)
 
-        self.assertEqual(version, "1.8.1")
+        self.assertEqual(version, "2.0.0")
         self.assertEqual(install_units, 11)
         self.assertEqual(skill_count, 34)
         self.assertEqual(errors, [])
@@ -47,7 +47,7 @@ class VersionReleaseContractTests(unittest.TestCase):
                     errors: list[str] = []
 
                     count = check_versions._check_marketplace(
-                        root, rel, "1.8.1", errors
+                        root, rel, "2.0.0", errors
                     )
 
                     self.assertEqual(count, 1)
@@ -134,11 +134,12 @@ class ManualReleaseChecklistTests(unittest.TestCase):
         self.assertEqual(len(tags), 10)
         self.assertEqual(len(set(tags)), 10)
 
-    def test_online_steps_require_authorization_and_hypotheses_are_not_evaluated(self) -> None:
+    def test_online_steps_require_authorization_and_quality_comes_from_blind_evals(self) -> None:
         self.assertIn("维护者明确授权发布后", self.text)
         self.assertIn("同一 commit", self.text)
         self.assertIn("SemVer", self.text)
-        self.assertIn("Not Evaluated", self.text)
+        self.assertIn("evals/README.md", self.text)
+        self.assertIn("没跑就写没跑", self.text)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,324 @@
+[
+  {
+    "id": "hotpot_unknown",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "格式看起来很清晰，字数也精简些，方便老板们阅读，他们应该没耐心看长篇大论"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "vendor_risk",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "带上了材料可信来源，这个比较方便验证，ai幻觉毕竟存在"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "platform_coverage",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "我觉得思路比较有逻辑。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "existing_stack",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "具备可实际落地的操作性"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "quiet_groups",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "还是排版格式利于阅读"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "simple_copy",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "虽然也很一般，但至少有用emoji的意识。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "cashier_reluctant",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "把我的IP凸显出来了，虽然回答还可以再好些"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "store_leaderboard",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "还是一样的，强化了【马甲】这个IP了。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "franchise_member_day",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "看着比较方便阅读，逻辑也严密"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "recall_all_30d",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "这版本比较好，但用户分层的概念可以讲解得更浅显易懂"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "franchise_coupon_cost",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "flash_sale_crowding",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "new_store_7days",
+    "ratings": {
+      "A": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "需要先进群，因为又快捷又好衡量指标，大家有正反馈，门店群事先见好就行，scrm满群自动切换"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "有我的IP露出"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "weekly_moments",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": "没有emoji，文字不易读，不抓眼球"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": ""
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "有用户消费场景，人货场"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  }
+]

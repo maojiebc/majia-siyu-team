@@ -1,18 +1,16 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v1.8.1-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v2.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-majia--siyu--team-171515.svg)](https://github.com/maojiebc/majia-siyu-team)
 
 > **私域专家团 · 马甲实战版**
 >
-> 中文私域经营工具箱。日常文案直接出活，结构问题再升级做全套诊断。入口只有一个：`/siyu`。
+> 把马甲做私域的判断装进你的 AI。日常文案直接出活；遇到拿不准的事，按他真做过的事给判断。入口只有一个：`/siyu`。
 
-私域经营动作全景图（统一入口 → 按目标接力 → 执行 / 问诊 / 升级全盘诊断；动态事实先检索留证；知识 Pilot 仅离线验证）：
+## 和通用 AI 差在哪
 
-![majia-siyu v1.8.1 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
-
-完整框架 SVG 与源码说明见 [GitHub docs/framework.svg](https://github.com/maojiebc/majia-siyu-team/blob/main/docs/framework.svg)。
+马甲在一家几百家店的连锁咖啡，从短信一条条发，做到企业微信社群三个月攒下一百万好友；后来又给餐饮老板做咨询。包里的案例讲的就是这些事：当时什么情况，他怎么判断，结果怎样，换到你家店该怎么改。你问的处境对得上，AI 会先说马甲会怎么判断，再讲当年那件事。
 
 ## 这个入口做什么
 
@@ -56,12 +54,9 @@ skillhub install siyu
 
 完整说明、角色导航、开发验证与源码：**https://github.com/maojiebc/majia-siyu-team**
 
-## 同行知识共建（邀请制）
-
-[填写真实案例采集卡](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)（约 3–5 分钟）。提交只进人工审核队列，不会直接注入 Skill；只有脱敏、批准并进入版本化发布批次的知识才可用于正式检索。
-
 ## 📋 版本记录
 
+- **v2.0.0**（2026-10-22）移除未运行的 Python 运行时，保留 17 个 Markdown 技能与合规检查，加入经本人审阅的真实案例及盲评记录。旧 Python 命令行入口停止提供，改用 Markdown 技能。
 - **v1.8.1**（2026-10-20）文案与配图表达修复：先交成品，加入完整模拟示范、场景语气与常用构图。
 - **v1.8.0**（2026-10-20）同活动的朋友圈、群发、私聊按需接力，沿用已完成稿件；精简补充文案和配图方法，完整素材分析留给独立收费项目。
 - **v1.7.0**（2026-10-19）选型核验风险与平台覆盖；49条有条件知识；分渠道文案、欢迎、评论和配图简报进入执行技能。H1/H2/H3未验证。
