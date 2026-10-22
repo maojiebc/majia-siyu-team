@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v2.1.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -168,6 +168,7 @@ python3 tools/ab_eval.py --help   # 装和不装的盲评
 
 ## 📋 版本记录
 
+- **v2.1.0**（2026-10-22）先问立场和任务边界再给方案：拍板的人全盘取舍，领了任务的人在任务里分层、先试一小批，马甲的取舍另起一段“给你自己看”；方案要给领导看的不批已做完的活动。第五轮盲评和 v2.0.0 打平，新题两个评审都选新版。
 - **v2.0.0**（2026-10-22）移除未运行的 Python 运行时，保留 17 个 Markdown 技能与合规检查，加入经本人审阅的真实案例及盲评记录。旧 Python 命令行入口停止提供，改用 Markdown 技能。
 - **v1.8.1**（2026-10-20）文案先交成品，补充跨场景完整示范与实用构图，检查留在后台，保留真实业务条件。
 - **v1.8.0**（2026-10-20）同一活动的朋友圈、群发与私聊按需接力，保留前置条件、已完成稿件和整体核对；小幅补充文案与配图方法，完整素材分析留给独立收费项目。
