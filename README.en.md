@@ -1,6 +1,6 @@
 # Siyu Expert Team · Majia Field Edition
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v2.1.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![ClawHub](https://img.shields.io/badge/ClawHub-majia--siyu-6b4bd8.svg)](https://clawhub.ai/s/majia-siyu)
 [![SkillHub](https://img.shields.io/badge/SkillHub-siyu-ef6c00.svg)](https://skillhub.cn)
@@ -113,6 +113,7 @@ claude plugin marketplace add maojiebc/majia-siyu-team
 
 ## Version history
 
+- **v2.1.0** (2026-10-22): Ask who is deciding and what the assigned task is before writing a plan. Decision-makers get the full trade-off; people handed a task get a plan inside that task, with Majia's own trade-off in a separate note for their eyes only, and plans going to a manager do not critique the campaign already run. Round-5 blind evaluation ties v2.0.0; both judges preferred the new version on the new question.
 - **v2.0.0** (2026-10-22): Removed the unused Python runtime; retained 17 Markdown skills and compliance checks; added reviewed cases and blind evaluations. Python CLI users must migrate to the Markdown skills.
 - **v1.8.1** (2026-10-20): Finished copy first, task-specific voices and layouts, original synthetic examples, and practical image briefs. Fact and risk checks stay in the background.
 - **v1.8.0** (2026-10-20): Bounded handoffs for related campaign copy, prerequisite checks, completed drafts and final consistency review. Focused copy and image guidance; the complete material library stays in the separate paid project.

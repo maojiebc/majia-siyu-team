@@ -1,6 +1,6 @@
 # 私域专家团 · 马甲实战版
 
-[![Skill Version](https://img.shields.io/badge/skill-v2.0.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
+[![Skill Version](https://img.shields.io/badge/skill-v2.1.0-0b5cad.svg)](https://github.com/maojiebc/majia-siyu-team/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/maojiebc/majia-siyu-team/blob/main/LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-majia--siyu--team-171515.svg)](https://github.com/maojiebc/majia-siyu-team)
 
@@ -56,7 +56,7 @@ skillhub install siyu
 
 ## 📋 版本记录
 
-- **v2.0.0**（2026-10-22）移除未运行的 Python 运行时，保留 17 个 Markdown 技能与合规检查，加入经本人审阅的真实案例及盲评记录。旧 Python 命令行入口停止提供，改用 Markdown 技能。
+- **v2.1.0**（2026-10-22）移除未运行的 Python 运行时，保留 17 个 Markdown 技能与合规检查，加入经本人审阅的真实案例及盲评记录。旧 Python 命令行入口停止提供，改用 Markdown 技能。
 - **v1.8.1**（2026-10-20）文案与配图表达修复：先交成品，加入完整模拟示范、场景语气与常用构图。
 - **v1.8.0**（2026-10-20）同活动的朋友圈、群发、私聊按需接力，沿用已完成稿件；精简补充文案和配图方法，完整素材分析留给独立收费项目。
 - **v1.7.0**（2026-10-19）选型核验风险与平台覆盖；49条有条件知识；分渠道文案、欢迎、评论和配图简报进入执行技能。H1/H2/H3未验证。
