@@ -54,6 +54,10 @@ def blind(args: argparse.Namespace) -> int:
         missing = [name for name, answers in arms.items() if not answers.get(q["id"], "").strip()]
         if missing:
             raise SystemExit(f"❌ {q['id']} 缺少回答：{', '.join(missing)}")
+        # 各版本独立作答，一字不差多半是答题时共用了临时文件，互相覆盖了。
+        twins = [(a, b) for a, b in combinations(sorted(arms), 2) if arms[a][q["id"]] == arms[b][q["id"]]]
+        if twins:
+            raise SystemExit(f"❌ {q['id']} 有两组回答一字不差：{twins}，先查答题过程")
         order = sorted(arms)
         salt = hashlib.sha256(f"{args.seed}:{q['id']}".encode()).hexdigest()
         random.Random(salt).shuffle(order)

@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>马甲审阅台</title>
+<style>
+:root {
+  --bg: #f6f5f2;
+  --panel: #ffffff;
+  --panel-2: #fbfaf8;
+  --ink: #1d1d1f;
+  --muted: #6b6b70;
+  --line: #e2e0db;
+  --accent: #0b5cad;
+  --accent-ink: #ffffff;
+  --accent-soft: #e7f0fa;
+  --good: #1f7a4d;
+  --good-soft: #e3f3ea;
+  --warn: #9a5b00;
+  --warn-soft: #fbefd9;
+  --bad: #b42318;
+  --bad-soft: #fbe6e4;
+  --mark: #ffe9a6;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212; --panel: #1c1c1e; --panel-2: #222224; --ink: #ececec; --muted: #a1a1a6;
+    --line: #34343a; --accent: #5aa2f0; --accent-ink: #0b1a2b; --accent-soft: #1b2a3c;
+    --good: #4cc38a; --good-soft: #15291f; --warn: #e3a64a; --warn-soft: #2e2412;
+    --bad: #f07067; --bad-soft: #341a18; --mark: #5c4a12; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212; --panel: #1c1c1e; --panel-2: #222224; --ink: #ececec; --muted: #a1a1a6;
+  --line: #34343a; --accent: #5aa2f0; --accent-ink: #0b1a2b; --accent-soft: #1b2a3c;
+  --good: #4cc38a; --good-soft: #15291f; --warn: #e3a64a; --warn-soft: #2e2412;
+  --bad: #f07067; --bad-soft: #341a18; --mark: #5c4a12; --shadow: none;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+header.top {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.top-inner { max-width: 1440px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.brand { font-weight: 650; font-size: 17px; margin-right: 8px; }
+.tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+.tab { border: 0; background: transparent; padding: 6px 14px; border-radius: 7px; color: var(--muted); }
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.top .spacer { flex: 1; }
+.progress-text { color: var(--muted); font-size: 13px; }
+.saved { font-size: 12px; color: var(--good); opacity: 0; transition: opacity .3s; }
+.saved.show { opacity: 1; }
+main { max-width: 1440px; margin: 0 auto; padding: 16px; }
+.hidden { display: none !important; }
+.intro {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; box-shadow: var(--shadow);
+}
+.intro summary { cursor: pointer; font-weight: 600; }
+.intro ul { margin: 8px 0 0; padding-left: 20px; }
+.intro li { margin: 2px 0; }
+.muted { color: var(--muted); }
+
+/* ---------- 盲评 ---------- */
+.qnav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.qchip {
+  min-width: 34px; height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--muted); font-size: 13px;
+}
+.qchip.done { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.qchip.partial { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.qchip.current { outline: 2px solid var(--accent); outline-offset: 1px; color: var(--ink); }
+.qcard { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+.qmeta { display: flex; gap: 10px; align-items: baseline; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+.qmeta code { font-size: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; }
+.request { font-size: 17px; font-weight: 600; margin: 0 0 8px; white-space: pre-wrap; }
+.evidence { margin: 0; padding: 8px 12px; background: var(--panel-2); border-left: 3px solid var(--line); border-radius: 6px; color: var(--muted); font-size: 14px; white-space: pre-wrap; }
+.answers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+@media (max-width: 1080px) { .answers { grid-template-columns: 1fr; } }
+.answer { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); min-width: 0; }
+.answer.preferred { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.ahead { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.alabel { font-weight: 650; }
+.alen { font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 400; }
+.pref { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 2px 10px; font-size: 13px; color: var(--muted); }
+.pref[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.abody { padding: 12px 14px; overflow: auto; max-height: 56vh; font-size: 14.5px; }
+@media (max-width: 1080px) { .abody { max-height: none; } }
+.controls { border-top: 1px solid var(--line); padding: 10px 14px 12px; display: grid; gap: 8px; background: var(--panel); border-radius: 0 0 12px 12px; }
+.crow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.clabel { width: 64px; font-size: 13px; color: var(--muted); flex: none; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; border-right: 1px solid var(--line); background: var(--panel); min-width: 34px; height: 30px; font-size: 14px; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg.err button[aria-pressed="true"].nz { background: var(--bad); color: #fff; }
+.reason { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--panel-2); font-size: 14px; }
+.pager { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; gap: 10px; }
+.btn { border: 1px solid var(--line); background: var(--panel); padding: 8px 16px; border-radius: 9px; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .4; cursor: default; }
+.hint { font-size: 12px; color: var(--muted); }
+
+/* ---------- Markdown ---------- */
+.md h1 { font-size: 21px; line-height: 1.4; margin: 0 0 14px; }
+.md h2 { font-size: 17px; margin: 22px 0 8px; }
+.md h3 { font-size: 15.5px; margin: 16px 0 6px; }
+.md p { margin: 0 0 10px; }
+.md ul, .md ol { margin: 0 0 10px; padding-left: 22px; }
+.md li { margin: 2px 0; }
+.md blockquote { margin: 0 0 10px; padding: 4px 12px; border-left: 3px solid var(--line); color: var(--muted); }
+.md table { border-collapse: collapse; margin: 0 0 12px; font-size: 13.5px; display: block; overflow-x: auto; max-width: 100%; }
+.md th, .md td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; vertical-align: top; }
+.md th { background: var(--panel-2); }
+.md code { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; font-size: .92em; }
+.md pre { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; overflow-x: auto; }
+.md a { color: var(--accent); }
+.md mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1px; }
+.md mark.flagmark { background: var(--warn-soft); box-shadow: inset 0 -2px 0 var(--warn); }
+
+/* ---------- 案例 ---------- */
+.cases { display: grid; grid-template-columns: 220px minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 1180px) { .cases { grid-template-columns: 200px minmax(0, 1fr); } .cpanel { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .cases { grid-template-columns: 1fr; } }
+.clist { position: sticky; top: 70px; display: grid; gap: 4px; }
+@media (max-width: 760px) { .clist { position: static; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+.citem { text-align: left; border: 1px solid transparent; background: transparent; border-radius: 9px; padding: 7px 10px; display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 1.45; }
+.citem:hover { background: var(--panel); }
+.citem.current { background: var(--panel); border-color: var(--line); box-shadow: var(--shadow); }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); flex: none; margin-top: 6px; }
+.dot.ok { background: var(--good); }
+.dot.revise { background: var(--warn); }
+.dot.drop { background: var(--bad); }
+.cmain { min-width: 0; }
+.casebody { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; box-shadow: var(--shadow); font-size: 15.5px; line-height: 1.85; }
+@media (max-width: 760px) { .casebody { padding: 16px; } }
+.flags { background: var(--warn-soft); border: 1px solid transparent; border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; }
+.flags h3 { margin: 0 0 6px; font-size: 14px; color: var(--warn); }
+.flag { padding: 8px 0; border-top: 1px dashed color-mix(in srgb, var(--warn) 35%, transparent); }
+.flag:first-of-type { border-top: 0; }
+.flag p { margin: 0 0 6px; font-size: 14px; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 3px 12px; font-size: 13.5px; }
+.opt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.locate { border: 0; background: none; color: var(--warn); font-size: 13px; text-decoration: underline; padding: 0 0 0 6px; }
+.flagnote { margin-top: 6px; width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 5px 9px; background: var(--panel); font-size: 13.5px; }
+.cpanel { position: sticky; top: 70px; display: grid; gap: 12px; }
+@media (max-width: 1180px) { .cpanel { position: static; } }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow); }
+.box h3 { margin: 0 0 8px; font-size: 14px; }
+.box textarea { width: 100%; min-height: 70px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; background: var(--panel-2); font-size: 14px; }
+.notes { display: grid; gap: 8px; max-height: 46vh; overflow: auto; }
+.note { border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; background: var(--panel-2); }
+.note q { display: block; font-size: 13px; color: var(--muted); quotes: "“" "”"; margin-bottom: 4px; cursor: pointer; }
+.note textarea { min-height: 52px; }
+.note .del { border: 0; background: none; color: var(--bad); font-size: 12px; padding: 0; margin-top: 2px; }
+.empty { font-size: 13px; color: var(--muted); }
+#selpop {
+  position: absolute; z-index: 30; background: var(--ink); color: var(--bg); border: 0; border-radius: 8px;
+  padding: 5px 12px; font-size: 13px; box-shadow: 0 4px 14px rgba(0,0,0,.2);
+}
+
+/* ---------- 导出 ---------- */
+.exportgrid { display: grid; gap: 14px; max-width: 900px; }
+.stat { display: flex; gap: 18px; flex-wrap: wrap; }
+.stat div { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; }
+.stat b { font-size: 20px; display: block; }
+#exportText { width: 100%; min-height: 220px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: var(--panel-2); }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 50; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <span class="brand">马甲审阅台</span>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="blind">盲评打分</button>
+      <button class="tab" role="tab" data-tab="cases">案例审阅</button>
+      <button class="tab" role="tab" data-tab="export">导出结果</button>
+    </nav>
+    <span class="spacer"></span>
+    <span class="progress-text" id="progressText"></span>
+    <span class="saved" id="saved">已自动保存</span>
+  </div>
+</header>
+
+<main>
+  <div class="intro hidden" id="nostore" style="background:var(--warn-soft);border-color:transparent">
+    这个浏览器现在没法自动保存进度。做完之前别关这个页面；中途想停，先到「导出结果」下载一次，下次用「导入」接着做。
+  </div>
+  <!-- 盲评 -->
+  <section id="tab-blind" class="hidden">
+    <details class="intro" id="blindIntro">
+      <summary>怎么打分（点开看）</summary>
+      <ul>
+        <li>__ARMS_NOTE__</li>
+        <li><b>严重错误</b>：编造用户没给的事实；超出证据下结论（比如把相关说成因果）；会让门店吃亏的建议（违规、违背用户明确要求、明显做不到）。没有就留 0。</li>
+        <li><b>有用程度</b>：你或者一个有经验的老板看了，会不会照着做。5 = 拿来就能用；3 = 方向对但泛，或者啰嗦；1 = 没用或跑偏。更长不等于更好。</li>
+        <li><b>最想要</b>：这题你最想发给这个老板的那份，点一下。真分不出可以点两份。</li>
+        <li>理由可以不填，填一句最好，方便我看出你和模型评审哪里不一样。</li>
+      </ul>
+    </details>
+    <div class="qnav" id="qnav"></div>
+    <article class="qcard" id="qcard"></article>
+    <div class="pager">
+      <button class="btn" id="prevQ">← 上一题</button>
+      <span class="hint" id="qhint"></span>
+      <button class="btn primary" id="nextQ">下一题 →</button>
+    </div>
+  </section>
+
+  <!-- 案例 -->
+  <section id="tab-cases" class="hidden">
+    <details class="intro" id="caseIntro">
+      <summary>怎么审（点开看）</summary>
+      <ul>
+        <li>这 10 个案例是按你的课程底稿、试讲和公开文章起草的，品牌写成“一家连锁咖啡”。你看的是：事实对不对，像不像你会说的话，能不能公开。</li>
+        <li>在正文里<b>用鼠标选中一段文字</b>，会弹出“批注这段”，点一下就在右边记一条意见。</li>
+        <li>黄色框里是我拿不准、需要你拍板的地方，点选项就行，“定位”能跳到原文。</li>
+        <li>每篇最后在右边选：可以放 / 改完再放 / 不放。</li>
+      </ul>
+    </details>
+    <div class="cases">
+      <nav class="clist" id="clist"></nav>
+      <div class="cmain">
+        <div id="flags"></div>
+        <article class="casebody md" id="casebody"></article>
+        <div class="pager">
+          <button class="btn" id="prevC">← 上一篇</button>
+          <button class="btn primary" id="nextC">下一篇 →</button>
+        </div>
+      </div>
+      <aside class="cpanel">
+        <div class="box">
+          <h3>这一篇怎么处理</h3>
+          <div class="opts" id="decision"></div>
+        </div>
+        <div class="box">
+          <h3>读着像你会说的话吗</h3>
+          <div class="opts" id="voice"></div>
+        </div>
+        <div class="box">
+          <h3>整体意见</h3>
+          <textarea id="overall" placeholder="比如：第二段那个数不对；这个故事我不想公开……"></textarea>
+        </div>
+        <div class="box">
+          <h3>逐段批注 <span class="muted" id="noteCount"></span></h3>
+          <div class="notes" id="notes"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 导出 -->
+  <section id="tab-export" class="hidden">
+    <div class="exportgrid">
+      <div class="box">
+        <h3>进度</h3>
+        <div class="stat" id="stats"></div>
+      </div>
+      <div class="box">
+        <h3>导出</h3>
+        <p class="muted" style="margin:0 0 10px">点「下载结果文件」，会存到浏览器的下载文件夹（一般是“下载”）。文件名以“马甲审阅结果”开头。存好后跟我说一声就行，我去那里找。也可以点「复制」，把内容直接贴到对话里。</p>
+        <div class="crow">
+          <button class="btn primary" id="download">下载结果文件</button>
+          <button class="btn" id="copy">复制</button>
+          <button class="btn" id="importBtn">导入之前导出的文件</button>
+          <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+          <span class="spacer"></span>
+          <button class="btn danger" id="reset">清空重来</button>
+        </div>
+      </div>
+      <textarea id="exportText" readonly></textarea>
+    </div>
+  </section>
+</main>
+
+<button id="selpop" class="hidden">批注这段</button>
+<div class="toast" id="toast"></div>
+
+<script type="application/json" id="data-blind">__BLIND__</script>
+<script type="application/json" id="data-cases">__CASES__</script>
+<script type="application/json" id="data-flags">__FLAGS__</script>
+<script>
+(() => {
+  const BLIND = JSON.parse(document.getElementById('data-blind').textContent);
+  const CASES = JSON.parse(document.getElementById('data-cases').textContent);
+  const FLAGS = JSON.parse(document.getElementById('data-flags').textContent);
+  const KEY = 'majia-review-__RUN__';
+  const DECISIONS = [['ok', '可以放'], ['revise', '改完再放'], ['drop', '不放']];
+  const VOICES = [['yes', '像'], ['some', '有点像'], ['no', '不像']];
+
+  // ---------- 状态 ----------
+  function fresh() {
+    return { blind: {}, cases: {}, ui: { tab: 'blind', q: 0, c: 0 } };
+  }
+  let state, canStore = true;
+  try {
+    localStorage.setItem(KEY + '-probe', '1'); localStorage.removeItem(KEY + '-probe');
+    state = JSON.parse(localStorage.getItem(KEY)) || fresh();
+  } catch (e) { state = fresh(); canStore = false; }
+  if (!canStore) document.getElementById('nostore').classList.remove('hidden');
+  state.blind ||= {}; state.cases ||= {}; state.ui ||= { tab: 'blind', q: 0, c: 0 };
+
+  let saveTimer;
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    const el = document.getElementById('saved');
+    el.classList.add('show');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => el.classList.remove('show'), 1200);
+    updateProgress();
+  }
+  function blindEntry(q) {
+    const labels = Object.keys(q.answers);
+    let e = state.blind[q.id];
+    if (!e) {
+      e = { pref: [] };
+      labels.forEach(l => e[l] = { e: 0, u: null, r: '' });
+      state.blind[q.id] = e;
+    }
+    return e;
+  }
+  function caseEntry(file) {
+    let e = state.cases[file];
+    if (!e) { e = { decision: null, voice: null, overall: '', flags: {}, notes: [] }; state.cases[file] = e; }
+    e.flags ||= {}; e.notes ||= [];
+    return e;
+  }
+  function qStatus(q) {
+    const e = state.blind[q.id];
+    if (!e) return 'none';
+    const labels = Object.keys(q.answers);
+    const n = labels.filter(l => e[l] && e[l].u != null).length;
+    if (n === labels.length) return 'done';
+    return n > 0 || (e.pref && e.pref.length) ? 'partial' : 'none';
+  }
+
+  // ---------- Markdown ----------
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function inline(s) {
+    s = esc(s);
+    s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => {
+      const file = decodeURIComponent(u.split('/').pop());
+      const idx = CASES.findIndex(c => c.file === file);
+      if (idx >= 0) return `<a href="#" data-case="${idx}">${t}</a>`;
+      return `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+    });
+    return s;
+  }
+  function md(src) {
+    const lines = src.replace(/\r/g, '').split('\n');
+    let html = '', i = 0, para = [];
+    const flush = () => { if (para.length) { html += '<p>' + para.map(inline).join('<br>') + '</p>'; para = []; } };
+    while (i < lines.length) {
+      const line = lines[i];
+      if (/^```/.test(line)) {
+        flush(); const buf = []; i++;
+        while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+        i++; html += '<pre><code>' + esc(buf.join('\n')) + '</code></pre>'; continue;
+      }
+      if (/^\s*\|/.test(line)) {
+        flush(); const rows = [];
+        while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
+        const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+        const body = rows.filter(r => !/^\s*\|[\s:|-]+\|\s*$/.test(r));
+        if (body.length) {
+          html += '<table><thead><tr>' + cells(body[0]).map(c => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
+          body.slice(1).forEach(r => html += '<tr>' + cells(r).map(c => '<td>' + inline(c) + '</td>').join('') + '</tr>');
+          html += '</tbody></table>';
+        }
+        continue;
+      }
+      let m;
+      if ((m = line.match(/^(#{1,4})\s+(.*)$/))) { flush(); const lv = Math.min(m[1].length, 3); html += `<h${lv}>${inline(m[2])}</h${lv}>`; i++; continue; }
+      if (/^\s*>/.test(line)) {
+        flush(); const buf = [];
+        while (i < lines.length && /^\s*>/.test(lines[i])) buf.push(lines[i++].replace(/^\s*>\s?/, ''));
+        html += '<blockquote>' + buf.map(inline).join('<br>') + '</blockquote>'; continue;
+      }
+      if (/^\s*([-*]|\d+[.、)])\s+/.test(line)) {
+        flush(); const ordered = /^\s*\d/.test(line); const items = [];
+        while (i < lines.length && /^\s*([-*]|\d+[.、)])\s+/.test(lines[i])) {
+          let item = lines[i++].replace(/^\s*([-*]|\d+[.、)])\s+/, '');
+          while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([-*]|\d+[.、)])\s+/.test(lines[i])) item += ' ' + lines[i++].trim();
+          items.push(item);
+        }
+        const tag = ordered ? 'ol' : 'ul';
+        html += `<${tag}>` + items.map(t => '<li>' + inline(t) + '</li>').join('') + `</${tag}>`; continue;
+      }
+      if (/^\s*(---|\*\*\*)\s*$/.test(line)) { flush(); html += '<hr>'; i++; continue; }
+      if (!line.trim()) { flush(); i++; continue; }
+      para.push(line); i++;
+    }
+    flush();
+    return html;
+  }
+  function highlight(root, quote, cls) {
+    if (!quote) return null;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const at = node.nodeValue.indexOf(quote);
+      if (at >= 0) {
+        const range = document.createRange();
+        range.setStart(node, at); range.setEnd(node, at + quote.length);
+        const mark = document.createElement('mark');
+        if (cls) mark.className = cls;
+        range.surroundContents(mark);
+        return mark;
+      }
+    }
+    return null;
+  }
+
+  // ---------- 通用 ----------
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1600);
+  }
+  function setTab(tab) {
+    state.ui.tab = tab;
+    document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
+    ['blind', 'cases', 'export'].forEach(t => document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab));
+    if (tab === 'blind') renderBlind();
+    if (tab === 'cases') renderCase();
+    if (tab === 'export') renderExport();
+    save();
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  function updateProgress() {
+    const done = BLIND.filter(q => qStatus(q) === 'done').length;
+    const decided = CASES.filter(c => state.cases[c.file] && state.cases[c.file].decision).length;
+    document.getElementById('progressText').textContent = `打分 ${done}/${BLIND.length}` + (CASES.length ? ` · 案例 ${decided}/${CASES.length}` : '');
+  }
+
+  // ---------- 盲评 ----------
+  function seg(values, current, onPick, extraCls) {
+    const wrap = document.createElement('div');
+    wrap.className = 'seg' + (extraCls ? ' ' + extraCls : '');
+    values.forEach(([v, label]) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = label;
+      b.setAttribute('aria-pressed', current === v);
+      if (v !== 0) b.classList.add('nz');
+      b.addEventListener('click', () => onPick(v));
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+  function renderQnav() {
+    const nav = document.getElementById('qnav');
+    nav.innerHTML = '';
+    BLIND.forEach((q, i) => {
+      const b = document.createElement('button');
+      b.className = 'qchip ' + qStatus(q) + (i === state.ui.q ? ' current' : '');
+      b.textContent = i + 1; b.title = q.id;
+      b.addEventListener('click', () => { state.ui.q = i; renderBlind(); save(); });
+      nav.appendChild(b);
+    });
+  }
+  function renderBlind() {
+    const qi = Math.max(0, Math.min(state.ui.q || 0, BLIND.length - 1));
+    state.ui.q = qi;
+    const q = BLIND[qi];
+    const e = blindEntry(q);
+    renderQnav();
+    const card = document.getElementById('qcard');
+    card.innerHTML = '';
+    const meta = document.createElement('div');
+    meta.className = 'qmeta';
+    meta.innerHTML = `<span>第 ${qi + 1} / ${BLIND.length} 题</span><code>${esc(q.id)}</code>`;
+    card.appendChild(meta);
+    const req = document.createElement('p'); req.className = 'request'; req.textContent = '用户问：' + q.request; card.appendChild(req);
+    const ev = document.createElement('p'); ev.className = 'evidence'; ev.textContent = '已知限制：' + q.evidence; card.appendChild(ev);
+    const grid = document.createElement('div'); grid.className = 'answers';
+    Object.entries(q.answers).forEach(([label, text]) => {
+      const r = e[label];
+      const box = document.createElement('div');
+      box.className = 'answer' + (e.pref.includes(label) ? ' preferred' : '');
+      const head = document.createElement('div'); head.className = 'ahead';
+      head.innerHTML = `<span class="alabel">回答 ${label}<span class="alen">${text.length} 字</span></span>`;
+      const pref = document.createElement('button');
+      pref.className = 'pref'; pref.type = 'button';
+      pref.setAttribute('aria-pressed', e.pref.includes(label));
+      pref.textContent = e.pref.includes(label) ? '★ 最想要' : '☆ 最想要';
+      pref.addEventListener('click', () => {
+        e.pref = e.pref.includes(label) ? e.pref.filter(x => x !== label) : [...e.pref, label].sort();
+        save(); renderBlind();
+      });
+      head.appendChild(pref); box.appendChild(head);
+      const body = document.createElement('div'); body.className = 'abody md'; body.innerHTML = md(text); box.appendChild(body);
+      const ctl = document.createElement('div'); ctl.className = 'controls';
+      const r1 = document.createElement('div'); r1.className = 'crow';
+      r1.innerHTML = '<span class="clabel">严重错误</span>';
+      r1.appendChild(seg([[0, '0'], [1, '1'], [2, '2'], [3, '3+']], r.e, v => { r.e = v; save(); renderBlind(); }, 'err'));
+      const r2 = document.createElement('div'); r2.className = 'crow';
+      r2.innerHTML = '<span class="clabel">有用程度</span>';
+      r2.appendChild(seg([[1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5']], r.u, v => { r.u = v; save(); renderBlind(); }));
+      const inp = document.createElement('input');
+      inp.className = 'reason'; inp.placeholder = '一句理由（可不填）'; inp.value = r.r || '';
+      inp.addEventListener('input', () => { r.r = inp.value; save(); });
+      ctl.append(r1, r2, inp); box.appendChild(ctl);
+      grid.appendChild(box);
+    });
+    card.appendChild(grid);
+    document.getElementById('prevQ').disabled = qi === 0;
+    const next = document.getElementById('nextQ');
+    next.textContent = qi === BLIND.length - 1 ? (CASES.length ? '去审案例 →' : '去导出 →') : '下一题 →';
+    const st = qStatus(q);
+    document.getElementById('qhint').textContent = st === 'done' ? (e.pref.length ? '这题打完了' : '这题打完了，还可以点一份“最想要”') : '三份都打了“有用程度”才算这题打完';
+    updateProgress();
+  }
+  document.getElementById('prevQ').addEventListener('click', () => { if (state.ui.q > 0) { state.ui.q--; renderBlind(); save(); window.scrollTo(0, 0); } });
+  document.getElementById('nextQ').addEventListener('click', () => {
+    if (state.ui.q < BLIND.length - 1) { state.ui.q++; renderBlind(); save(); window.scrollTo(0, 0); }
+    else setTab(CASES.length ? 'cases' : 'export');
+  });
+
+  // ---------- 案例 ----------
+  function renderClist() {
+    const nav = document.getElementById('clist');
+    nav.innerHTML = '';
+    CASES.forEach((c, i) => {
+      const e = state.cases[c.file];
+      const b = document.createElement('button');
+      b.className = 'citem' + (i === state.ui.c ? ' current' : '');
+      b.innerHTML = `<span class="dot ${e && e.decision ? e.decision : ''}"></span><span>${esc(c.short)}</span>`;
+      b.title = c.title;
+      b.addEventListener('click', () => { state.ui.c = i; renderCase(); save(); window.scrollTo(0, 0); });
+      nav.appendChild(b);
+    });
+  }
+  function pills(container, options, current, onPick) {
+    container.innerHTML = '';
+    options.forEach(([v, label]) => {
+      const b = document.createElement('button');
+      b.className = 'opt'; b.type = 'button'; b.textContent = label;
+      b.setAttribute('aria-pressed', current === v);
+      b.addEventListener('click', () => onPick(current === v ? null : v));
+      container.appendChild(b);
+    });
+  }
+  function renderNotes(e, body) {
+    const wrap = document.getElementById('notes');
+    wrap.innerHTML = '';
+    document.getElementById('noteCount').textContent = e.notes.length ? `（${e.notes.length} 条）` : '';
+    if (!e.notes.length) { wrap.innerHTML = '<p class="empty">在左边正文里选中一段文字，点“批注这段”。</p>'; return; }
+    e.notes.forEach((n, idx) => {
+      const div = document.createElement('div'); div.className = 'note';
+      const q = document.createElement('q'); q.textContent = n.quote.length > 80 ? n.quote.slice(0, 80) + '…' : n.quote; q.title = '跳到原文';
+      q.addEventListener('click', () => { const m = body.querySelectorAll('mark.notemark')[idx]; if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+      const ta = document.createElement('textarea'); ta.value = n.comment || ''; ta.placeholder = '这段怎么改？';
+      ta.addEventListener('input', () => { n.comment = ta.value; save(); });
+      const del = document.createElement('button'); del.className = 'del'; del.type = 'button'; del.textContent = '删掉这条';
+      del.addEventListener('click', () => { e.notes.splice(idx, 1); save(); renderCase(); });
+      div.append(q, ta, del); wrap.appendChild(div);
+      if (n.focus) { delete n.focus; setTimeout(() => ta.focus(), 30); }
+    });
+  }
+  function renderCase() {
+    const ci = Math.max(0, Math.min(state.ui.c || 0, CASES.length - 1));
+    state.ui.c = ci;
+    const c = CASES[ci];
+    const e = caseEntry(c.file);
+    renderClist();
+    const body = document.getElementById('casebody');
+    body.innerHTML = md(c.md);
+    body.querySelectorAll('a[data-case]').forEach(a => a.addEventListener('click', ev => {
+      ev.preventDefault(); state.ui.c = +a.dataset.case; renderCase(); save(); window.scrollTo(0, 0);
+    }));
+    const flags = FLAGS[c.file] || [];
+    const flagWrap = document.getElementById('flags');
+    flagWrap.innerHTML = '';
+    const flagMarks = {};
+    flags.forEach(f => { if (f.quote) flagMarks[f.id] = highlight(body, f.quote, 'flagmark'); });
+    e.notes.forEach(n => highlight(body, n.quote, 'notemark'));
+    if (flags.length) {
+      const box = document.createElement('div'); box.className = 'flags';
+      box.innerHTML = '<h3>要你拍板的地方</h3>';
+      flags.forEach(f => {
+        const fe = e.flags[f.id] || (e.flags[f.id] = { choice: null, note: '' });
+        const div = document.createElement('div'); div.className = 'flag';
+        const p = document.createElement('p'); p.textContent = f.q;
+        if (f.quote) {
+          const loc = document.createElement('button'); loc.className = 'locate'; loc.type = 'button'; loc.textContent = '定位';
+          loc.addEventListener('click', () => { const m = flagMarks[f.id]; if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+          p.appendChild(loc);
+        }
+        const opts = document.createElement('div'); opts.className = 'opts';
+        pills(opts, f.options.map(o => [o, o]), fe.choice, v => { fe.choice = v; save(); renderCase(); });
+        const note = document.createElement('input'); note.className = 'flagnote'; note.placeholder = '备注（可不填）'; note.value = fe.note || '';
+        note.addEventListener('input', () => { fe.note = note.value; save(); });
+        div.append(p, opts, note); box.appendChild(div);
+      });
+      flagWrap.appendChild(box);
+    }
+    pills(document.getElementById('decision'), DECISIONS, e.decision, v => { e.decision = v; save(); renderCase(); });
+    pills(document.getElementById('voice'), VOICES, e.voice, v => { e.voice = v; save(); renderCase(); });
+    const ov = document.getElementById('overall');
+    ov.value = e.overall || '';
+    ov.oninput = () => { e.overall = ov.value; save(); };
+    renderNotes(e, body);
+    document.getElementById('prevC').disabled = ci === 0;
+    document.getElementById('nextC').textContent = ci === CASES.length - 1 ? '去导出 →' : '下一篇 →';
+    updateProgress();
+  }
+  document.getElementById('prevC').addEventListener('click', () => { if (state.ui.c > 0) { state.ui.c--; renderCase(); save(); window.scrollTo(0, 0); } });
+  document.getElementById('nextC').addEventListener('click', () => {
+    if (state.ui.c < CASES.length - 1) { state.ui.c++; renderCase(); save(); window.scrollTo(0, 0); }
+    else setTab('export');
+  });
+
+  // 选中文字 → 批注
+  const pop = document.getElementById('selpop');
+  let pendingQuote = '';
+  document.addEventListener('mouseup', ev => {
+    if (ev.target === pop) return;
+    setTimeout(() => {
+      const sel = window.getSelection();
+      const body = document.getElementById('casebody');
+      const text = sel ? sel.toString().trim() : '';
+      if (!text || state.ui.tab !== 'cases' || !sel.rangeCount || !body.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+        pop.classList.add('hidden'); return;
+      }
+      const rect = sel.getRangeAt(0).getBoundingClientRect();
+      pendingQuote = text;
+      pop.style.left = (window.scrollX + rect.left + rect.width / 2 - 40) + 'px';
+      pop.style.top = (window.scrollY + rect.top - 38) + 'px';
+      pop.classList.remove('hidden');
+    }, 0);
+  });
+  pop.addEventListener('mousedown', ev => ev.preventDefault());
+  pop.addEventListener('click', () => {
+    const c = CASES[state.ui.c];
+    const e = caseEntry(c.file);
+    e.notes.push({ quote: pendingQuote.replace(/\s+/g, ' '), comment: '', focus: true });
+    pop.classList.add('hidden');
+    window.getSelection().removeAllRanges();
+    save(); renderCase();
+  });
+
+  // ---------- 导出 ----------
+  function buildExport() {
+    const blind_review = BLIND.map(q => {
+      const e = state.blind[q.id] || {};
+      const ratings = {};
+      Object.keys(q.answers).forEach(l => {
+        const r = e[l] || {};
+        ratings[l] = { critical_errors: r.e ?? 0, usefulness: r.u ?? null, reason: r.r || '' };
+      });
+      return { id: q.id, ratings, preferred: e.pref || [] };
+    });
+    const case_review = {};
+    CASES.forEach(c => {
+      const e = state.cases[c.file];
+      if (!e) return;
+      case_review[c.file] = {
+        decision: e.decision, voice: e.voice, overall: e.overall || '',
+        flags: Object.fromEntries((FLAGS[c.file] || []).map(f => [f.id, { question: f.q, choice: (e.flags[f.id] || {}).choice || null, note: (e.flags[f.id] || {}).note || '' }])),
+        notes: e.notes.map(n => ({ quote: n.quote, comment: n.comment || '' })),
+      };
+    });
+    return { reviewer: '马甲', exported_at: new Date().toISOString(), blind_run: '__RUN__', blind_review, case_review };
+  }
+  function renderExport() {
+    const done = BLIND.filter(q => qStatus(q) === 'done').length;
+    const prefs = BLIND.filter(q => (state.blind[q.id] || {}).pref?.length).length;
+    const decided = CASES.filter(c => state.cases[c.file] && state.cases[c.file].decision).length;
+    const notes = CASES.reduce((s, c) => s + ((state.cases[c.file] || {}).notes || []).length, 0);
+    document.getElementById('stats').innerHTML =
+      `<div><b>${done}/${BLIND.length}</b>题打完分</div><div><b>${prefs}</b>题选了最想要</div><div><b>${decided}/${CASES.length}</b>篇定了怎么处理</div><div><b>${notes}</b>条批注</div>`;
+    document.getElementById('exportText').value = JSON.stringify(buildExport(), null, 2);
+  }
+  document.getElementById('download').addEventListener('click', () => {
+    const text = JSON.stringify(buildExport(), null, 2);
+    const blob = new Blob([text], { type: 'application/json' });
+    const a = document.createElement('a');
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
+    a.href = URL.createObjectURL(blob);
+    a.download = `马甲审阅结果-${stamp}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('已下载，存在浏览器的下载文件夹');
+  });
+  document.getElementById('copy').addEventListener('click', async () => {
+    const ta = document.getElementById('exportText');
+    ta.value = JSON.stringify(buildExport(), null, 2);
+    try { await navigator.clipboard.writeText(ta.value); toast('已复制'); }
+    catch (e) { ta.select(); document.execCommand('copy'); toast('已复制'); }
+  });
+  document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+  document.getElementById('importFile').addEventListener('change', async ev => {
+    const file = ev.target.files[0];
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      const next = fresh();
+      (data.blind_review || []).forEach(item => {
+        const q = BLIND.find(x => x.id === item.id);
+        if (!q) return;
+        const e = { pref: item.preferred || [] };
+        Object.keys(q.answers).forEach(l => {
+          const r = (item.ratings || {})[l] || {};
+          e[l] = { e: r.critical_errors ?? 0, u: r.usefulness ?? null, r: r.reason || '' };
+        });
+        next.blind[item.id] = e;
+      });
+      Object.entries(data.case_review || {}).forEach(([file, c]) => {
+        next.cases[file] = {
+          decision: c.decision || null, voice: c.voice || null, overall: c.overall || '',
+          flags: Object.fromEntries(Object.entries(c.flags || {}).map(([k, v]) => [k, { choice: v.choice || null, note: v.note || '' }])),
+          notes: (c.notes || []).map(n => ({ quote: n.quote, comment: n.comment || '' })),
+        };
+      });
+      state = next; save(); setTab('export'); toast('已导入，可以接着做');
+    } catch (e) { toast('这个文件读不了'); }
+    ev.target.value = '';
+  });
+  document.getElementById('reset').addEventListener('click', () => {
+    if (!confirm('清空所有打分和批注？这一步撤不回来。')) return;
+    state = fresh(); save(); setTab('blind');
+  });
+
+  if (!CASES.length) {
+    document.querySelector('[data-tab="cases"]').classList.add('hidden');
+    if (state.ui.tab === 'cases') state.ui.tab = 'blind';
+  }
+  // 第一次打开时展开说明
+  if (!Object.keys(state.blind).length) document.getElementById('blindIntro').open = true;
+  if (!Object.keys(state.cases).length) document.getElementById('caseIntro').open = true;
+  setTab(state.ui.tab || 'blind');
+})();
+</script>
+</body>
+</html>

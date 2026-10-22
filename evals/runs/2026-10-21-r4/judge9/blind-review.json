@@ -1,0 +1,72 @@
+[
+  {"id": "hotpot_unknown", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 3, "reason": "方向对，还点出了直营还是加盟这个关键变量，但没有加粗结论和分块，主要是在反问，能直接照做的动作少。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "加粗结论一眼可见，按“先盘点、按缺口补、先挑一两家店走通”分块，好读好执行，结尾只问一个问题。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "盘点清单和“按卡点对号”很具体（好友码、欢迎语、群码，储值和换收银先别急），但开头经验那段是大块文字，读着慢一点。"}},
+   "preferred": ["B"]},
+  {"id": "vendor_risk", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论加一张对比表，甲暂停、乙只到试用，口头说法不算证据，签约前要补的列得清楚，来源带日期，适合赶时间的人。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "判断准，试用清单最细（签约方和收款方要一致、费用分项报价），但表格和段落偏密；“你们收银稳定”是从“只缺会员复购”推出来的，用户没直说。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "结论和依据都对，但没有表格，链接都夹在正文里，大段文字，用户说了赶时间，这样不好扫读。"}},
+   "preferred": ["A"]},
+  {"id": "platform_coverage", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "方法完整：按渠道找、把平台资源拆开看、用同一条路逐段比、正反两面都查、结论分三档，美团不加分也写清了，但六步偏长。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "内容和 A 基本一样，也说清了美团合作意向不加分，篇幅同样偏长，结构比 A 略紧一点。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论一句话交代了怎么找、怎么比、美团不加分，后面三块写得紧凑，关键核查点一个没漏，最好读。"}},
+   "preferred": ["C"]},
+  {"id": "existing_stack", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "只给一个动作，谁做什么、每周看哪三个数都写清了，还用“回来出示权益”来数回店的人，正好绕开了企微和会员对不上的问题，也没夸大因果。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "一个动作，分工清楚，篇幅短，“先看顾客付没付钱”的判断用得上；但没处理企微客户和收银会员对不上、回店怎么数的问题。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "最周全，有准备、每周巡店、券批次和收手条件，但用户只要一个小动作，这份展开得太长。"}},
+   "preferred": ["A"]},
+  {"id": "quiet_groups", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "先别关，相关不等于因果讲清了，记四样数、按毛利对账、什么时候收缩都具体，但开头经验那段是大块文字，没有加粗结论。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "短而清楚，“安静的群可以只是领券用”这一点说得好；但缺成本数据时就说“不该关、数据支持留着”稍嫌肯定，也没给一个对账的办法。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论，看券不看发言讲得直白，每周记一行加毛利对账，还有随机留群不发的对照办法和收手条件，结构最清楚。"}},
+   "preferred": ["C"]},
+  {"id": "simple_copy", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "80字以内，条件一样不少也没加，每行一个对得上内容的 emoji（火锅、时钟、饮品），开头一句抓眼，最像群通知。"},
+    "B": {"critical_errors": 0, "usefulness": 3, "reason": "信息准确也够短，但一个 emoji 都没有，一段平铺，在群里不抓眼。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "信息完整、口气自然，分行好读，只有一个 emoji，抓眼程度不如 A。"}},
+   "preferred": ["A"]},
+  {"id": "cashier_reluctant", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "加粗结论抓住了“码不会自己招呼人，关键是收银员开口”，话术、奖励口径、总部和加盟商分工都具体；但高峰期还是要收银员开口，排队的问题处理得不够。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "排查原因、高峰改桌贴和等位区自助扫、加盟商自己定，都写得周全，但开头经验是一大段文字，整体偏长。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "先去现场看清店员为什么不推，高峰只结账、码挪到桌上和等位区，总部给东西不下命令，还可以先承担试点期成本，最贴合两层加盟和排队这两个情况。"}},
+   "preferred": ["C"]},
+  {"id": "store_leaderboard", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "结论直给，四个评估问题加改法（按比例排、分组排、进步榜、现场抽查），还写了防刷数和试一个月，完整可执行。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论直接给出“每100单加上几人”的比法，有算好的例子，点出排名主要用来找没动起来的店，最短最好懂。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "内容扎实，规则先定、先跑两周只公布不挂奖都好，但开头是经验而不是对这个提议的结论，要读到第二段才看到判断。"}},
+   "preferred": ["B"]},
+  {"id": "franchise_member_day", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "算账、用几个“如果”去问、翻历史记录三步都对，问出来的答案怎么归类也写了，但开头没有加粗结论，读着平。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "五类阻力加数一数、比一比、对一对，最系统，还提醒实收已扣优惠别重复减，但条目多、偏长。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "“一次只换一个条件问，在哪松口就是主要阻力”这个办法很利落，举例的账算得对（标了是打比方），篇幅最短。"}},
+   "preferred": ["C"]},
+  {"id": "recall_all_30d", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "按每个人自己的消费间隔圈人、超过一倍算久、留对照组都对，但“一年换一次手机”这个比方和火锅店离得远。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "分几拨、每拨说不同的话，最好落地，只来过一次的单独处理也对，但开头经验那段是大块文字，结论不够醒目。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论，直接说清为什么一刀切会白送钱、还会养成等券再来的习惯，六步圈人发券的流程清楚，也没硬给统一天数。"}},
+   "preferred": ["C"]},
+  {"id": "franchise_coupon_cost", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论一句交代了“先算账、两头分摊、券改省”，没把“效果是有的”当成证据，券只在参加的店能用这个细节也想到了，紧凑。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "先点破核销多不等于多赚，按算出来的结果分情况谈，几档券模板加月度对账单，执行性强，略长于 A。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "几种分摊方式和结算要写清都很实用，但开头两段是大块文字，结论不醒目。"}},
+   "preferred": ["A"]},
+  {"id": "flash_sale_crowding", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "结论醒目，限量、错开时段、分批推、看有没有挤掉正价客都对，但引的小程序被挤崩是系统扛不住，和门店做不过来不完全是一回事。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "唯一提出已经卖出去的券照原规则兑现，这点很关键，其他步骤也全，但开头是大段经验，结论被压到后面。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "先查堵在哪、有没有挤掉正价客，再一次只改一样，有门店报量和核销一步完成，试点要看什么也写了，结构清楚。"}},
+   "preferred": ["C"]},
+  {"id": "new_store_7days", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "先后顺序清楚，提醒了诱导转发会被处罚，但开头经验那段偏长，十个步骤读着累。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "加粗结论给出进群这条路，代价和“要好友就换一条路走”都说清了，先做和后做两块很短，群满自动开新群也提醒先实测。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "走加好友这条路，培训只练一句话、码放两处、别拿手机号批量加人都很实用，但没比较直接进群更快这个选项。"}},
+   "preferred": ["B"]},
+  {"id": "weekly_moments", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "四条的节奏合理，缺的信息都用【填】空着没编，但第二、三条文案偏平，周三、周四两条的内容有重复。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "文案最抓眼（“总说吃什么都行的人”、周三只透露不报价），emoji 和内容对得上，周日还有一条最后一天的提醒，【填】的地方列清了。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "结构清楚，每条标了发布时间，第一条开头有力，但后几条更像信息卡，感染力不如 B。"}},
+   "preferred": ["B"]}
+]
