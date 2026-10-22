@@ -9,7 +9,7 @@ metadata:
 
 # siyu-report：客户咨询报告
 
-只从 `~/.siyu/clients/{客户}/` 的存档合并报告，不从当前对话凭空发挥。报告属于跨对话客户档案；`.siyu-team/` 仍只是一轮总协调安排的运行中状态。
+只从 `~/.siyu/clients/{客户}/` 的存档合并报告，不从当前对话凭空发挥。报告属于跨对话客户档案。
 
 ## 用户措辞
 
@@ -76,8 +76,10 @@ metadata:
 先写到报告路径，再运行：
 
 ```bash
-PYTHONPATH=src python3 -m siyu_team.eval.cli score "{报告路径}" --threshold 0
+PYTHONPATH=src python3 -m siyu_team.eval.cli compliance "{报告路径}"
 ```
+
+单入口包在包根目录把 `PYTHONPATH=src` 换成 `PYTHONPATH=tools`。不能运行脚本时按 `wechat-compliance-redlines` 逐句自查，并在合规记录里写明是自查。
 
 - 命中 `COMPLIANCE_RED`：不得交付。定位命中句，基于原存档做合规改写；不能安全改写时停止并让用户确认。
 - 未命中：在「合规记录」写扫描时间与结果，再完成交付。

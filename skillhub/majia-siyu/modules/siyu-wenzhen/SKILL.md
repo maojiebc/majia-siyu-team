@@ -9,7 +9,7 @@ metadata:
 
 # siyu-wenzhen：私域问诊
 
-由入口接力时先读[接手契约](references/handoff-contract.json)，沿用原始条件和已核验事实，只完成本步交付；待核假设不得升级为事实。
+由入口接力时，沿用原始条件和已核验事实，只完成本步交付；待核假设不得升级为事实。
 
 帮助用户做当前这一步判断。不要把所有问题变成问卷、全案或对提问方式的审判。
 
@@ -43,7 +43,7 @@ metadata:
 
 ## 知识与交付
 
-增长类问题按需用计划中的 `growth_atoms`；无计划时查 `modules/_knowledge/00-methodology/L0-通用用户增长原则.md`，餐饮再读 `modules/_knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`。公开知识是带条件的经验，不是本次用户事实或当前规则。引用社区原子时标明社区C级 / 单源D级 / 维护者A级。
+先看[马甲的判断清单](../_knowledge/cases/00-判断清单.md)：用户问的就是案例里那件事，才先给马甲会怎么判断、用一两句讲当年的事，再落到用户这家店；只是沾边就不讲案例。用户明确要的目标和案例判断冲突，以用户目标为准。案例里没写的，不说成马甲的判断。增长类问题再查 `modules/_knowledge/00-methodology/L0-通用用户增长原则.md`，餐饮读 `modules/_knowledge/02-industry/catering/L1-餐饮零售用增Know-how.md`。案例和公开知识都是带条件的经验，不是本次用户事实。
 
 门店执行按需读 [门店会员执行参考](../_knowledge/02-industry/catering/门店会员执行参考.md)；指标口径、复购计算、SQL 或数据核验交会员数据能力。动态事实按市场调研核验，不靠经验补齐。
 

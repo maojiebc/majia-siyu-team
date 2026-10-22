@@ -134,11 +134,12 @@ class ManualReleaseChecklistTests(unittest.TestCase):
         self.assertEqual(len(tags), 10)
         self.assertEqual(len(set(tags)), 10)
 
-    def test_online_steps_require_authorization_and_hypotheses_are_not_evaluated(self) -> None:
+    def test_online_steps_require_authorization_and_quality_comes_from_blind_evals(self) -> None:
         self.assertIn("维护者明确授权发布后", self.text)
         self.assertIn("同一 commit", self.text)
         self.assertIn("SemVer", self.text)
-        self.assertIn("Not Evaluated", self.text)
+        self.assertIn("evals/README.md", self.text)
+        self.assertIn("没跑就写没跑", self.text)
 
 
 if __name__ == "__main__":

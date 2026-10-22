@@ -22,11 +22,6 @@ SKILL_VERSION_RE = re.compile(
 BADGE_RE = re.compile(
     r"img\.shields\.io/badge/(?:skill-)?v?([0-9.]+)-[A-Fa-f0-9]+\.svg"
 )
-KNOWLEDGE_MANIFESTS = (
-    Path("knowledge/manifest.json"),
-    Path("src/siyu_team/knowledge/data/manifest.json"),
-    Path("skillhub/majia-siyu/modules/_knowledge/manifest.json"),
-)
 
 
 def _read_text(root: Path, rel: Path, errors: list[str]) -> str | None:
@@ -192,46 +187,6 @@ def _check_release_documents(root: Path, version: str, errors: list[str]) -> Non
         else:
             _check_value("CHANGELOG.md 最新发布版本", heading.group(1), version, errors)
 
-    framework = _read_text(root, Path("docs/framework.svg"), errors)
-    if framework is not None and framework.count(f"v{version}") < 2:
-        errors.append("docs/framework.svg: 标题与版本芯片未同时更新")
-
-
-def _check_knowledge_manifests(root: Path, version: str, errors: list[str]) -> None:
-    expected_batch_marker = f"v{version}"
-    batch_pattern = re.compile(
-        rf"(?:^|[^0-9]){re.escape(expected_batch_marker)}(?:$|[^0-9])"
-    )
-    for rel in KNOWLEDGE_MANIFESTS:
-        payload = _read_json(root, rel, errors)
-        if payload is None:
-            continue
-        batches: list[tuple[str, object]] = []
-
-        def collect(value: object, location: str) -> None:
-            if isinstance(value, dict):
-                for key, child in value.items():
-                    child_location = f"{location}.{key}" if location else str(key)
-                    if key == "release_batch":
-                        batches.append((child_location, child))
-                    collect(child, child_location)
-            elif isinstance(value, list):
-                for index, child in enumerate(value):
-                    collect(child, f"{location}[{index}]")
-
-        collect(payload, "")
-        if not batches:
-            errors.append(f"{rel}: 缺少 release_batch")
-        for location, release_batch in batches:
-            if (
-                not isinstance(release_batch, str)
-                or batch_pattern.search(release_batch) is None
-            ):
-                errors.append(
-                    f"{rel} {location} {release_batch!r} "
-                    f"未标记 {expected_batch_marker}"
-                )
-
 
 def check(root: Path = ROOT) -> tuple[str, int, int, list[str]]:
     """返回版本、安装单元数、Skill 数与所有漂移错误。"""
@@ -270,7 +225,6 @@ def check(root: Path = ROOT) -> tuple[str, int, int, list[str]]:
     _check_python_version_files(root, version, errors)
     _check_readmes(root, version, errors)
     _check_release_documents(root, version, errors)
-    _check_knowledge_manifests(root, version, errors)
     return version, install_units, skill_count, errors
 
 

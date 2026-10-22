@@ -1,17 +1,19 @@
 # CLAUDE.md — 私域专家团 · 给 AI 协作者的不变量
 
-**唯一真源（source of truth）**：能力定义只在 `plugins/`（角色人设+方法论）和 `src/siyu_team/`（编排/收口/质量门/连接器）。多端派生分发（`tools/generate.py` → codex/cursor/opencode）目前**尚未启用**（脚本为禁用桩）；一旦启用，其产物即派生物、绝不手改。
+**这个包是什么**：马甲判断力的样品，不是平台。用户拿到的只有 Markdown 技能和知识；它唯一的价值，是模型读了以后比没读时答得好。不再加运行时、状态机、连接器、流水线这类后台系统。
 
-**编排范式**：走 wshobson「单 orchestrator + 文件状态机」（范式 A），不碰需要实验开关的 agent-teams（范式 B）。团长链是顺序依赖 + 要人审，范式 A 更稳。
+**唯一真源**：能力定义在 `plugins/`（技能、四官人设、编排命令）和 `knowledge/`（方法、行业册、案例）。`skillhub/majia-siyu/` 和 `dist/workbuddy/` 都由 `tools/build_*_bundle.py` 生成，绝不手改。`src/siyu_team/` 只剩三个文案检查脚本共用的合规扫描器。
 
-**收口范式**：走 qiaomu HeavySkill 主持人模式——四官各自独立采样、互不可见，团长（host）不投票不平均，只评推理质量、保留少数意见。合规官红线一票否决。
+**案例是核心**：`knowledge/cases/` 放马甲讲透的真事，`00-判断清单.md` 是入口。每个案例照他讲课的路子：先讲真事，再讲怎么判断，最后讲换到你家店怎么改。用他的口吻写，敢下判断；不要层层加"不代表、不等于"磨平。技能里引用案例时用第三人称（"马甲当时……"）。
 
-**质量门**：静态合规与质量评分分开。`siyu-eval compliance` 只报告按语境解释的合规命中；`siyu-eval judge` 仅在独立宿主逐维评分并回填完整来源后计算质量分。缺少 `JudgeReport` 时不得显示分数或徽章，分数也不自动批准案例或知识。`siyu-eval score` / `make eval` 只保留一个版本的 deprecated 合规别名。当前事实见 `docs/architecture-current.md`。
+**改动要过盲评**：技能或案例有实质改动，按 `evals/README.md` 跑装和不装的盲评；结果变差就撤。回答更长、模板更多不算进步。
 
-**护城河边界**：`knowledge/03-majia-sop/` 是马甲真实 SOP，私有，git-ignore，**绝不进公开库**。所有 `【待马甲填真实SOP】` 标记处由马甲本人注入。
+**编排**：四官分头看、合规官一票否决、团长不投票只评推理质量并保留少数意见（qiaomu HeavySkill 主持人模式）。宿主支持子代理就并行派；不支持就依次写，并说明不是彼此独立的。
 
-**知识分层不变量**：高频案例内联 `SKILL.md`（≤8KB）→ 深度方法论进 skill 的 `references/` 或 `knowledge/00-methodology/` → 全量语料原子化进私有 `knowledge/03-majia-sop/atoms.jsonl`。公开层只保留 schema 与脱敏示例；各层之间用路径指针引用，不复制正文，防止漂移。
+**护城河边界**：`knowledge/03-majia-sop/` 是马甲的原始材料，私有，git-ignore，**绝不进公开库**。案例进公开库前由马甲本人过目。
 
-**脱敏红线**：commit message 与任何对外内容都脱敏，不写真实品牌/雇主/他人姓名。密钥走 keychain 指针（`keychain:siyu-team/<tool>`），真 token 不入库。
+**脱敏红线**：案例里品牌写成"一家连锁咖啡"，品牌特有的专名也换掉（人设号名字、限定商品名、周年数）；不写同事、客户、外包、厂商的名字；课程里标了不外讲的原话和数字不写。咨询案例不写店名、商标和经营数字。commit message 同样脱敏。密钥走 keychain 指针（`keychain:siyu-team/<tool>`），真 token 不入库。
 
-> 这个 repo 是怎么来的：看透两个 4-5 档标杆（wshobson/agents、qiaomu-llm-mcp）后把编排范式翻译成私域专家团骨架。完整拆解见 `docs/`。
+**不要写进免费包**：独立收费项目 SaaS-siyu 的方法卡、排期格式、时间窗口规则、跨渠道一致性规则。
+
+> 来历：最初照两个标杆（wshobson/agents、qiaomu-llm-mcp）的编排范式搭了骨架和一套 Python 运行时；2026-10 按"样品不是平台"删掉了运行时，见 `docs/THIRD_PARTY_INSPIRATIONS.md` 和 CHANGELOG。

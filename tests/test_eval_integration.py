@@ -1,8 +1,7 @@
-"""Integration coverage for the separated compliance and Judge semantics."""
+"""Integration coverage for the compliance CLI."""
 from __future__ import annotations
 
 import contextlib
-import hashlib
 import io
 import json
 import tempfile
@@ -10,9 +9,6 @@ import unittest
 from pathlib import Path
 
 from siyu_team.eval import cli as eval_cli
-from siyu_team.eval.engine import composite
-from siyu_team.eval.models import JudgeReport
-from siyu_team.eval.rubrics import DIMENSION_WEIGHTS
 
 
 SAFE_PLAN = "会员触达方案：店长负责；按到店人数/触达人数计算到店率，先小范围验证。"
@@ -52,150 +48,23 @@ class EvalCliIntegrationTests(unittest.TestCase):
         self.assertEqual(report["flags"], [])
         self.assertEqual(report["hits"], [])
 
-    def test_deprecated_score_is_a_compliance_alias(self) -> None:
+    def test_compliance_blocks_clear_red_lines(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            plan = Path(tmp) / "plan.md"
-            plan.write_text(SAFE_PLAN, encoding="utf-8")
-            code, output = self._run(["score", str(plan)])
-
-        self.assertEqual(code, 0)
-        self.assertIn("deprecated", output)
-        self.assertIn("静态合规检查", output)
-        self.assertNotIn("Platinum", output)
-        self.assertNotIn("Gold", output)
-
-    def test_emit_prompts_does_not_create_judge_report_or_badge(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            plan = Path(tmp) / "plan.md"
-            plan.write_text(SAFE_PLAN, encoding="utf-8")
-            code, output = self._run(["judge", str(plan), "--emit-prompts"])
+            plan = Path(tmp) / "copy.md"
+            plan.write_text("全国销量第一，转发3个群领券", encoding="utf-8")
+            code, output = self._run(["compliance", str(plan), "--json"])
 
         payload = json.loads(output)
-        self.assertEqual(code, 0)
-        self.assertEqual(set(payload), set(DIMENSION_WEIGHTS) | {"reliability_checks"})
-        self.assertNotIn("score", payload)
-        self.assertNotIn("badge", payload)
-
-    def test_legacy_scores_cannot_create_quality_score_or_badge(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            plan = Path(tmp) / "plan.md"
-            plan.write_text(SAFE_PLAN, encoding="utf-8")
-            scores = Path(tmp) / "legacy-scores.json"
-            scores.write_text(
-                json.dumps({dim: 0.9 for dim in DIMENSION_WEIGHTS}),
-                encoding="utf-8",
-            )
-            code, output = self._run(
-                ["judge", str(plan), "--scores", str(scores)]
-            )
-
-        payload = json.loads(output)
-        self.assertEqual(code, 2)
-        self.assertEqual(payload["status"], "not_evaluated")
-        self.assertIsNone(payload["score"])
-        self.assertIsNone(payload["badge"])
-        self.assertFalse(payload["config"]["metadata_complete"])
-
-    def test_complete_independent_envelope_creates_judge_report(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            plan = Path(tmp) / "plan.md"
-            plan.write_text(SAFE_PLAN, encoding="utf-8")
-            request = Path(tmp) / "request.md"
-            evidence = Path(tmp) / "evidence.md"
-            request.write_text("写一个会员触达小试方案", encoding="utf-8")
-            evidence.write_text("用户只需小范围验证，无外部动态事实。", encoding="utf-8")
-            scores = Path(tmp) / "judge-scores.json"
-            scores.write_text(
-                json.dumps(
-                    {
-                        "model": "host-model-test",
-                        "config": {"temperature": 0, "prompt_version": "1"},
-                        "reviewed_at": "2026-08-09T08:00:00Z",
-                        "review_method": "independent_host_judge",
-                        "review_binding": {
-                            "answer_sha256": hashlib.sha256(plan.read_bytes()).hexdigest(),
-                            "request_sha256": hashlib.sha256(request.read_bytes()).hexdigest(),
-                            "evidence_sha256": hashlib.sha256(evidence.read_bytes()).hexdigest(),
-                        },
-                        "reliability_checks": {
-                            "factual_support": {"status": "pass", "reason": "无动态事实。"},
-                            "customer_fit": {"status": "pass", "reason": "只建议小范围验证。"},
-                            "risk_screening": {"status": "not_applicable", "reason": "不涉及采购。"},
-                            "option_coverage": {"status": "not_applicable", "reason": "不涉及比选。"},
-                        },
-                        "scores": {
-                            dim: {"score": 0.9, "why": f"{dim} 有可核验依据"}
-                            for dim in DIMENSION_WEIGHTS
-                        },
-                    },
-                    ensure_ascii=False,
-                ),
-                encoding="utf-8",
-            )
-            code, output = self._run(
-                ["judge", str(plan), "--scores", str(scores),
-                 "--request", str(request), "--evidence", str(evidence)]
-            )
-
-        payload = json.loads(output)
-        self.assertEqual(code, 0)
-        self.assertEqual(payload["status"], "passed")
-        self.assertEqual(payload["score"], 90.0)
-        self.assertIsNotNone(payload["badge"])
-        self.assertNotIn("案例库", payload["badge"])
-        self.assertNotIn("知识", payload["badge"])
-        self.assertTrue(payload["config"]["metadata_complete"])
-        self.assertFalse(
-            payload["config"]["automatic_case_or_knowledge_approval"]
-        )
-
-    def test_partial_composite_has_neither_score_nor_badge(self) -> None:
-        result = composite({"合规安全": 0.9})
-        self.assertEqual(result["status"], "incomplete")
-        self.assertIsNone(result["score"])
-        self.assertIsNone(result["badge"])
-
-    def test_complete_scores_still_need_report_metadata_for_badge(self) -> None:
-        result = composite({dim: 0.9 for dim in DIMENSION_WEIGHTS})
-        self.assertEqual(result["score"], 90.0)
-        self.assertIsNone(result["badge"])
-
-    def test_completed_report_contract_rejects_missing_reasons(self) -> None:
-        with self.assertRaises(ValueError):
-            JudgeReport(
-                status="passed",
-                source="plan.md",
-                model="test-model",
-                config={"metadata_complete": True},
-                reviewed_at="2026-08-09T08:00:00Z",
-                review_method="independent_host_judge",
-                scores={dim: 0.9 for dim in DIMENSION_WEIGHTS},
-                reasons={},
-                score=90.0,
-                badge="Gold 独立评审通过",
-            )
+        self.assertEqual(code, 1)
+        self.assertFalse(payload["passed"])
 
 
-class OrchestrationContractTests(unittest.TestCase):
-    def test_make_targets_have_separate_semantics(self) -> None:
+class MakeTargetTests(unittest.TestCase):
+    def test_compliance_target_never_scores(self) -> None:
         makefile = Path("Makefile").read_text(encoding="utf-8")
         self.assertIn("compliance:", makefile)
-        self.assertIn("judge:", makefile)
-        self.assertIn("make eval 已 deprecated", makefile)
-        self.assertIn("--mode knowledge", makefile)
-
-    def test_orchestrator_orders_compliance_judge_then_host(self) -> None:
-        command = Path(
-            "plugins/_orchestrator/commands/siyu-onboard.md"
-        ).read_text(encoding="utf-8")
-        compliance = command.index("## Step 3a · 静态合规门")
-        judge = command.index("## Step 3b · 独立 Judge")
-        host = command.index("## Step 3c · 主持收口")
-        self.assertLess(compliance, judge)
-        self.assertLess(judge, host)
-        self.assertIn("本轮未做独立质量评分", command)
-        self.assertIn("禁止传 `00-intake.md`", command)
-        self.assertIn("不得自动批准案例入库或知识原子", command)
+        self.assertIn("不产生质量分或徽章", makefile)
+        self.assertNotIn("judge:", makefile)
 
 
 if __name__ == "__main__":

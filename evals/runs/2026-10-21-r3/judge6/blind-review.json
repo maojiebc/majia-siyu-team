@@ -1,0 +1,72 @@
+[
+  {"id": "hotpot_unknown", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "按缺口给初步判断，点出直营/加盟和储值的取舍，问题收得少，但默认往会员私域方向引，没覆盖收银还没统一的情况。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "按几种常见情况分别判断，先理收银、再补缺口、不一口气配齐，最后只问一个问题，最贴近老板能拿来就用的判断。"},
+    "C": {"critical_errors": 0, "usefulness": 3, "reason": "六类系统清单加原则，方向没错但偏泛，像产品目录，最后一次问四个问题，老板读完还是不知道先补哪块。"}
+  }, "preferred": ["B"]},
+  {"id": "vendor_risk", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "判断准、证据边界清楚（甲主体无来源、乙没做负面检索），但用户说赶时间，表格加整段来源清单偏长。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "结论和表格都准，厂商自述和待核分得清，试用要盯的五件事具体，篇幅比A紧，适合赶时间的初筛。"},
+    "C": {"critical_errors": 1, "usefulness": 3, "reason": "最简洁，追问甲资金走向这一条很好；但把材料里只写外卖订单关联不上，扩大成企微客人对不上消费记录，乙自家页面的存续也当成可用事实，乙没做负面检索也没提。"}
+  }, "preferred": ["B"]},
+  {"id": "platform_coverage", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "先定要打通的那条路、把有平台资源拆成五种关系、同表同路径比较，方法严谨，美团不加分；但找候选只说公开检索，落地渠道偏少。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "和A思路相近，多了出结论前反查一遍和三档结论，方法完整；找候选的实际渠道同样偏少。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "按客源占比定平台，给了问同行、问收银商、看平台合作名录这些实打实的找法，测试剧本带30天回店、三年总账、官方授权接口，还专门看美团接不接得住非美团客，最能直接照做。"}
+  }, "preferred": ["C"]},
+  {"id": "existing_stack", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "动作具体、分工到人、有话术和试点，但默认企微欢迎语能自动发券、收银能查到券使用，没处理跨系统认不出人这个已知限制。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "一个小动作讲透：每店一个码、总部定上限，收银发不了券就用出示欢迎消息兜底，提醒不能全算增量，还给了何时停或改，完全符合不换系统。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "用出示权益来数回店，巧妙绕开身份关联问题，增量也提醒了；但权益只留空，没给示例，店里拿到还得再想。"}
+  }, "preferred": ["B"]},
+  {"id": "quiet_groups", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 3, "reason": "不关的判断对，但用户没给成本和对照，它却断言该关的几种情况现在都不成立，账也把全部核销单都算成群的功劳。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "判断对，分清了在起作用和多赚了多少，维持动作和关群条件都清楚，略偏常规。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "判断对、因果边界清楚，用现成的数就能算值不值，还给了先停发券看看、不必马上解散这条低成本退路，短而准。"}
+  }, "preferred": ["C"]},
+  {"id": "simple_copy", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "条件完整、没加条件、字数达标，但这份赠饮这种说法略书面，口气平。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "条件完整、用了本店、口气自然，结尾欢迎来吃火锅像店里真会发的话，直接能发。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "条件完整、口气自然，配火锅正好挺有生活气，不与其他优惠同享稍正式，也能直接发。"}
+  }, "preferred": ["B"]},
+  {"id": "cashier_reluctant", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 5, "reason": "先现场看原因，高峰不加步骤、把码挪到等位和桌上，按先付后吃和吃完再结区分权益说法，对加盟商给东西不下命令，奖励防刷规则清楚。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "挪到餐桌、按比例考核都实用，加盟商要加自己门店账号这点抓得准；但按加微数发钱没讲防刷，权益是直接替用户定的。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "抓住开口才是关键、当单让利两头出钱、一店一码，经验讲得可信也能落地；但主阵地仍放在排队的收银台，对高峰拥堵的回应比A弱。"}
+  }, "preferred": ["A"]},
+  {"id": "store_leaderboard", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "改比例、分组、进步榜、防刷都对，还建议把提议的店长拉进来定规则，简洁但口径定义略粗。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "核心判断准：看板是用来找没动起来的店，不是用来发奖状；口径规则和奖励前提也讲了，引用的经历对得上，略少几条落地防刷的细节。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "刷数方式、新增口径、一店一码、新开或停业店剔除、加后回店、抽查和奖励规则都有，评估框架完整又能直接改提议。"}
+  }, "preferred": ["C"]},
+  {"id": "franchise_member_day", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "把利润说法当成一笔真账来算，五类原因加上比较愿意和不愿意的店，思路对；对症方案多，篇幅略散。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "逐个改条件去问哪个一变就愿意，是找主要阻力最直接的办法，再翻旧账查信任问题，短而准。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "算账公式清楚，一对一问题里有总部全出还参不参加、会员记在谁名下，对症调整也实在，略长。"}
+  }, "preferred": ["B"]},
+  {"id": "recall_all_30d", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 3, "reason": "不全发、留对照的方向对，但给的固定档位自相矛盾：半年来4次的人平均45天一来，30天就召回正是它自己说的给本来要来的人送钱，品类不明还套死天数。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "按个人间隔判断、先排除、由轻到重、封顶和对照都对；引用的经历说召回看等级，结尾又说别把等级和召回混在一起，有点打架。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "按个人间隔圈人、排除名单、先给理由再给券、对照、封顶，还专门把只来过一次的单拎出来，并说明不给统一天数的原因，判断最稳。"}
+  }, "preferred": ["C"]},
+  {"id": "franchise_coupon_cost", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "分摊方式多、降成本和书面约定都实用；但开头就默认券确实多带来了钱，没讲算下来亏了怎么办。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "先算增量，再按赚或亏两种结果分别谈，亏了先改券而不是逼门店出钱，加盟商自愿、按月给对账单，逻辑完整。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "增量账、分摊方式、改券都有，还点出会员是品牌的、补贴要按时到账，结尾那句算下来还亏就改活动本身最在理。"}
+  }, "preferred": ["C"]},
+  {"id": "flash_sale_crowding", "ratings": {
+    "A": {"critical_errors": 0, "usefulness": 4, "reason": "错开用券时段、门店报量、分批推、已卖出的券照旧兑现都实用；引用的经历讲小程序被挤崩，跟门店拥堵关系不大。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "先查堵在哪、有没有挤掉正价客，再按原因改，时段、限量、好出的菜、一步核销、发前对门店都覆盖到，试点看的指标也对。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "例子具体、手段多，拉长有效期、高峰和低峰券分档都有新意；但显示各店剩余名额、预约到店默认系统和门店都做得到，限核销时间最有效这句也没依据。"}
+  }, "preferred": ["B"]},
+  {"id": "new_store_7days", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 4, "reason": "时间线清楚、靠物料和一句话很落地；但用户没说品类，它默认是火锅（上锅底、翻台），不是火锅店的话这部分用不上。"},
+    "B": {"critical_errors": 0, "usefulness": 4, "reason": "开业先扫码进群、以后再转好友，这个取舍有经验支撑，也照顾到用户可能必须要好友；店长先自己走一遍、按付款前后讲不同好处都很实用，只是主推进群和用户说的加企微顾客有点偏。"},
+    "C": {"critical_errors": 0, "usefulness": 5, "reason": "先把整条路走通再开口，十分钟培训内容具体，提醒别用手机号批量加人，第八天接回店，不预设品类，也照顾到付款时机。"}
+  }, "preferred": ["C"]},
+  {"id": "weekly_moments", "ratings": {
+    "A": {"critical_errors": 1, "usefulness": 3, "reason": "上班族周末不在附近这点想到了，但用户没说品类，文案却写死火锅，填空以外的句子也得改，六条也偏多。"},
+    "B": {"critical_errors": 0, "usefulness": 5, "reason": "四条节奏合理，文案抓住了上班族工作日赶、周末想慢慢吃，不预设品类，填空清楚，还提醒先核对、用实拍、不拍顾客脸。"},
+    "C": {"critical_errors": 0, "usefulness": 4, "reason": "先种草、周五公布详情、周末提醒，结构完整，配图说明细；周三那条不放价格和内容，在朋友圈里偏弱。"}
+  }, "preferred": ["B"]}
+]

@@ -9,17 +9,11 @@
 
 > **Siyu Expert Team · 马甲实战版**
 >
-> A Chinese private-domain (WeCom / 私域) operations toolbox. One entry point — `/siyu` — routes you to the single most useful capability, runs it, then re-routes from the real outcome.
+> Majia's private-domain judgment, packaged for your AI. Daily copy ships directly; when a call is hard, the answer draws on things Majia actually did. One entry point: `/siyu`.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/assets/icon.png" alt="Siyu Expert Team icon" width="120">
 </p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png" width="520" alt="majia-siyu v1.8.1 architecture: one entry connects the necessary steps; external facts require live evidence; structural issues escalate to a full four-expert review; knowledge pilot stays offline">
-</p>
-
-> **In one glance**: describe a real situation → `/siyu` connects the necessary steps for that goal → high-frequency work (Moments / group broadcast / welcome scripts) ships with write-time compliance → true structural issues escalate to four isolated officers → results can be saved, resumed, and reported. Operating actions live here; membership metrics / SQL / warehouses belong in [majia-huiyuan](https://github.com/maojiebc/majia-huiyuan).
 
 ---
 
@@ -30,6 +24,7 @@
 | Start for the first time | [Quick start](#quick-start) → type `/siyu` |
 | Write Moments / broadcasts / welcome copy | [Capability map · execution](#2-high-frequency-execution) |
 | Diagnose conversion or quiet groups | [Capability map · diagnosis](#3-diagnosis--research) |
+| Read Majia's calls and the stories behind them | [Judgment list](knowledge/cases/00-判断清单.md) (Chinese) |
 | Compare SCRM vendors or verify pricing | `siyu-market-research` |
 | Design the whole private-domain system | owner guide or `siyu-onboard` |
 | Resume last client thread / ship a report | `/siyu-save` · `/siyu-restore` · `/siyu-report` |
@@ -39,23 +34,11 @@ Full Chinese manual: [README.md](./README.md).
 
 ## What it is
 
-Private-domain work usually falls into three buckets:
+A generic AI can already write Moments posts and recite private-domain methods. What it lacks is someone who has actually been burned.
 
-1. **Daily writing** — Moments, group pushes, welcome scripts (and compliance risk)
-2. **Occasional judgment** — is the drop a copy problem or a mechanism problem? can this vendor/price be trusted?
-3. **Heavy but rare** — whole-system design, client memory, handoff reports
+Majia built WeCom community operations for a coffee chain with several hundred stores: from paying per SMS to one million WeCom friends in three months, and 1,500+ pushes a year with almost no errors. He later consulted for restaurant owners. This package holds those stories in Chinese under [`knowledge/cases/`](knowledge/cases/00-判断清单.md): the situation, the call he made, what happened, and how to adapt it to your store. When your situation matches, the AI gives Majia's call first, then the story; when it does not, it answers normally.
 
-Generic copy tools cover most of bucket 1. This toolbox finishes the last 20% and also covers buckets 2–3:
-
-- **One entry** — remember `/siyu`, not 17 skill names
-- **Write-time compliance** — blocks WeCom-ban triggers, absolute ad-law claims, share-bait before output ships
-- **External-fact gate** — vendors, products, pricing, and policy require live research with dated sources
-- **Escalate only when structural** — four experts review in isolation; compliance has veto power
-- **Continuity** — local client archives for save / resume / report
-
-The public repo ships framework, methodology, and installable Skills. Real client operating SOPs stay private.
-
-The free toolbox stays compact: a few transferable copy and image methods, plus the steps needed for one request. The full material library, case texts, and industry analysis remain in the separate paid SaaS-siyu project.
+Whether the package helps is measured one way only: the same questions answered with and without it, shuffled, anonymised and scored by a reviewer who did not take part. See [`evals/`](evals/README.md).
 
 ## Capability map
 
@@ -121,37 +104,6 @@ ClawHub uses `majia-siyu`. SkillHub keeps the historical store identity `siyu` s
 npx -y skills add maojiebc/majia-siyu-team -g --all
 claude plugin marketplace add maojiebc/majia-siyu-team
 ```
-
-## How it works
-
-```mermaid
-flowchart LR
-    A["Real situation"] --> B["Structure the task"]
-    B --> C["Pick only the current step"]
-    C --> D["Execute: ship content"]
-    C --> E["Diagnose: dissolve the problem first"]
-    E --> F["Escalate true structural issues"]
-    D --> G["Save / resume / re-route"]
-    F --> G
-```
-
-1. **Evidence** — live research for vendors, pricing, cases, policy; no recommendation without sources  
-2. **Planning** — natural language becomes a structured task; ask only the one field that unblocks routing  
-3. **Execution** — Moments / broadcast / scripts with built-in compliance  
-4. **Diagnosis** — four isolated officers + host quality gate + compliance veto  
-5. **Foundation** — local state, redacted traces, layered knowledge contract, connector stubs (online submit/retrieve not enabled by default)
-
-current execution facts: [`docs/architecture-current.md`](docs/architecture-current.md) · capability status: [`docs/capability-status.md`](docs/capability-status.md) · knowledge contract: [`docs/knowledge-runtime.md`](docs/knowledge-runtime.md).
-
-## Community knowledge pilot (invitation only)
-
-This release validates knowledge value, contribution demand, and editorial throughput. No real H1/H2/H3 result is claimed yet.
-
-- [Feishu collaboration space](https://supermjbc.feishu.cn/wiki/XdrvwbtIyif61Pku8yQcSCj6nWf)
-- [Field case form](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)
-- [Pilot protocol](docs/pilot/README.md)
-
-Feishu is intake + human review only — not a runtime source. No auto-approval, retrieval, or runtime injection in this release.
 
 ## Methodology
 

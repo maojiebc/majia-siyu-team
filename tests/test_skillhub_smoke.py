@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 import json
-import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -16,7 +15,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCRIPT = ROOT / "tools/build_skillhub_bundle.py"
 LINK_CHECK = ROOT / "tools/check_links.py"
-ROUTE_CHECK = ROOT / "tools/check_route_contracts.py"
 LINT_SCRIPTS = {
     "siyu-pyq": "pyq_lint.py",
     "siyu-qunfa": "qunfa_lint.py",
@@ -112,7 +110,7 @@ class SkillHubBundleSmokeTests(unittest.TestCase):
         _require_success(result, "临时目录干净构建 SkillHub bundle")
         cls.metadata = _json_object(result.stdout, "bundle build metadata")
 
-    def test_bundle_layout_routes_and_version_are_self_contained(self) -> None:
+    def test_bundle_layout_and_version_are_self_contained(self) -> None:
         expected_version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
         self.assertEqual(self.metadata.get("version"), expected_version)
         self.assertEqual(
@@ -120,10 +118,8 @@ class SkillHubBundleSmokeTests(unittest.TestCase):
             self.bundle.resolve(),
         )
         self.assertTrue((self.bundle / "SKILL.md").is_file())
-        self.assertTrue((self.bundle / "modules/_knowledge/manifest.json").is_file())
-        self.assertTrue(
-            (self.bundle / "modules/_runtime/route-contract.json").is_file()
-        )
+        self.assertTrue((self.bundle / "modules/_knowledge/cases/00-判断清单.md").is_file())
+        self.assertFalse((self.bundle / "modules/_runtime").exists())
         self.assertFalse(any(path.is_symlink() for path in self.bundle.rglob("*")))
 
         index = _json_object(
@@ -140,106 +136,28 @@ class SkillHubBundleSmokeTests(unittest.TestCase):
                 self.assertTrue(target.is_relative_to(bundle_root))
                 self.assertTrue(target.is_file(), target)
 
-        contract = _json_object(
-            (
-                self.bundle / "modules/_runtime/route-contract.json"
-            ).read_text(encoding="utf-8"),
-            "bundle route contract",
-        )
-        routes = contract.get("routes")
-        self.assertIsInstance(routes, dict)
-        assert isinstance(routes, dict)
-        for route in routes.values():
-            self.assertIsInstance(route, dict)
-            assert isinstance(route, dict)
-            skill = route.get("skill")
-            if route.get("target_type") == "bundled" and skill != "majia-siyu":
-                self.assertIn(skill, index)
-
-    def test_standalone_judge_blocks_unsupported_procurement(self) -> None:
-        documents = {
-            "answer": "十家店必须采购央厨配送系统。",
-            "request": "十家火锅店需要什么系统？",
-            "evidence": "用户未说明是否有央厨，现有系统和目标未知。",
-        }
-        paths = {}
-        for name, content in documents.items():
-            paths[name] = self.temp_root / (name + ".md")
-            paths[name].write_text(content, encoding="utf-8")
-        scores = self.temp_root / "review.json"
-        scores.write_text(json.dumps({
-            "scores": {},
-            "review_binding": {
-                name + "_sha256": hashlib.sha256(content.encode()).hexdigest()
-                for name, content in documents.items()
-            },
-            "reliability_checks": {"customer_fit": {
-                "status": "fail", "reason": "用户未说明央厨，不能断言必须采购。"}},
-        }, ensure_ascii=False), encoding="utf-8")
+    def test_bundled_report_scan_works_without_source_tree(self) -> None:
+        report = self.temp_root / "report.md"
+        report.write_text("本店全国销量第一，转发3个群领券。", encoding="utf-8")
         launcher = (
             "import sys,runpy; sys.path.insert(0,sys.argv.pop(1)); "
             "runpy.run_module('siyu_team.eval.cli',run_name='__main__')"
         )
         result = _run([
             sys.executable, "-I", "-B", "-c", launcher, self.bundle / "tools",
-            "judge", paths["answer"], "--request", paths["request"],
-            "--evidence", paths["evidence"], "--scores", scores,
-            "--mode", "internal_report",
+            "compliance", report, "--json",
         ], cwd=self.temp_root, env=self.env)
         self.assertEqual(result.returncode, 1, _output(result))
-        payload = _json_object(result.stdout, "standalone Judge report")
-        self.assertEqual(payload["status"], "blocked")
-        self.assertFalse(payload["gate_passed"])
-        self.assertIsNone(payload["score"])
+        payload = _json_object(result.stdout, "standalone compliance report")
+        self.assertFalse(payload["passed"])
 
-    def test_bundle_links_and_routes_pass_repository_checkers(self) -> None:
+    def test_bundle_links_pass_repository_checker(self) -> None:
         links = _run(
             [sys.executable, "-I", "-B", LINK_CHECK, "--root", self.bundle],
             cwd=self.temp_root,
             env=self.env,
         )
         _require_success(links, "SkillHub Markdown 链接")
-        routes = _run(
-            [
-                sys.executable,
-                "-I",
-                "-B",
-                ROUTE_CHECK,
-                "--root",
-                ROOT,
-                "--bundle",
-                self.bundle,
-            ],
-            cwd=self.temp_root,
-            env=self.env,
-        )
-        _require_success(routes, "SkillHub 路由契约")
-
-    def test_bundle_query_loads_strict_public_corpus_without_source_path(self) -> None:
-        query = self.bundle / "tools/atoms_query.py"
-        result = _run(
-            [
-                sys.executable,
-                "-I",
-                "-B",
-                query,
-                "--skills",
-                "siyu-qunfa",
-                "--limit",
-                "1",
-            ],
-            cwd=self.bundle,
-            env=self.env,
-        )
-        _require_success(result, "SkillHub 独立知识查询")
-        rows = [line for line in result.stdout.splitlines() if line.strip()]
-        self.assertEqual(len(rows), 1, _output(result))
-        atom = _json_object(rows[0], "SkillHub query atom")
-        self.assertEqual(atom.get("quality", {}).get("review_status"), "approved")
-        combined = result.stdout + result.stderr
-        self.assertNotIn(str(ROOT / "src"), combined)
-        self.assertNotIn("03-majia-sop", combined)
-        self.assertRegex(combined, r"hash=sha256:[0-9a-f]{64}")
 
     def test_bundled_execution_lints_work_in_isolated_mode(self) -> None:
         for slug, script_name in LINT_SCRIPTS.items():

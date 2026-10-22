@@ -12,10 +12,6 @@ class SiyuBaseError(Exception):
     """私域专家团业务异常基类。"""
 
 
-class TaskValidationError(SiyuBaseError, ValueError):
-    """任务字段不符合 schema。"""
-
-
 class ComplianceBlockedError(SiyuBaseError):
     """合规红线硬拦：方案不得交付。
 
@@ -33,16 +29,3 @@ class ComplianceBlockedError(SiyuBaseError):
         super().__init__(message)
         self.flags = flags
         self.details = details
-
-
-class KnowledgeLoadError(SiyuBaseError):
-    """知识文件存在但读取/解析失败。"""
-
-
-class RouteAmbiguousError(SiyuBaseError):
-    """路由意图歧义：多个候选同分或信号不足，需要澄清。
-
-    当前积分路由在同分时按先登记顺序兜底，并在 ``RouteDecision`` 上以
-    ``needs_clarification`` 表达，不强制抛异常；保留本类作为严格模式的
-    扩展点。
-    """

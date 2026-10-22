@@ -1,0 +1,326 @@
+[
+  {
+    "id": "hotpot_unknown",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "判断准（先别买、先看缺哪块），落到“这周给收银客服打电话问三件事”很具体；但只围绕会员私域，没提10家火锅真会用到的供应链。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": "六类系统列得全，含供应链，但基本是通用清单，最后抛四个问题，用户拿到还是不知道这周干什么。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "按缺口给初步判断、点出直营还是加盟的影响，讲得稳；但没给一个马上能做的动作，比A略虚。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "vendor_risk",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "结论和材料一致，指出甲主体没来源、乙主体是自家官网、乙没做负面检索，表格清楚；结尾“按事实、适配、风险、覆盖自己查过”这句是流程话，用户用不上。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "甲乙判断方向对，提出让甲说清资金怎么走很实用；但没指出乙一条风险检索都没做，乙的主体存续也没标是厂商自述。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "不越证据，甲停、乙进试用的理由讲透，试用要盯的五件事和补负面检索都很具体，还提醒把现有收银会员模块拉进来一起比。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "platform_coverage",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先按自家客源占比定义“公域”，再给三类候选和具体去哪找（同城老板、收银商已对接名单、平台服务市场），统一演示剧本加三年总账，美团单列合作价值，拿来就能用。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "拆“平台资源”的关系层级、统一场景逐段打状态、正反两面核查都对，但找候选只说“上网查”，比A少落地渠道。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "思路和B几乎一样且分得更清楚，结尾只问一个关键问题；同样缺具体找候选的渠道和成本算法。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "existing_stack",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "动作具体、三个角色分工清楚，加微率口径和两周试点都可执行；但默认欢迎语能自动发券、收银能直接查这张券，没考虑系统未必打通，也没提回店里有本来就会来的人。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "每店一个码、券单独开批次、发不了链接就“出示消息核销”，正好绕开身份打不通的未知；分工到人，还说清回店不全是券的功劳和怎么留对照。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "用“出示权益”数回店同样绕开系统打通问题，克制且可执行；权益只留了空没给例子，具体程度略逊B。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "quiet_groups",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "结论清楚、提醒到店不全是群带来的，维持动作和关群信号都实用；最后“数据支持留着”说得略满，成本毛利其实还没算。"
+      },
+      "B": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "让算毛利减券成本很实用，但结尾断言“这几条都不成立”，而成本、毛利、是不是老客本来就会来都没有数据，属于超出证据下结论。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "“有用的迹象有了，值不值成本还没算清”分寸最准，记三个数（含人工时间）不加投入，还提醒真关群要先告知顾客去哪找、券还能不能用。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "simple_copy",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "63字，条件齐全、没加条件、没提问，口气自然，可直接发。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "分行加表情，群里一眼看清，条件齐全没多加，可直接发。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "60字，条件齐全，结尾“欢迎来吃火锅”收得自然，可直接发。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "cashier_reluctant",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "按话、流程、利益三块拆，奖励口径和“总部也出一点钱、门店也出一点物料”很实在，每店一个码找没动的店；引的咖啡经验和问题有点隔，篇幅偏长。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先去店里看五件事再对症改，高峰不加步骤、码挪到等位等菜处、先付后付两种话术、对加盟商给东西不下命令、不按总数排名，最贴合加盟两层加排队的实际。"
+      },
+      "C": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "点出加盟商要用自己门店的企微号才有动力，很有价值；但用户没说是火锅，整套方案建在“上锅底时说、等锅开扫桌码”上，收银台排队的店很可能是快餐茶饮，用不上。"
+      }
+    },
+    "preferred": [
+      "B"
+    ]
+  },
+  {
+    "id": "store_leaderboard",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "把评估拆成目的、口径、分母、加上后有没有用四问，给出比例排、分组排、进步榜和抽查，连刷数和挂奖励的规则都交代了，最完整。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "“排行榜用来找没动起来的店”这个角度很实用，垫底店先查原因、分低可能是生意本身不行，口径和归属也说清了。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "加微率、留存、分组和进步榜都对，落地也简洁，但口径（删了再加、跨店归属）没讲细，比A、B略泛。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "franchise_member_day",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先算账、再一对一问，“如果折扣全由总部出你还愿不愿意”这一问能直接分出是不是钱的问题，阻力分类和对应改法（打折改赠菜等）都能落地。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "五类阻力归类清楚，“比较愿意和不愿意的店差在哪”很好，提醒实收别重复扣优惠也细；整体和A相近，诊断上少一个能一刀分辨的问法。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "点出加盟商真正心疼的是“老客换个日子来还打了折”，让店主给顾虑排序、翻历史活动对数，很抓真问题；引的贝果例子有点绕。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "recall_all_30d",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "按个人间隔、只来一次的单列、排除名单、留对照组都对；但结尾丢出“majia-huiyuan”这个用户不知道是什么的方法名，开头会员数量的例子也偏离题。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 3,
+        "reason": "给了具体分档和1.5-2倍间隔、留10%-20%对照，很好上手；但“半年来4次就30天召回且券力度大一点”自相矛盾，这批人平均四十多天来一次，正好把券送给本来就会来的人。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "讲清同样30天对不同人意思不同，按自身间隔圈人、先给理由再给券、限联系次数、只来一次的另做，不硬套天数，判断准也不啰嗦。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "franchise_coupon_cost",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "抓住“效果要变成加盟商认的账”，留对照组算增量、按核销出钱、总部先多出，并按现状给起手点；引用经历占篇幅，具体分担工具不如B多。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "留对照组证明增量，再给按比例、只为增量付费、设上限、走营销基金、分档自选几种可组合做法，还提醒对照加盟合同书面约定，总部拿去就能谈。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "明确指出“核销了多少张”回答不了加盟商的问题，按算出来的结果分情况谈：赚就摆账、不赚先改券，证据不足总部先出试点，分寸很准。"
+      }
+    },
+    "preferred": [
+      "B",
+      "C"
+    ]
+  },
+  {
+    "id": "flash_sale_crowding",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "限时段、按产能限量、拉长有效期、选好做的品都对路；但页面显示各店剩余名额、预约到店要系统和人手支撑，没评估做不做得到。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 4,
+        "reason": "门店报数、错时、分批分店放、看正价单和等待时长都实用；引的小程序崩溃例子和门店出餐问题有点隔。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "先查堵在哪、有没有挤掉正价客再一次只改一样，补上核销一步完成这个常被忽略的点，试点看的数也对。"
+      }
+    },
+    "preferred": [
+      "C"
+    ]
+  },
+  {
+    "id": "new_store_7days",
+    "ratings": {
+      "A": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "顺序清楚，店长先自己走一遍全流程、只练一句话、一次只改一处；新店可先扫码进群少一步的判断给了适用条件，先付后付两种情况都照顾到了。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "同样先走通再开口，培训“一句话一个动作两条规矩”很好记，提醒别拿手机号批量加人、测试数据别混进正式数据，都很实在。"
+      },
+      "C": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "指定一两个负责人、第7天发回头券都可用；但品类和付款方式都不知道，却按火锅写成“上锅底时说一句”“每张桌放台卡”，换成别的业态就用不上。"
+      }
+    },
+    "preferred": [
+      "A"
+    ]
+  },
+  {
+    "id": "weekly_moments",
+    "ratings": {
+      "A": {
+        "critical_errors": 1,
+        "usefulness": 3,
+        "reason": "用户没说品类，文案却写成“周末就交给火锅吧”“起来吃顿火锅”，属于编造；一周六条推同一个套餐也偏多，容易被屏蔽。"
+      },
+      "B": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "四条节奏合理，周三种草、周五给详情、周末提醒，未知信息全部留空没编，配图和发布时间建议都实在，还提醒上班族周末不在附近。"
+      },
+      "C": {
+        "critical_errors": 0,
+        "usefulness": 5,
+        "reason": "四条文案贴上班族（周一待办、周五下班前约人），未知信息全留空，发送时间、配图、周五晚能用就改“今晚下班来”的提醒都很实用。"
+      }
+    },
+    "preferred": [
+      "B",
+      "C"
+    ]
+  }
+]

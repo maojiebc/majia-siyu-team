@@ -10,9 +10,7 @@ from siyu_team.eval.static import assert_compliant, scan, scan_result
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = ROOT / "tests" / "fixtures" / "compliance-context-cases.jsonl"
-APPROVED_ATOMS = (
-    ROOT / "knowledge" / "04-atoms" / "growth-layers.approved.jsonl"
-)
+CASES_DIR = ROOT / "knowledge" / "cases"
 
 
 class ComplianceContextFixtureTests(unittest.TestCase):
@@ -90,26 +88,18 @@ class ComplianceContextFixtureTests(unittest.TestCase):
         self.assertEqual(customer_rules, knowledge_rules)
 
 
-class ApprovedKnowledgeComplianceTests(unittest.TestCase):
-    def test_all_approved_atoms_have_no_hard_knowledge_conflict(self) -> None:
-        atoms = [
-            json.loads(line)
-            for line in APPROVED_ATOMS.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        self.assertEqual(49, len(atoms))
-
+class CaseComplianceTests(unittest.TestCase):
+    def test_cases_have_no_hard_knowledge_conflict(self) -> None:
         conflicts: list[str] = []
-        for atom in atoms:
-            text = json.dumps(atom, ensure_ascii=False, sort_keys=True)
-            result = scan(text, ScanMode.KNOWLEDGE)
+        for path in sorted(CASES_DIR.glob("*.md")):
+            result = scan(path.read_text(encoding="utf-8"), ScanMode.KNOWLEDGE)
             if result["hard_fail"]:
                 hard_rules = [
                     detail["rule"]
                     for detail in result["details"]
                     if detail["hard"]
                 ]
-                conflicts.append(f"{atom['id']}: {hard_rules}")
+                conflicts.append(f"{path.relative_to(ROOT)}: {hard_rules}")
         self.assertEqual([], conflicts)
 
 

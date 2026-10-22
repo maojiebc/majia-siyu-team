@@ -6,13 +6,11 @@
 
 > **私域专家团 · 马甲实战版**
 >
-> 中文私域经营工具箱。日常文案直接出活，结构问题再升级做全套诊断。入口只有一个：`/siyu`。
+> 把马甲做私域的判断装进你的 AI。日常文案直接出活；遇到拿不准的事，按他真做过的事给判断。入口只有一个：`/siyu`。
 
-私域经营动作全景图（统一入口 → 按目标接力 → 执行 / 问诊 / 升级全盘诊断；动态事实先检索留证；知识 Pilot 仅离线验证）：
+## 和通用 AI 差在哪
 
-![majia-siyu v1.8.1 框架全局](https://raw.githubusercontent.com/maojiebc/majia-siyu-team/main/docs/framework.png)
-
-完整框架 SVG 与源码说明见 [GitHub docs/framework.svg](https://github.com/maojiebc/majia-siyu-team/blob/main/docs/framework.svg)。
+马甲在一家几百家店的连锁咖啡，从短信一条条发，做到企业微信社群三个月攒下一百万好友；后来又给餐饮老板做咨询。包里的案例讲的就是这些事：当时什么情况，他怎么判断，结果怎样，换到你家店该怎么改。你问的处境对得上，AI 会先说马甲会怎么判断，再讲当年那件事。
 
 ## 这个入口做什么
 
@@ -55,10 +53,6 @@ skillhub install siyu
 > 三者不要混用：`siyu` 只是历史安装名，不是标题。
 
 完整说明、角色导航、开发验证与源码：**https://github.com/maojiebc/majia-siyu-team**
-
-## 同行知识共建（邀请制）
-
-[填写真实案例采集卡](https://supermjbc.feishu.cn/share/base/form/shrcnLsRQgaQJilUGNg6BjBXflg)（约 3–5 分钟）。提交只进人工审核队列，不会直接注入 Skill；只有脱敏、批准并进入版本化发布批次的知识才可用于正式检索。
 
 ## 📋 版本记录
 

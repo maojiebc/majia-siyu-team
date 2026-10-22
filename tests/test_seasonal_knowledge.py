@@ -11,9 +11,8 @@ class SeasonalKnowledgeTests(unittest.TestCase):
     def test_shipped_execution_skills_resolve_same_seasonal_document(self):
         source = ROOT / "knowledge/02-industry/catering" / DOC
         expected = source.read_bytes()
-        for copy in (ROOT / "src/siyu_team/knowledge/data/02-industry/catering" / DOC,
-                     ROOT / "skillhub/majia-siyu/modules/_knowledge/02-industry/catering" / DOC):
-            self.assertEqual(copy.read_bytes(), expected)
+        copy = ROOT / "skillhub/majia-siyu/modules/_knowledge/02-industry/catering" / DOC
+        self.assertEqual(copy.read_bytes(), expected)
         for skill in ("siyu-pyq", "siyu-qunfa", "siyu-huashu"):
             for path in (ROOT / "plugins/siyu-execution/skills" / skill / "SKILL.md",
                          ROOT / "skillhub/majia-siyu/modules" / skill / "SKILL.md"):

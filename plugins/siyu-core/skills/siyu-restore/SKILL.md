@@ -9,7 +9,7 @@ metadata:
 
 # siyu-restore：接续客户档案
 
-从 `~/.siyu/clients/` 读取存档，恢复跨对话状态。不要把它与单次编排使用的 `.siyu-team/` 混用。
+从 `~/.siyu/clients/` 读取存档，恢复跨对话状态。
 
 ## 用户措辞
 
