@@ -71,6 +71,8 @@ def blind(args: argparse.Namespace) -> int:
         })
 
     out = Path(args.out)
+    if out.exists() and (not out.is_dir() or any(out.iterdir())):
+        raise SystemExit("❌ 输出目录必须是新目录或空目录，不能覆盖已有盲评记录")
     out.mkdir(parents=True, exist_ok=True)
     _write(out / "blind-packet.json", packet)
     _write(out / "blind-key.json", {"seed": args.seed, "key": key})

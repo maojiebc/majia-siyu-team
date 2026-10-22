@@ -20,7 +20,7 @@ FLAGS_FILE = HERE / "case_flags.json"
 
 
 def embed(value: object) -> str:
-    return json.dumps(value, ensure_ascii=False).replace("</", "<\\/")
+    return json.dumps(value, ensure_ascii=False).replace("<", "\\u003c")
 
 
 def main() -> int:

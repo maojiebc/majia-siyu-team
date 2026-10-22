@@ -1,6 +1,6 @@
 [project]
 name = "siyu-team"
-version = "1.8.1"
+version = "2.0.0"
 description = "私域专家团 · 马甲实战版：Markdown 技能与执行文案共用的合规扫描器"
 requires-python = ">=3.10"
 dependencies = []
